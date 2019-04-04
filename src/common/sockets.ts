@@ -1,0 +1,171 @@
+import WebSocket from 'ws';
+import { Observable, empty, of } from 'rxjs';
+import { filter, mergeMap, share } from 'rxjs/operators';
+import { Channels } from '@aimee-blue/ab-shared';
+import * as Joi from 'joi';
+
+function wsCodeToReason(code: number) {
+  switch (code) {
+    case 1000:
+      return 'Normal Closure';
+    case 1001:
+      return 'Going Away';
+    case 1002:
+      return 'Protocol Error';
+    case 1003:
+      return 'Unsupported Data';
+    case 1004:
+      return '';
+    case 1005:
+      return 'No Status Received';
+    case 1006:
+      return 'Abnormal Closure';
+    case 1007:
+      return 'Invalid frame payload data';
+    case 1008:
+      return 'Policy Violation';
+    case 1009:
+      return 'Message too big';
+    case 1010:
+      return 'Missing Extension';
+    case 1011:
+      return 'Internal Error';
+    case 1012:
+      return 'Service Restart';
+    case 1013:
+      return 'Try Again Later';
+    case 1014:
+      return 'Bad Gateway';
+    case 1015:
+      return 'TLS Handshake';
+  }
+  return '';
+}
+
+const isBuffer = (value: WebSocket.Data): value is Buffer => {
+  return value instanceof Buffer;
+};
+
+const isString = (value: WebSocket.Data): value is string => {
+  return typeof value === 'string';
+};
+
+const dataStreamFromSocket = (
+  client: WebSocket,
+  closeConnection: boolean = true
+) => {
+  return new Observable<WebSocket.Data>(subscriber => {
+    client.on('message', data => {
+      subscriber.next(data);
+    });
+
+    client.on('error', error => {
+      console.error('💥  Error on client socket', error);
+      subscriber.error(error);
+    });
+
+    client.on('close', (code, reason) => {
+      console.log(
+        `👋  Connection closed from client side with code ${code}; ${reason ||
+          wsCodeToReason(code)}`
+      );
+      subscriber.complete();
+    });
+
+    return () => {
+      if (closeConnection) {
+        client.close(1000, 'Data stream unsubscribed');
+      }
+    };
+  });
+};
+
+const tryParse = <T>(text: string): T | null => {
+  try {
+    return JSON.parse(text) as T;
+  } catch (err) {
+    console.error('💥  Cannot parse incoming message', err);
+    return null;
+  }
+};
+
+export const shareWebSocket = (
+  client: WebSocket,
+  closeConnection: boolean = true
+) => {
+  return dataStreamFromSocket(client, closeConnection).pipe(share());
+};
+
+export const actionStreamFromSocket = <T extends { type: string }>(
+  data: Observable<WebSocket.Data>
+) => {
+  return data.pipe(
+    filter(isString),
+    mergeMap(nonParsed => {
+      const value = tryParse<T>(nonParsed);
+      if (value === null) {
+        return empty();
+      }
+
+      if (typeof value !== 'object' || !value || !('type' in value)) {
+        console.error('💥  No type property in incoming message');
+        return empty();
+      }
+
+      const schema = Channels.actionSchemaByType(value.type);
+
+      if (!schema) {
+        console.error('💥  No schema found for type', value.type);
+        return empty();
+      }
+
+      const result = Joi.validate(value, schema);
+
+      if (result.error as (Error | null)) {
+        console.error('💥  Invalid message of type', value.type);
+        return empty();
+      }
+
+      return of(result.value);
+    })
+  );
+};
+
+export const audioStreamFromSocket = (data: Observable<WebSocket.Data>) => {
+  return data.pipe(filter(isBuffer));
+};
+
+export const pipeStreamIntoSocket = (
+  stream: Observable<{}>,
+  client: WebSocket,
+  closeConnection: boolean = false
+) => {
+  const clientSend = (data: object) => {
+    if (client.readyState === client.OPEN) {
+      client.send(JSON.stringify(data), err => {
+        if (err) {
+          console.error('💥  Cannot send', err);
+        }
+      });
+    }
+  };
+
+  const subscription = stream.subscribe(
+    data => {
+      clientSend(data);
+    },
+    error => {
+      console.error('Outgoing stream error', error);
+      client.close(1011, 'Outgoing stream error');
+    },
+    () => {
+      if (closeConnection) {
+        client.close(1000, 'OK');
+      }
+    }
+  );
+
+  client.on('close', () => {
+    subscription.unsubscribe();
+  });
+};
