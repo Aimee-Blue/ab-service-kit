@@ -13,24 +13,28 @@ export interface ICommandLineArgs {
   envFile?: string;
 }
 
+export interface IAction {
+  type: string;
+}
+
 export interface IServiceConfig {
   defaultPort: number;
 
   endpoints?: (app: express.Express) => Promise<void>;
-  sockets?: () => Promise<ISocketsMap>;
+  sockets?: () => Promise<ISocketEpicsMap>;
 
   argsBuilder?: ArgsBuilder;
 }
 
-export interface ISocketsMap {
-  [path: string]: SocketPipeline;
+export interface ISocketEpicsMap {
+  [path: string]: SocketEpic;
 }
 
-type SocketPipeline = <I extends { type: string }, O extends { type: string }>(
-  request: IncomingMessage,
+export type SocketEpic = <I extends IAction>(
   commands: Observable<I>,
+  request: IncomingMessage,
   binary: Observable<Buffer>
-) => Observable<O | Buffer>;
+) => Observable<IAction | Buffer>;
 
 type ArgsBuilder = (
   args: yargs.Argv<ICommandLineArgs>

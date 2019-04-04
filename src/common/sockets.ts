@@ -1,8 +1,16 @@
 import WebSocket from 'ws';
-import { Observable, empty, of } from 'rxjs';
-import { filter, mergeMap, share } from 'rxjs/operators';
+import { Observable, empty, of, Subscription, Subject } from 'rxjs';
+import {
+  filter,
+  mergeMap,
+  share,
+  toArray,
+  takeUntil,
+  map,
+} from 'rxjs/operators';
 import { Channels } from '@aimee-blue/ab-shared';
 import * as Joi from 'joi';
+import { publishStream } from './publishStream';
 
 function wsCodeToReason(code: number) {
   switch (code) {
@@ -50,32 +58,33 @@ const isString = (value: WebSocket.Data): value is string => {
   return typeof value === 'string';
 };
 
-const dataStreamFromSocket = (
-  client: WebSocket,
-  closeConnection: boolean = true
-) => {
+export const dataStreamFromSocket = (client: WebSocket) => {
   return new Observable<WebSocket.Data>(subscriber => {
-    client.on('message', data => {
+    const messageHandler = (data: WebSocket.Data) => {
       subscriber.next(data);
-    });
+    };
 
-    client.on('error', error => {
+    const errorHandler = (error: unknown) => {
       console.error('💥  Error on client socket', error);
       subscriber.error(error);
-    });
+    };
 
-    client.on('close', (code, reason) => {
+    const closeHandler = (code: number, reason: string) => {
       console.log(
         `👋  Connection closed from client side with code ${code}; ${reason ||
           wsCodeToReason(code)}`
       );
       subscriber.complete();
-    });
+    };
+
+    client.on('message', messageHandler);
+    client.on('error', errorHandler);
+    client.on('close', closeHandler);
 
     return () => {
-      if (closeConnection) {
-        client.close(1000, 'Data stream unsubscribed');
-      }
+      client.off('message', messageHandler);
+      client.off('error', errorHandler);
+      client.off('close', closeHandler);
     };
   });
 };
@@ -87,13 +96,6 @@ const tryParse = <T>(text: string): T | null => {
     console.error('💥  Cannot parse incoming message', err);
     return null;
   }
-};
-
-export const shareWebSocket = (
-  client: WebSocket,
-  closeConnection: boolean = true
-) => {
-  return dataStreamFromSocket(client, closeConnection).pipe(share());
 };
 
 export const actionStreamFromSocket = <T extends { type: string }>(
@@ -131,22 +133,27 @@ export const actionStreamFromSocket = <T extends { type: string }>(
   );
 };
 
-export const audioStreamFromSocket = (data: Observable<WebSocket.Data>) => {
+export const binaryStreamFromSocket = (data: Observable<WebSocket.Data>) => {
   return data.pipe(filter(isBuffer));
 };
 
 export const pipeStreamIntoSocket = (
   stream: Observable<{}>,
-  client: WebSocket,
-  closeConnection: boolean = false
+  socket: WebSocket
 ) => {
   const clientSend = (data: object) => {
-    if (client.readyState === client.OPEN) {
-      client.send(JSON.stringify(data), err => {
+    if (socket.readyState === socket.OPEN) {
+      socket.send(JSON.stringify(data), err => {
         if (err) {
           console.error('💥  Cannot send', err);
         }
       });
+    } else {
+      console.error(
+        '💥  Trying to send data while socket is not ready',
+        data,
+        new Error()
+      );
     }
   };
 
@@ -155,17 +162,14 @@ export const pipeStreamIntoSocket = (
       clientSend(data);
     },
     error => {
-      console.error('Outgoing stream error', error);
-      client.close(1011, 'Outgoing stream error');
-    },
-    () => {
-      if (closeConnection) {
-        client.close(1000, 'OK');
-      }
+      console.error('💥  Outgoing stream error', error);
+      socket.close(1011, 'Outgoing stream error');
     }
   );
 
-  client.on('close', () => {
+  socket.on('close', () => {
     subscription.unsubscribe();
   });
+
+  return subscription;
 };
