@@ -1,0 +1,10 @@
+{
+  "name": "ab-service-kit",
+  "version": "1.0.0",
+  "description": "Aimee Blue Service Template",
+  "main": "index.js",
+  "repository": "git@github.com:Aimee-Blue/ab-service-kit.git",
+  "author": "@Aimee-Blue",
+  "license": "MIT",
+  "private": false
+}
