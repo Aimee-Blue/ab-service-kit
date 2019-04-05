@@ -4,8 +4,7 @@ import * as https from 'https';
 import fs from 'fs-extra';
 import yargs from 'yargs';
 
-import { loadEnv } from './common/env';
-import { initializeRxJsSpy } from './common/initSpy';
+import { loadEnv } from './setup/env';
 import { serviceSetup } from './setup';
 import { ICommandLineArgs, IServiceConfig } from './common/types';
 
@@ -87,15 +86,27 @@ export async function start(config: IServiceConfig) {
       });
 
   const handleServerRequestsWithDevTools = async () => {
-    initializeRxJsSpy();
-
     if (params.watch) {
       // tslint:disable-next-line: no-unsafe-any
-      const watchServer = require('./common/watchServerCode')
-        .watchServer as typeof import('./common/watchServerCode')['watchServer'];
-      watchServer(server);
+      const serviceSetupInWatchMode = require('./setup/watchServerCode')
+        .serviceSetupInWatchMode as typeof import('./setup/watchServerCode')['serviceSetupInWatchMode'];
+
+      const configFile = config.serviceConfigModuleId || './service';
+
+      let filePath;
+      try {
+        filePath = require.resolve(configFile);
+      } catch (err) {
+        throw new Error(
+          'Cannot resolve service configuration module, a certain setup is required for watch mode to work'
+        );
+      }
+
+      await serviceSetupInWatchMode(filePath, async newConfig => {
+        return await serviceSetup(server, newConfig, params);
+      });
     } else {
-      await serviceSetup(server, config);
+      await serviceSetup(server, config, params);
     }
   };
 

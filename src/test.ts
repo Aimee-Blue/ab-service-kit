@@ -1,8 +1,7 @@
 import { start } from './start';
+import service from './service';
 
-start({
-  defaultPort: 4000,
-}).catch((exc: unknown) => {
+start(service).catch((exc: unknown) => {
   console.error('💥  ', exc);
   process.exit(1);
 });

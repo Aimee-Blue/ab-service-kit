@@ -22,6 +22,9 @@ export interface IServiceConfig {
 
   endpoints?: (app: express.Express) => Promise<void>;
   sockets?: () => Promise<ISocketEpicsMap>;
+  spy?: (spy: ReturnType<typeof import('rxjs-spy').create>) => Promise<void>;
+
+  serviceConfigModuleId?: string;
 
   argsBuilder?: ArgsBuilder;
 }

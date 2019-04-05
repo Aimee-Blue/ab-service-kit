@@ -109,7 +109,7 @@ export const actionStreamFromSocket = <T extends { type: string }>(
         return empty();
       }
 
-      if (typeof value !== 'object' || !value || !('type' in value)) {
+      if (typeof value !== 'object' || !('type' in value)) {
         console.error('💥  No type property in incoming message');
         return empty();
       }

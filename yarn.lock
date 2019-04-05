@@ -2264,6 +2264,14 @@ clean-stack@^2.0.0:
   resolved "https://registry.yarnpkg.com/clean-stack/-/clean-stack-2.0.0.tgz#301bfa9e8dd2d3d984c0e542f7aa67b996f63e0a"
   integrity sha512-VEoL9Qh7I8s8iHnV53DaeWSt8NJ0g3khMfK6NiCPB7H657juhro+cSw2O88uo3bo0c0X5usamtXk0/Of0wXa5A==
 
+clear-module@3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/clear-module/-/clear-module-3.1.0.tgz#611c88aa8176b35678687f2085187a45095792e5"
+  integrity sha512-YEe9OX62MYUMjw16Vf2txyzZ3x2ICXNOrjuZ+06MMhnx3fy7V121h9VA3M3bMTtDg8oEfQ2f/fLuhxrSLXS8uw==
+  dependencies:
+    parent-module "^1.0.0"
+    resolve-from "^4.0.0"
+
 cli-boxes@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/cli-boxes/-/cli-boxes-1.0.0.tgz#4fa917c3e59c94a004cd61f8ee509da651687143"
