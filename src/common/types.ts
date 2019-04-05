@@ -24,9 +24,9 @@ export interface IServiceConfig {
   sockets?: () => Promise<ISocketEpicsMap>;
   spy?: (spy: ReturnType<typeof import('rxjs-spy').create>) => Promise<void>;
 
-  serviceConfigModuleId?: string;
-
   argsBuilder?: ArgsBuilder;
+  serviceConfigModuleId?: string;
+  watchPatterns?: string[];
 }
 
 export interface ISocketEpicsMap {

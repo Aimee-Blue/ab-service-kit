@@ -1,5 +1,5 @@
 import chokidar from 'chokidar';
-import path from 'path';
+import path, { dirname } from 'path';
 import { Observable, of, from, defer } from 'rxjs';
 import {
   mergeMap,
@@ -10,6 +10,7 @@ import {
   concatMap,
   toArray,
   distinct,
+  switchMap,
 } from 'rxjs/operators';
 import clearModule from 'clear-module';
 import { IServiceConfig } from 'src/common/types';
@@ -20,12 +21,6 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 const resolve = (p: string) => require.resolve(path.join('../', p));
-
-// please note that changes to this pattern will probably need changes to `watchServerCode` function
-// to detect .ts file locations correctly
-const WATCH_PATTERNS = ['lib/**/*.js', '.env', '.env.local'];
-
-console.log(`🔍  Watching for file changes in ${WATCH_PATTERNS}`);
 
 const watchMultiple = (patterns: string[]) => {
   return new Observable<string>(subscriber => {
@@ -96,8 +91,6 @@ function findModule(
   );
 }
 
-const allChildModulesOfMainModule = () => allChildModules();
-
 type ServiceSetupFunc = (config: IServiceConfig) => Promise<() => void>;
 
 function requireSetupModule(moduleId: string): IServiceConfig {
@@ -121,7 +114,20 @@ export async function serviceSetupInWatchMode(
   setupModuleId: string,
   setup: ServiceSetupFunc
 ) {
-  teardownOldServer = await setup(requireSetupModule(setupModuleId));
+  const initialConfig = requireSetupModule(setupModuleId);
+  const setupFilePath = path.relative('./', setupModuleId);
+
+  teardownOldServer = await setup(initialConfig);
+
+  // please note that changes to this pattern will probably need changes to `watchServerCode` function
+  // to detect .ts file locations correctly
+  const WATCH_PATTERNS = initialConfig.watchPatterns || [
+    'lib/**/*.js',
+    '.env',
+    '.env.local',
+  ];
+
+  console.log(`🔍  Watching for file changes in ${WATCH_PATTERNS}`);
 
   watchMultiple(WATCH_PATTERNS)
     .pipe(
@@ -149,13 +155,16 @@ export async function serviceSetupInWatchMode(
         if (pair) {
           return allChildModules(pair.mod).pipe(
             distinct(),
-            toArray(),
-            tag('child-modules')
+            toArray()
           );
         } else {
-          return allChildModulesOfMainModule().pipe(
-            distinct(),
-            toArray()
+          return findModule(setupFilePath).pipe(
+            concatMap(setupModule =>
+              allChildModules(setupModule!.mod).pipe(
+                distinct(),
+                toArray()
+              )
+            )
           );
         }
       }),
@@ -167,10 +176,17 @@ export async function serviceSetupInWatchMode(
         clearModule(setupModuleId);
 
         for (const mod of mods) {
+          if (mod.mod.id === '.') {
+            // we do not reload the main module
+            continue;
+          }
           if (mod.mod.id === setupModuleId) {
             continue;
           }
-          console.log('Unloading', mod.mod.id);
+          if (dirname(mod.mod.id) === __dirname) {
+            continue;
+          }
+          console.log('Unloading', mod.mod.id, mod.filePath);
           clearModule(mod.mod.id);
         }
 
