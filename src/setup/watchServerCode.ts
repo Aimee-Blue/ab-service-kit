@@ -10,11 +10,9 @@ import {
   concatMap,
   toArray,
   distinct,
-  switchMap,
 } from 'rxjs/operators';
 import clearModule from 'clear-module';
 import { IServiceConfig } from 'src/common/types';
-import { tag } from 'rxjs-spy/operators/tag';
 
 if (process.env.NODE_ENV === 'production') {
   throw new Error('This file should not be imported in production');
