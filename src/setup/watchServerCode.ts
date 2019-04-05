@@ -1,6 +1,6 @@
 import chokidar from 'chokidar';
 import path from 'path';
-import { Observable, of, from, concat, defer } from 'rxjs';
+import { Observable, of, from, defer } from 'rxjs';
 import {
   mergeMap,
   map,

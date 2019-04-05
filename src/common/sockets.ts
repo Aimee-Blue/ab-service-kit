@@ -1,16 +1,8 @@
 import WebSocket from 'ws';
-import { Observable, empty, of, Subscription, Subject } from 'rxjs';
-import {
-  filter,
-  mergeMap,
-  share,
-  toArray,
-  takeUntil,
-  map,
-} from 'rxjs/operators';
+import { Observable, empty, of } from 'rxjs';
+import { filter, mergeMap } from 'rxjs/operators';
 import { Channels } from '@aimee-blue/ab-shared';
 import * as Joi from 'joi';
-import { publishStream } from './publishStream';
 
 function wsCodeToReason(code: number) {
   switch (code) {
