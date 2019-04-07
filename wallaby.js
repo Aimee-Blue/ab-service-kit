@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = function(wallaby) {
   const babel = wallaby.compilers.babel({
     babel: require('@babel/core'),
