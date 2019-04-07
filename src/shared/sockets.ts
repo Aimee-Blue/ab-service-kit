@@ -115,7 +115,7 @@ export const actionStreamFromSocket = <T extends { type: string }>(
 
       const result = Joi.validate(value, schema);
 
-      if (result.error as (Error | null)) {
+      if (result.error as Error | null) {
         console.error('💥  Invalid message of type', value.type);
         return empty();
       }

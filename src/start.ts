@@ -6,7 +6,7 @@ import yargs from 'yargs';
 
 import { loadEnv } from './setup/env';
 import { serviceSetup } from './setup';
-import { ICommandLineArgs, IServiceConfig } from './common/types';
+import { ICommandLineArgs, IServiceConfig } from '@shared';
 
 const buildArgumentsParser = (config: IServiceConfig) =>
   (yargs as yargs.Argv<ICommandLineArgs>)
@@ -47,7 +47,7 @@ export async function start(config: IServiceConfig) {
 
   const params = effectiveParser.parse();
 
-  loadEnv(params.envFile);
+  await loadEnv(params.envFile);
 
   const certPath = params.cert || process.env.HTTPS_CERT_PATH!;
   const keyPath = params.cert || process.env.HTTPS_KEY_PATH!;

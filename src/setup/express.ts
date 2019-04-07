@@ -3,7 +3,7 @@ import * as http from 'http';
 import * as https from 'https';
 import cors from 'cors';
 
-import { IServiceConfig } from '../common/types';
+import { IServiceConfig } from '@shared';
 
 export async function setupExpress(
   server: http.Server | https.Server,
@@ -13,7 +13,7 @@ export async function setupExpress(
 
   app.use(
     cors({
-      origin: 'https://aimeeblue.com',
+      origin: process.env.CORS_ORIGIN,
       optionsSuccessStatus: 200,
     })
   );

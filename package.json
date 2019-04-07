@@ -1,13 +1,4 @@
 {
-  "name": "ab-service-kit",
-  "version": "0.0.0-development",
-  "description": "Aimee Blue Service Template",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
-  "repository": "git@github.com:Aimee-Blue/ab-service-kit.git",
-  "author": "@Aimee-Blue",
-  "license": "MIT",
-  "private": false,
   "scripts": {
     "build": "node ./scripts/build.js -s",
     "declarations": "tsc -p ./tsconfig.declarations.json",
@@ -20,16 +11,35 @@
     "lint": "tslint -p . -t verbose",
     "check": "concurrently \"node ./scripts/build.js\" \"tsc\" \"tslint -p . -t verbose\"",
     "patch": "ts-deps patch",
-    "release": "semantic-release"
+    "release": "semantic-release",
+    "prepublishOnly": "yarn run build && yarn run declarations"
   },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
+      "pre-commit": "pretty-quick --staged",
+      "pre-push": "npm run check"
+    }
+  },
+  "name": "ab-service-kit",
+  "version": "0.0.0-development",
+  "description": "Aimee Blue Service Template",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "repository": "git@github.com:Aimee-Blue/ab-service-kit.git",
+  "author": "@Aimee-Blue",
+  "license": "MIT",
+  "private": false,
   "peerDependencies": {
     "@aimee-blue/ab-shared": ">=1.51.0"
   },
   "dependencies": {
+    "@google-cloud/pubsub": "0.28.1",
     "@types/cors": "2.8.4",
     "@types/express": "4.16.1",
     "@types/joi": "14.3.2",
     "@types/node": "10.14.4",
+    "@types/node-fetch": "2.3.0",
     "@types/ws": "6.0.1",
     "chokidar": "2.1.5",
     "clear-module": "3.1.0",
@@ -40,6 +50,7 @@
     "fs-extra": "7.0.1",
     "joi": "14.3.1",
     "mock-socket": "8.0.5",
+    "node-fetch": "2.3.0",
     "rxjs": "6.4.0",
     "rxjs-spy": "7.5.1",
     "rxjs-stream": "3.0.1",
@@ -51,14 +62,6 @@
     "@aimee-blue/ab-shared": ">=1.51.0",
     "@types/dotenv": "6.1.1",
     "rxjs-marbles": "5.0.0",
-    "rxjs-tslint-rules": "4.19.1",
     "ts-deps": "0.2.3"
-  },
-  "husky": {
-    "hooks": {
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
-      "pre-commit": "pretty-quick --staged",
-      "pre-push": "npm run check"
-    }
   }
 }

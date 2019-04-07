@@ -3,16 +3,16 @@ import * as http from 'http';
 import * as https from 'https';
 import url from 'url';
 import { Socket } from 'net';
-import { IServiceConfig, SocketEpic } from '../common/types';
+import { IServiceConfig, AnySocketEpic } from '@shared';
 import {
   actionStreamFromSocket,
   binaryStreamFromSocket,
   pipeStreamIntoSocket,
   dataStreamFromSocket,
-} from '../common/sockets';
+} from '@shared/sockets';
 import { Subscription } from 'rxjs';
 import { finalize } from 'rxjs/operators';
-import { publishStream } from '../common/publishStream';
+import { publishStream } from '../shared/publishStream';
 
 type SocketHandler = (socket: WebSocket, request: http.IncomingMessage) => void;
 
@@ -40,7 +40,7 @@ const builderDeps = {
 };
 
 export const socketHandlerBuilder = (
-  pipelines: Map<string, SocketEpic>,
+  pipelines: Map<string, AnySocketEpic>,
   deps = builderDeps
 ): SocketHandler => (socket, message) => {
   if (!message.url) {
@@ -90,7 +90,7 @@ export async function setupSockets(
 
   const pipelines = await config.sockets();
 
-  const epicsByPath = new Map<string, SocketEpic>(Object.entries(pipelines));
+  const epicsByPath = new Map<string, AnySocketEpic>(Object.entries(pipelines));
   if (epicsByPath.size === 0) {
     return noop;
   }

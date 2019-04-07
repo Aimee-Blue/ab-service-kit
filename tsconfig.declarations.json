@@ -6,7 +6,8 @@
     "allowJs": false,
     "noEmit": false,
     "declaration": true,
-    "emitDeclarationOnly": true
+    "emitDeclarationOnly": true,
+    "paths": { "@shared": ["./src/shared"], "@shared/*": ["./src/shared/*"] }
   },
   "include": ["src"],
   "exclude": ["src/**/__tests__/**", "src/__integration-tests__/**"]

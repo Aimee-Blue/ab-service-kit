@@ -1,17 +1,24 @@
 import dotenvExpand from 'dotenv-expand';
 import dotenv from 'dotenv';
-import fs from 'fs';
-import path from 'path';
+import fs, { pathExists } from 'fs-extra';
 
 const defaults = ['.env.local', '.env'];
 
-export function loadEnv(envFile?: string) {
+const packageJson = 'package.json';
+
+export async function loadEnv(envFile?: string) {
   const files = envFile ? [envFile, ...defaults] : defaults;
 
-  files.forEach(file => {
-    const filePath = path.join(__dirname, '../../', file);
+  const packageJsonExists = await pathExists(packageJson);
+  if (!packageJsonExists) {
+    throw new Error(
+      'Cannot find package.json, this application is meant to be run with current package.json in cwd'
+    );
+  }
+
+  files.forEach(filePath => {
     if (fs.existsSync(filePath)) {
-      console.log(`- Loading ${file}`);
+      console.log(`- Loading ${filePath}`);
       dotenvExpand(
         dotenv.config({
           path: filePath,

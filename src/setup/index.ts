@@ -1,6 +1,6 @@
 import * as http from 'http';
 import * as https from 'https';
-import { IServiceConfig, ICommandLineArgs } from '../common/types';
+import { IServiceConfig, ICommandLineArgs } from '@shared';
 import { setupSockets } from './sockets';
 import { setupExpress } from './express';
 import { setupSpy } from './spy';
@@ -15,11 +15,11 @@ export async function serviceSetup(
   const unsubscribeApp = await setupExpress(server, config);
   const unsubscribeWs = await setupSockets(server, config);
 
-  return () => {
+  return async () => {
     unsubscribeApp();
     unsubscribeWs();
     tearDownSpy();
 
-    loadEnv(params.envFile);
+    await loadEnv(params.envFile);
   };
 }

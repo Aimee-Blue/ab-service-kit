@@ -2,6 +2,7 @@ import yargs from 'yargs';
 import express from 'express';
 import { Observable } from 'rxjs';
 import { IncomingMessage } from 'http';
+import { IAction } from './action';
 
 export interface ICommandLineArgs {
   http: boolean;
@@ -11,10 +12,6 @@ export interface ICommandLineArgs {
   host?: string;
   port: number;
   envFile?: string;
-}
-
-export interface IAction {
-  type: string;
 }
 
 export interface IServiceConfig {
@@ -30,13 +27,21 @@ export interface IServiceConfig {
 }
 
 export interface ISocketEpicsMap {
-  [path: string]: SocketEpic;
+  [path: string]: AnySocketEpic;
 }
 
-export type SocketEpic = <I extends IAction>(
+export type AnySocketEpic = (
+  commands: Observable<unknown>,
+  request: IncomingMessage,
+  binary: Observable<Buffer>,
+  deps?: unknown
+) => Observable<IAction | Buffer>;
+
+export type SocketEpic<I extends IAction, D = unknown> = (
   commands: Observable<I>,
   request: IncomingMessage,
-  binary: Observable<Buffer>
+  binary: Observable<Buffer>,
+  deps?: D
 ) => Observable<IAction | Buffer>;
 
 type ArgsBuilder = (

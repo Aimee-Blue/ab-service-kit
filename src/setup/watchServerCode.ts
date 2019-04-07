@@ -10,9 +10,10 @@ import {
   concatMap,
   toArray,
   distinct,
+  mapTo,
 } from 'rxjs/operators';
 import clearModule from 'clear-module';
-import { IServiceConfig } from 'src/common/types';
+import { IServiceConfig } from '@shared';
 
 if (process.env.NODE_ENV === 'production') {
   throw new Error('This file should not be imported in production');
@@ -55,7 +56,7 @@ const compiledToSource = (file: string) =>
     .replace('.js', '')
     .replace('.env', `../.env`);
 
-let teardownOldServer = () => {
+let teardownOldServer = async () => {
   console.log('Dummy teardown was called ... odd');
   return;
 };
@@ -89,7 +90,9 @@ function findModule(
   );
 }
 
-type ServiceSetupFunc = (config: IServiceConfig) => Promise<() => void>;
+type ServiceSetupFunc = (
+  config: IServiceConfig
+) => Promise<() => Promise<void>>;
 
 function requireSetupModule(moduleId: string): IServiceConfig {
   const result = require(moduleId) as
@@ -167,10 +170,9 @@ export async function serviceSetupInWatchMode(
         }
       }),
 
-      concatMap(mods => {
-        teardownOldServer();
+      concatMap(mods => from(teardownOldServer()).pipe(mapTo(mods))),
 
-        console.log('Unloading', setupModuleId);
+      concatMap(mods => {
         clearModule(setupModuleId);
 
         for (const mod of mods) {
@@ -184,7 +186,6 @@ export async function serviceSetupInWatchMode(
           if (dirname(mod.mod.id) === __dirname) {
             continue;
           }
-          console.log('Unloading', mod.mod.id, mod.filePath);
           clearModule(mod.mod.id);
         }
 

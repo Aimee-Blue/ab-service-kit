@@ -1,5 +1,9 @@
 {
   "extends": "./node_modules/ts-deps/lib/config/tsconfig.default.json",
-  "compilerOptions": { "baseUrl": ".", "outDir": "lib" },
+  "compilerOptions": {
+    "baseUrl": ".",
+    "outDir": "lib",
+    "paths": { "@shared": ["./src/shared"], "@shared/*": ["./src/shared/*"] }
+  },
   "include": ["src"]
 }
