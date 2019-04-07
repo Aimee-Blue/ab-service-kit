@@ -1,4 +1,13 @@
 {
+  "name": "@aimee-blue/ab-service-kit",
+  "version": "0.0.0-development",
+  "description": "Aimee Blue Service Template",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "repository": "git@github.com:Aimee-Blue/ab-service-kit.git",
+  "author": "@Aimee-Blue",
+  "license": "MIT",
+  "private": false,
   "scripts": {
     "build": "node ./scripts/build.js -s",
     "declarations": "tsc -p ./tsconfig.declarations.json",
@@ -21,15 +30,6 @@
       "pre-push": "npm run check"
     }
   },
-  "name": "ab-service-kit",
-  "version": "0.0.0-development",
-  "description": "Aimee Blue Service Template",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
-  "repository": "git@github.com:Aimee-Blue/ab-service-kit.git",
-  "author": "@Aimee-Blue",
-  "license": "MIT",
-  "private": false,
   "peerDependencies": {
     "@aimee-blue/ab-shared": ">=1.51.0"
   },
