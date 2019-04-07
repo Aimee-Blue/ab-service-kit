@@ -2,7 +2,7 @@
 # yarn lockfile v1
 
 
-"@aimee-blue/ab-shared@>=1.51.0":
+"@aimee-blue/ab-shared@>=1.52.0":
   version "1.52.0"
   resolved "https://registry.yarnpkg.com/@aimee-blue/ab-shared/-/ab-shared-1.52.0.tgz#112d2efc02729a784ff0fd2eb08ee99381e83dff"
   integrity sha512-WjJDpuRsoRtJJVdGyBxImx2P52/VEkG60t/8/9yYHEXb5h+SG4TcYn6NR24Pb6yJaDf9rh/Kjt6n+L7xU25OcA==
