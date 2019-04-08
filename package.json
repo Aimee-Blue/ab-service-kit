@@ -27,6 +27,7 @@
     "patch": "ts-deps patch",
     "release": "semantic-release",
     "prepublishOnly": "yarn run build && yarn run declarations",
+    "start": "node lib/test",
     "start:watch": "node lib/test --watch"
   },
   "husky": {
