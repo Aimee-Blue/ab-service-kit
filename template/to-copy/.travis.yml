@@ -1,0 +1,26 @@
+language: node_js
+cache:
+  yarn: true
+  directories:
+    - node_modules
+node_js:
+  - '10'
+branches:
+  except:
+    - /^v\d+\.\d+\.\d+(-\w+(\.\d+)?(@\w+))?$/
+before_install:
+  - curl -o- -L https://yarnpkg.com/install.sh | bash
+  - export PATH="$HOME/.yarn/bin:$PATH"
+jobs:
+  include:
+    - stage: test and lint
+      script:
+        - time yarn run check
+    - stage: test and lint
+      script:
+        - time yarn build-docker
+      if: NOT branch IN (master, release, test) OR type = pull_request
+    - stage: deploy
+      script:
+        - yarn release
+      if: branch IN (master, release, test) AND type = push AND fork = false

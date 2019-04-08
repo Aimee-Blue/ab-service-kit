@@ -1,0 +1,26 @@
+{
+  "version": "0.0.0-development",
+  "private": true,
+  "author": "@aimee-blue",
+  "main": "lib/server.js",
+  "scripts": {
+    "upgrade-shared": "yarn upgrade @aimee-blue/ab-shared --latest",
+    "upgrade-scripts": "yarn upgrade @aimee-blue/ab-scripts --latest",
+    "upgrade-kit": "yarn upgrade @aimee-blue/ab-service-kit --latest",
+    "build:watch": "yarn build --watch",
+    "start": "node lib/server.js",
+    "start:watch": "node lib/server.js --watch",
+    "build-docker": "docker build -t aimeeblue/$npm_package_name .",
+    "run-docker": "docker run -p 80:8080 --restart unless-stopped --name $npm_package_name $npm_package_name",
+    "run-docker:dev": "docker run -p 80:8080 --name $npm_package_name aimeeblue/$npm_package_name",
+    "shell-docker": "docker exec -it $(docker ps -aqf name=$npm_package_name) bash"
+  },
+  "dependencies": {
+    "@aimee-blue/ab-shared": "latest"
+  },
+  "devDependencies": {
+    "@aimee-blue/ab-service-kit": "latest",
+    "@aimee-blue/ab-scripts": "latest",
+    "ts-deps": "latest"
+  }
+}
