@@ -16,11 +16,12 @@
     "shell-docker": "docker exec -it $(docker ps -aqf name=$npm_package_name) bash"
   },
   "dependencies": {
-    "@aimee-blue/ab-shared": "latest"
+    "@aimee-blue/ab-shared": "1.52.0"
   },
   "devDependencies": {
-    "@aimee-blue/ab-service-kit": "latest",
-    "@aimee-blue/ab-scripts": "latest",
-    "ts-deps": "latest"
+    "@semantic-release/exec": "3.3.2",
+    "@aimee-blue/ab-service-kit": "1.0.1",
+    "@aimee-blue/ab-scripts": "1.1.0",
+    "ts-deps": "0.3.1"
   }
 }
