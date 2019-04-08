@@ -6,6 +6,7 @@ export * from './profiler';
 export * from './publishStream';
 export * from './time';
 export * from './isTest';
+export * from './startup';
 
 import * as Api from './api';
 import * as Config from './configuration';

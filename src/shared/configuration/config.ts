@@ -1,8 +1,9 @@
 import { Config } from '@aimee-blue/ab-shared';
 import { callFn } from '../api';
 import { Observable, from, timer, defer } from 'rxjs';
-import { map, flatMap, ignoreElements } from 'rxjs/operators';
+import { map, flatMap, ignoreElements, switchMapTo } from 'rxjs/operators';
 import { isTest } from '../isTest';
+import { onStartup } from '../startup';
 
 const configurationLoad = (revision?: number) =>
   callFn<Config.IConfig>('configurationLoad')({ revision });
@@ -53,10 +54,14 @@ export const withLatest = <T>(whatever: Observable<T>) =>
 if (!isTest()) {
   const CONFIG_REFRESH_PERIOD = 60000;
 
-  timer(0, CONFIG_REFRESH_PERIOD)
+  onStartup()
     .pipe(
-      flatMap(() => load()),
-      ignoreElements()
+      switchMapTo(
+        timer(0, CONFIG_REFRESH_PERIOD).pipe(
+          flatMap(() => load()),
+          ignoreElements()
+        )
+      )
     )
     .subscribe();
 }

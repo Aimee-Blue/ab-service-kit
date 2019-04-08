@@ -1,16 +1,13 @@
 import { IServiceConfig } from './shared';
-import { ping } from './endpoints/ping';
 
 const config: IServiceConfig = {
-  defaultPort: 4000,
+  defaultPort: 4010,
 
   spy: async _spy => {
     return;
   },
 
-  endpoints: async app => {
-    ping(app);
-  },
+  endpoints: async _app => {},
 };
 
 export default config;

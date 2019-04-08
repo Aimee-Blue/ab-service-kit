@@ -24,6 +24,8 @@ export interface IServiceConfig {
   argsBuilder?: ArgsBuilder;
   serviceConfigModuleId?: string;
   watchPatterns?: string[];
+
+  shouldUseDefaultEndpoints?: boolean;
 }
 
 export interface ISocketEpicsMap {

@@ -4,6 +4,7 @@ import * as https from 'https';
 import cors from 'cors';
 
 import { IServiceConfig } from '../shared';
+import { defaultEndpoints } from '../endpoints';
 
 export async function setupExpress(
   server: http.Server | https.Server,
@@ -19,6 +20,12 @@ export async function setupExpress(
   );
 
   if (config.endpoints) {
+    if (
+      typeof config.shouldUseDefaultEndpoints !== 'boolean' ||
+      config.shouldUseDefaultEndpoints
+    ) {
+      defaultEndpoints(app);
+    }
     await config.endpoints(app);
   }
 

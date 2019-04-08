@@ -26,7 +26,8 @@
     "check": "concurrently \"node ./scripts/build.js\" \"tsc\" \"tslint -p . -t verbose\"",
     "patch": "ts-deps patch",
     "release": "semantic-release",
-    "prepublishOnly": "yarn run build && yarn run declarations"
+    "prepublishOnly": "yarn run build && yarn run declarations",
+    "start:watch": "node lib/test --watch"
   },
   "husky": {
     "hooks": {
@@ -55,7 +56,6 @@
     "express": "4.16.4",
     "fs-extra": "7.0.1",
     "joi": "14.3.1",
-    "mock-socket": "8.0.5",
     "node-fetch": "2.3.0",
     "rxjs": "6.4.0",
     "rxjs-spy": "7.5.1",
@@ -70,6 +70,6 @@
     "@types/cors": "2.8.4",
     "@types/node": "10.14.4",
     "rxjs-marbles": "5.0.0",
-    "ts-deps": "0.3.0-master.1"
+    "ts-deps": "0.3.0"
   }
 }

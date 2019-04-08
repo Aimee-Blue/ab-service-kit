@@ -5,6 +5,19 @@ import { setupSockets } from './sockets';
 import { setupExpress } from './express';
 import { setupSpy } from './spy';
 import { loadEnv } from './env';
+import { startup } from './startup';
+
+function emitStartup(
+  server: http.Server | https.Server,
+  config: IServiceConfig,
+  args: ICommandLineArgs
+) {
+  startup.next({
+    server,
+    config,
+    args,
+  });
+}
 
 export async function serviceSetup(
   server: http.Server | https.Server,
@@ -14,6 +27,8 @@ export async function serviceSetup(
   const tearDownSpy = await setupSpy(config);
   const unsubscribeApp = await setupExpress(server, config);
   const unsubscribeWs = await setupSockets(server, config);
+
+  emitStartup(server, config, params);
 
   return async () => {
     unsubscribeApp();
