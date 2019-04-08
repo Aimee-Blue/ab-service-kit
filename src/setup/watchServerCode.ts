@@ -13,7 +13,7 @@ import {
   mapTo,
 } from 'rxjs/operators';
 import clearModule from 'clear-module';
-import { IServiceConfig } from '@shared';
+import { IServiceConfig } from '../shared';
 
 if (process.env.NODE_ENV === 'production') {
   throw new Error('This file should not be imported in production');

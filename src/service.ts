@@ -1,4 +1,4 @@
-import { IServiceConfig } from '@shared';
+import { IServiceConfig } from './shared';
 import { ping } from './endpoints/ping';
 
 const config: IServiceConfig = {

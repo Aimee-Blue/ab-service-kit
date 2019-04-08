@@ -4,7 +4,7 @@ import { filter, mergeMap } from 'rxjs/operators';
 import { Channels } from '@aimee-blue/ab-shared';
 import * as Joi from 'joi';
 
-function wsCodeToReason(code: number) {
+export function wsCodeToReason(code: number) {
   switch (code) {
     case 1000:
       return 'Normal Closure';

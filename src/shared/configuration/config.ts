@@ -1,5 +1,5 @@
 import { Config } from '@aimee-blue/ab-shared';
-import { callFn } from '@shared/api';
+import { callFn } from '../api';
 import { Observable, from, timer, defer } from 'rxjs';
 import { map, flatMap, ignoreElements } from 'rxjs/operators';
 
@@ -13,7 +13,7 @@ export interface IGetConfigParams {
   revision?: number;
 }
 
-export const loadConfig = async ({
+export const load = async ({
   forceRefresh,
   revision,
 }: IGetConfigParams = {}): Promise<Config.IConfig> => {
@@ -37,13 +37,13 @@ export const loadConfig = async ({
   }
 };
 
-export const latestConfig = () => defer(() => from(loadConfig()));
+export const latest = () => defer(() => from(load()));
 
-export const withLatestConfig = <T>(whatever: Observable<T>) =>
+export const withLatest = <T>(whatever: Observable<T>) =>
   whatever.pipe(
     // tslint:disable-next-line:rxjs-no-unsafe-scope
     flatMap(something =>
-      from(loadConfig()).pipe(
+      from(load()).pipe(
         map(config => [something, config] as [T, Config.IConfig])
       )
     )
@@ -53,7 +53,7 @@ const CONFIG_REFRESH_PERIOD = 60000;
 
 timer(0, CONFIG_REFRESH_PERIOD)
   .pipe(
-    flatMap(() => loadConfig()),
+    flatMap(() => load()),
     ignoreElements()
   )
   .subscribe();

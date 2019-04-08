@@ -1,6 +1,6 @@
 import * as http from 'http';
 import * as https from 'https';
-import { IServiceConfig, ICommandLineArgs } from '@shared';
+import { IServiceConfig, ICommandLineArgs } from '../shared';
 import { setupSockets } from './sockets';
 import { setupExpress } from './express';
 import { setupSpy } from './spy';

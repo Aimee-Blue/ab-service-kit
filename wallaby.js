@@ -29,6 +29,6 @@ module.exports = function(wallaby) {
       ignoreCoverage: /istanbul ignore next/,
     },
 
-    debug: true,
+    debug: false,
   };
 };

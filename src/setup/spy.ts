@@ -1,4 +1,4 @@
-import { IServiceConfig } from '@shared';
+import { IServiceConfig } from '../shared';
 
 export async function setupSpy(config: IServiceConfig) {
   const { create } = require('rxjs-spy') as {

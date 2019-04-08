@@ -1,8 +1,6 @@
 import * as PubSub from '@google-cloud/pubsub';
 
-const pubsubClient = new PubSub.PubSub({
-  projectId: process.env.GOOGLE_PROJECT_ID!,
-});
+const pubsubClient = new PubSub.PubSub();
 
 const topicMap = new Map<string, PubSub.Topic>();
 
@@ -53,11 +51,11 @@ const getTopic = (topic: string): PubSub.Topic => {
   return topicPublisher;
 };
 
-const topicsToPreload: string[] = ['userMessages', 'profiler'];
-
-topicsToPreload.forEach(topic => {
-  addTopicToMap(topic);
-});
+export async function prepareTopics(topics: string[]) {
+  topics.forEach(topic => {
+    addTopicToMap(topic);
+  });
+}
 
 export async function publish<T>(topic: string, data: T) {
   const topicPublisher = getTopic(topic);

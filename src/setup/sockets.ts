@@ -3,13 +3,13 @@ import * as http from 'http';
 import * as https from 'https';
 import url from 'url';
 import { Socket } from 'net';
-import { IServiceConfig, AnySocketEpic } from '@shared';
+import { IServiceConfig, AnySocketEpic } from '../shared';
 import {
   actionStreamFromSocket,
   binaryStreamFromSocket,
   pipeStreamIntoSocket,
   dataStreamFromSocket,
-} from '@shared/sockets';
+} from '../shared/sockets';
 import { Subscription } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { publishStream } from '../shared/publishStream';

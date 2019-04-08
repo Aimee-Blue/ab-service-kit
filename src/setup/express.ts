@@ -3,7 +3,7 @@ import * as http from 'http';
 import * as https from 'https';
 import cors from 'cors';
 
-import { IServiceConfig } from '@shared';
+import { IServiceConfig } from '../shared';
 
 export async function setupExpress(
   server: http.Server | https.Server,

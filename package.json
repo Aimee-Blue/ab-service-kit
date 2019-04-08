@@ -8,6 +8,11 @@
   "author": "@Aimee-Blue",
   "license": "MIT",
   "private": false,
+  "files": [
+    "lib",
+    "src",
+    "template"
+  ],
   "scripts": {
     "build": "node ./scripts/build.js -s",
     "declarations": "tsc -p ./tsconfig.declarations.json",
@@ -30,11 +35,6 @@
       "pre-push": "npm run check"
     }
   },
-  "files": [
-    "lib",
-    "src",
-    "template"
-  ],
   "publishConfig": {
     "access": "public"
   },

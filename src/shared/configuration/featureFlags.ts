@@ -1,13 +1,13 @@
-import { IGetConfigParams, loadConfig } from './config';
+import * as Config from './config';
 import { Observable, from, defer } from 'rxjs';
 import { flatMap, map } from 'rxjs/operators';
 
-export function configureLoadFlags<F = {}>(defaultFlags: F) {
-  const loadFlags = async ({
+export function configureFlags<F = {}>(defaultFlags: F) {
+  const flags = async ({
     forceRefresh,
     revision,
-  }: IGetConfigParams = {}) => {
-    const flagsData = (await loadConfig({ forceRefresh, revision }).then(
+  }: Config.IGetConfigParams = {}) => {
+    const flagsData = (await Config.load({ forceRefresh, revision }).then(
       config => config.featureFlags
     )) as F;
     return {
@@ -16,20 +16,17 @@ export function configureLoadFlags<F = {}>(defaultFlags: F) {
     };
   };
 
-  const latestFlags = () =>
-    defer(() => from(loadFlags({ forceRefresh: false })));
+  const latestFlags = () => defer(() => from(flags()));
 
   const withLatestFlags = () => <T>(whatever: Observable<T>) =>
     whatever.pipe(
       flatMap(something =>
-        from(loadFlags({ forceRefresh: false })).pipe(
-          map(flags => [something, flags] as [T, F])
-        )
+        from(flags()).pipe(map(item => [something, item] as [T, F]))
       )
     );
 
   return {
-    loadFlags,
+    flags,
     latestFlags,
     withLatestFlags,
   };

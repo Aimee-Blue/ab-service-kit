@@ -6,7 +6,7 @@ import yargs from 'yargs';
 
 import { loadEnv } from './setup/env';
 import { serviceSetup } from './setup';
-import { ICommandLineArgs, IServiceConfig } from '@shared';
+import { ICommandLineArgs, IServiceConfig } from './shared';
 
 const buildArgumentsParser = (config: IServiceConfig) =>
   (yargs as yargs.Argv<ICommandLineArgs>)
