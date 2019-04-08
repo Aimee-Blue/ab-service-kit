@@ -11,12 +11,10 @@ import {
   toArray,
   distinct,
   mapTo,
-  startWith,
-  tap,
 } from 'rxjs/operators';
 import clearModule from 'clear-module';
 import { IServiceConfig, isTruthy } from '../shared';
-import { pathExistsSync, pathExists } from 'fs-extra';
+import { pathExists } from 'fs-extra';
 
 if (process.env.NODE_ENV === 'production') {
   throw new Error('This file should not be imported in production');
