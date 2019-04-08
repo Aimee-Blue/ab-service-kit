@@ -15,6 +15,7 @@
   ],
   "scripts": {
     "build": "node ./scripts/build.js -s",
+    "build:watch": "node ./scripts/build.js -s --watch",
     "declarations": "tsc -p ./tsconfig.declarations.json",
     "prebuild": "node ./scripts/clean.js",
     "clean": "node ./scripts/clean.js",

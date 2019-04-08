@@ -1,6 +1,6 @@
 import chokidar from 'chokidar';
-import path, { dirname } from 'path';
-import { Observable, of, from, defer } from 'rxjs';
+import path, { dirname, resolve, join } from 'path';
+import { Observable, of, from, defer, concat, empty } from 'rxjs';
 import {
   mergeMap,
   map,
@@ -11,15 +11,16 @@ import {
   toArray,
   distinct,
   mapTo,
+  startWith,
+  tap,
 } from 'rxjs/operators';
 import clearModule from 'clear-module';
-import { IServiceConfig } from '../shared';
+import { IServiceConfig, isTruthy } from '../shared';
+import { pathExistsSync, pathExists } from 'fs-extra';
 
 if (process.env.NODE_ENV === 'production') {
   throw new Error('This file should not be imported in production');
 }
-
-const resolve = (p: string) => require.resolve(path.join('../', p));
 
 const watchMultiple = (patterns: string[]) => {
   return new Observable<string>(subscriber => {
@@ -49,13 +50,6 @@ const watchMultiple = (patterns: string[]) => {
   });
 };
 
-const compiledToSource = (file: string) =>
-  file
-    .replace('\\', '/')
-    .replace(`lib/`, `./`)
-    .replace('.js', '')
-    .replace('.env', `../.env`);
-
 let teardownOldServer = async () => {
   console.log('Dummy teardown was called ... odd');
   return;
@@ -67,25 +61,38 @@ const moduleInfo = (mod: NodeModule) => ({
 });
 
 function allChildModules(startFrom: NodeModule = require.main!) {
-  return of(moduleInfo(startFrom)).pipe(
-    expand(data =>
-      from(data.mod.children).pipe(
-        map(moduleInfo),
-        filter(pair => !/node_modules/.test(pair.filePath))
+  return of(moduleInfo(startFrom)).pipe(stream => {
+    const set = new Set();
+
+    // sometimes modules circularly reference each other :(
+    const uniqueModules = (arr: NodeModule[]) => {
+      const items = arr.filter(item => !set.has(item));
+      items.forEach(set.add.bind(set));
+      return items;
+    };
+
+    return stream.pipe(
+      expand(data =>
+        from(uniqueModules(data.mod.children)).pipe(
+          map(moduleInfo),
+          filter(pair => !/node_modules/.test(pair.filePath))
+        )
       )
-    )
-  );
+    );
+  });
 }
 
 function findModule(
-  relativeToRootPathToDotJs: string,
+  fullPathToJs: string,
   startFrom: NodeModule = require.main!
 ) {
-  const compareTo = path.normalize(relativeToRootPathToDotJs);
+  const compareTo = resolve(path.normalize(fullPathToJs));
+
   return allChildModules(startFrom).pipe(
     //
     find(result => {
-      return path.normalize(result.filePath) === compareTo;
+      const resolvedPath = resolve(path.normalize(result.filePath));
+      return resolvedPath === compareTo;
     })
   );
 }
@@ -112,11 +119,10 @@ function requireSetupModule(moduleId: string): IServiceConfig {
 }
 
 export async function serviceSetupInWatchMode(
-  setupModuleId: string,
+  setupFilePath: string,
   setup: ServiceSetupFunc
 ) {
-  const initialConfig = requireSetupModule(setupModuleId);
-  const setupFilePath = path.relative('./', setupModuleId);
+  const initialConfig = requireSetupModule(setupFilePath);
 
   teardownOldServer = await setup(initialConfig);
 
@@ -132,55 +138,50 @@ export async function serviceSetupInWatchMode(
 
   watchMultiple(WATCH_PATTERNS)
     .pipe(
-      filter(file => {
-        const filePath = compiledToSource(file);
-
-        let resolved: string | null = null;
-        let shouldContinue = false;
-
-        try {
-          resolved = resolve(filePath);
-          shouldContinue = !!resolved;
-        } catch (err) {
+      mergeMap(filePath =>
+        from(
+          pathExists(join(process.cwd(), filePath))
+            .catch(() => false)
+            .then(exists => ({
+              exists,
+              filePath,
+              resolved: join(process.cwd(), filePath),
+            }))
+        )
+      ),
+      filter(pair => {
+        if (!pair.exists) {
           console.log(
-            `Cannot resolve changes to ${file} (using ${filePath}), ignoring`
+            `Cannot resolve changes to ${pair.filePath} (tried ${
+              pair.resolved
+            }), ignoring`
           );
         }
 
-        return shouldContinue;
+        return pair.exists;
       }),
 
-      mergeMap(file => findModule(file)),
+      mergeMap(fileInfo => findModule(fileInfo.resolved)),
 
-      concatMap(pair => {
-        if (pair) {
-          return allChildModules(pair.mod).pipe(
-            distinct(),
-            toArray()
-          );
-        } else {
-          return findModule(setupFilePath).pipe(
-            concatMap(setupModule =>
-              allChildModules(setupModule!.mod).pipe(
-                distinct(),
-                toArray()
-              )
-            )
-          );
-        }
-      }),
+      concatMap(pair =>
+        concat(
+          findModule(setupFilePath).pipe(
+            filter(isTruthy),
+            concatMap(setupModule => allChildModules(setupModule.mod))
+          ),
+          pair ? allChildModules(pair.mod) : empty()
+        ).pipe(
+          distinct(mod => mod.filePath),
+          toArray()
+        )
+      ),
 
       concatMap(mods => from(teardownOldServer()).pipe(mapTo(mods))),
 
       concatMap(mods => {
-        clearModule(setupModuleId);
-
         for (const mod of mods) {
           if (mod.mod.id === '.') {
             // we do not reload the main module
-            continue;
-          }
-          if (mod.mod.id === setupModuleId) {
             continue;
           }
           if (dirname(mod.mod.id) === __dirname) {
@@ -191,7 +192,7 @@ export async function serviceSetupInWatchMode(
 
         return defer(() =>
           from(
-            setup(requireSetupModule(setupModuleId)).then(teardown => {
+            setup(requireSetupModule(setupFilePath)).then(teardown => {
               teardownOldServer = teardown;
               return Promise.resolve();
             })

@@ -1,7 +1,7 @@
 import { start } from './start';
-import service from './service';
+import config from './config';
 
-start(service).catch((exc: unknown) => {
+start(config).catch((exc: unknown) => {
   console.error('💥  ', exc);
   process.exit(1);
 });

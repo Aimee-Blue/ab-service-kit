@@ -3,6 +3,7 @@ import * as http from 'http';
 import * as https from 'https';
 import fs from 'fs-extra';
 import yargs from 'yargs';
+import { resolve } from 'path';
 
 import { loadEnv } from './setup/env';
 import { serviceSetup } from './setup';
@@ -91,18 +92,17 @@ export async function start(config: IServiceConfig) {
       const serviceSetupInWatchMode = require('./setup/watchServerCode')
         .serviceSetupInWatchMode as typeof import('./setup/watchServerCode')['serviceSetupInWatchMode'];
 
-      const configFile = config.serviceConfigModuleId || './service';
+      const configFile = config.serviceConfigModuleId || './lib/config.js';
+      const configFilePath = resolve(configFile);
+      const exists = await fs.pathExists(configFilePath);
 
-      let filePath;
-      try {
-        filePath = require.resolve(configFile);
-      } catch (err) {
+      if (!exists) {
         throw new Error(
-          'Cannot resolve service configuration module, a certain setup is required for watch mode to work'
+          `Cannot resolve service configuration module (${configFilePath}), setup is required for watch mode to work`
         );
       }
 
-      await serviceSetupInWatchMode(filePath, async newConfig => {
+      await serviceSetupInWatchMode(configFilePath, async newConfig => {
         return await serviceSetup(server, newConfig, params);
       });
     } else {
