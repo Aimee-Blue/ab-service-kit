@@ -2,7 +2,7 @@ import { socketHandlerBuilder } from '../setup/sockets';
 import { marbles } from 'rxjs-marbles/jest';
 import { takeUntil, filter, map } from 'rxjs/operators';
 import { EventEmitter } from 'events';
-import { publishStream } from '@shared';
+import { publishStream } from '../shared';
 
 function buildDeps(incoming) {
   const dataStreamFromSocket = () => incoming;

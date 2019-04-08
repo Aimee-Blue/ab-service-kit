@@ -5,6 +5,7 @@ export * from './kit';
 export * from './profiler';
 export * from './publishStream';
 export * from './time';
+export * from './isTest';
 
 import * as Api from './api';
 import * as Config from './configuration';
