@@ -14,10 +14,12 @@ export interface ICommandLineArgs {
   envFile?: string;
 }
 
+export type EndpointsHandler = (app: express.Express) => Promise<void>;
+
 export interface IServiceConfig {
   defaultPort: number;
 
-  endpoints?: (app: express.Express) => Promise<void>;
+  endpoints?: EndpointsHandler;
   sockets?: () => Promise<ISocketEpicsMap>;
   spy?: (spy: ReturnType<typeof import('rxjs-spy').create>) => Promise<void>;
 

@@ -7,7 +7,9 @@ const config: IServiceConfig = {
     return;
   },
 
-  endpoints: async _app => {},
+  endpoints: async _app => {
+    return;
+  },
 };
 
 export default config;
