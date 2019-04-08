@@ -86,7 +86,16 @@ function findModule(
 ) {
   const compareTo = resolve(path.normalize(fullPathToJs));
 
-  return allChildModules(startFrom).pipe(
+  return concat(
+    allChildModules(startFrom),
+    from(
+      Object.entries(require.cache as { [key: string]: NodeModule | undefined })
+        .filter(entry => !entry[0].includes('node_modules'))
+        .map(entry => entry[1])
+        .filter(isTruthy)
+        .map(module => moduleInfo(module))
+    )
+  ).pipe(
     //
     find(result => {
       const resolvedPath = resolve(path.normalize(result.filePath));
