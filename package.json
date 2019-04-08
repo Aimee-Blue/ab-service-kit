@@ -70,7 +70,7 @@
     "@aimee-blue/ab-shared": ">=1.52.0",
     "@types/dotenv": "6.1.1",
     "@types/cors": "2.8.4",
-    "@types/node": "11.13.0",
+    "@types/node": "10.14.4",
     "rxjs-marbles": "5.0.0",
     "ts-deps": "0.3.0"
   }

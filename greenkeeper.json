@@ -1,10 +1,8 @@
 {
   "groups": {
     "default": {
-      "packages": [
-        "package.json",
-        "template/to-process/package.json"
-      ]
+      "packages": ["package.json", "template/to-process/package.json"],
+      "ignore": ["@types/node"]
     }
   }
 }
