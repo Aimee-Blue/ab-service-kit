@@ -17,7 +17,8 @@ export interface ICommandLineArgs {
 
 export type EndpointsHandler = (router: Router, app: Koa) => Promise<void>;
 
-export type EndpointHandler = Koa.Middleware<
+export type EndpointHandler<T = {}> = Koa.Middleware<
+  T,
   Koa.ParameterizedContext<unknown, Router.IRouterParamContext<unknown, {}>>
 >;
 

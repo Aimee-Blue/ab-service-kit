@@ -1,7 +1,7 @@
 import { hostname } from 'os';
 import { appVersion } from '../shared';
 
-import { EndpointHandler } from 'src/shared/kit';
+import { EndpointHandler } from '../shared/kit';
 
 export const versionHandler: EndpointHandler = async (ctx, next) => {
   const hostnameStr = hostname();

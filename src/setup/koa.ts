@@ -32,9 +32,11 @@ export async function setupKoa(
     await config.endpoints(router, app);
   }
 
-  server.addListener('request', app.callback());
+  const callback = app.callback();
+
+  server.addListener('request', callback);
 
   return () => {
-    server.removeListener('request', app.callback());
+    server.removeListener('request', callback);
   };
 }

@@ -11,7 +11,6 @@ const config: IServiceConfig = {
   endpoints: async router => {
     router.get('/ping', Endpoints.pingHandler);
     router.get('/version', Endpoints.versionHandler);
-    return;
   },
 };
 
