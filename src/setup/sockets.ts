@@ -1,7 +1,7 @@
-import WebSocket from 'ws';
+import * as WebSocket from 'ws';
 import * as http from 'http';
 import * as https from 'https';
-import url from 'url';
+import * as url from 'url';
 import { Socket } from 'net';
 import { IServiceConfig, AnySocketEpic } from '../shared';
 import {

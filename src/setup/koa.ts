@@ -1,21 +1,24 @@
-import express from 'express';
+import Koa from 'koa';
+import Router from 'koa-router';
+import cors from '@koa/cors';
+
 import * as http from 'http';
 import * as https from 'https';
-import cors from 'cors';
 
 import { IServiceConfig } from '../shared';
 import { defaultEndpoints } from '../endpoints';
 
-export async function setupExpress(
+export async function setupKoa(
   server: http.Server | https.Server,
   config: IServiceConfig
 ) {
-  const app = express();
+  const app = new Koa();
+  const router = new Router();
 
+  app.use(router.routes());
   app.use(
     cors({
       origin: process.env.CORS_ORIGIN,
-      optionsSuccessStatus: 200,
     })
   );
 
@@ -24,14 +27,14 @@ export async function setupExpress(
       typeof config.shouldUseDefaultEndpoints !== 'boolean' ||
       config.shouldUseDefaultEndpoints
     ) {
-      defaultEndpoints(app);
+      defaultEndpoints(router);
     }
-    await config.endpoints(app);
+    await config.endpoints(router, app);
   }
 
-  server.addListener('request', app);
+  server.addListener('request', app.callback());
 
   return () => {
-    server.removeListener('request', app);
+    server.removeListener('request', app.callback());
   };
 }

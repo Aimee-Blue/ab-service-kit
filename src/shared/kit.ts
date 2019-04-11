@@ -1,5 +1,6 @@
-import yargs from 'yargs';
-import express from 'express';
+import * as yargs from 'yargs';
+import * as Koa from 'koa';
+import * as Router from 'koa-router';
 import { Observable } from 'rxjs';
 import { IncomingMessage } from 'http';
 import { IAction } from './action';
@@ -14,7 +15,11 @@ export interface ICommandLineArgs {
   envFile?: string;
 }
 
-export type EndpointsHandler = (app: express.Express) => Promise<void>;
+export type EndpointsHandler = (router: Router, app: Koa) => Promise<void>;
+
+export type EndpointHandler = Koa.Middleware<
+  Koa.ParameterizedContext<unknown, Router.IRouterParamContext<unknown, {}>>
+>;
 
 export interface IServiceConfig {
   defaultPort: number;

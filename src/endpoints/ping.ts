@@ -1,7 +1,6 @@
-import express from 'express';
+import { EndpointHandler } from 'src/shared/kit';
 
-export function ping(app: express.Express) {
-  app.get('/ping', (_req, res) => {
-    res.send("Yes, I'm rolling baby, doubly so!").status(200);
-  });
-}
+export const pingHandler: EndpointHandler = (ctx, _next) => {
+  ctx.body = "Yes, I'm rolling baby, doubly so!";
+  ctx.status = 200;
+};

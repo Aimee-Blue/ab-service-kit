@@ -1,6 +1,6 @@
 import 'source-map-support/register';
-import * as http from 'http';
-import * as https from 'https';
+import http from 'http';
+import https from 'https';
 import fs from 'fs-extra';
 import yargs from 'yargs';
 import { resolve } from 'path';

@@ -1,16 +1,14 @@
-import express from 'express';
 import { hostname } from 'os';
 import { appVersion } from '../shared';
 
-export function version(app: express.Express) {
-  app.get('/version', (_req, res, next) => {
-    const hostnameStr = hostname();
-    appVersion()
-      .then(result => {
-        res.send(`${result}_${hostnameStr}`).status(200);
-      })
-      .catch(err => {
-        next(err);
-      });
-  });
-}
+import { EndpointHandler } from 'src/shared/kit';
+
+export const versionHandler: EndpointHandler = async (ctx, next) => {
+  const hostnameStr = hostname();
+  const version = await appVersion();
+
+  ctx.body = `${version}_${hostnameStr}`;
+  ctx.status = 200;
+
+  await next();
+};

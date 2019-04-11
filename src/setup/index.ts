@@ -2,7 +2,7 @@ import * as http from 'http';
 import * as https from 'https';
 import { IServiceConfig, ICommandLineArgs } from '../shared';
 import { setupSockets } from './sockets';
-import { setupExpress } from './express';
+import { setupKoa } from './koa';
 import { setupSpy } from './spy';
 import { loadEnv } from './env';
 import { startup } from './startup';
@@ -25,7 +25,8 @@ export async function serviceSetup(
   params: ICommandLineArgs
 ) {
   const tearDownSpy = await setupSpy(config);
-  const unsubscribeApp = await setupExpress(server, config);
+  const unsubscribeApp = await setupKoa(server, config);
+
   const unsubscribeWs = await setupSockets(server, config);
 
   emitStartup(server, config, params);

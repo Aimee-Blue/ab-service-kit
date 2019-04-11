@@ -1,8 +1,10 @@
-import express from 'express';
-import { ping } from './ping';
-import { version } from './version';
+import Router from 'koa-router';
+import { pingHandler } from './ping';
+import { versionHandler } from './version';
 
-export function defaultEndpoints(app: express.Express) {
-  ping(app);
-  version(app);
-}
+export { pingHandler, versionHandler };
+export const defaultEndpoints = async (router: Router) => {
+  router.get('/ping', pingHandler);
+  router.get('/version', versionHandler);
+  return;
+};
