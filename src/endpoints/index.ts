@@ -3,7 +3,7 @@ import { pingHandler } from './ping';
 import { versionHandler } from './version';
 
 export { pingHandler, versionHandler };
-export const defaultEndpoints = async (router: Router) => {
+export const defaultEndpoints = (router: Router) => {
   router.get('/ping', pingHandler);
   router.get('/version', versionHandler);
   return;
