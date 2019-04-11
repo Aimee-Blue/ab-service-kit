@@ -1,4 +1,4 @@
-import * as WebSocket from 'ws';
+import WebSocket from 'ws';
 import * as http from 'http';
 import * as https from 'https';
 import url from 'url';
