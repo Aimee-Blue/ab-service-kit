@@ -50,6 +50,7 @@
     "@types/joi": "14.3.2",
     "@types/node-fetch": "2.3.0",
     "@types/ws": "6.0.1",
+    "body-parser": "1.18.3",
     "chokidar": "2.1.5",
     "clear-module": "3.1.0",
     "cors": "2.8.5",
@@ -68,8 +69,8 @@
   },
   "devDependencies": {
     "@aimee-blue/ab-shared": ">=1.52.0",
-    "@types/dotenv": "6.1.1",
     "@types/cors": "2.8.4",
+    "@types/dotenv": "6.1.1",
     "@types/node": "10.14.4",
     "rxjs-marbles": "5.0.0",
     "ts-deps": "0.3.0"

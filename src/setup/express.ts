@@ -2,6 +2,7 @@ import express from 'express';
 import * as http from 'http';
 import * as https from 'https';
 import cors from 'cors';
+import bodyParser from 'body-parser';
 
 import { IServiceConfig } from '../shared';
 import { defaultEndpoints } from '../endpoints';
@@ -18,6 +19,14 @@ export async function setupExpress(
       optionsSuccessStatus: 200,
     })
   );
+
+  app.use(bodyParser.json());
+
+  app.post('/tester', (req, res) => {
+    console.log(req.body);
+    console.log(req.params);
+    res.send().status(200);
+  });
 
   if (config.endpoints) {
     if (
