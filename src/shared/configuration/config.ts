@@ -50,18 +50,3 @@ export const withLatest = <T>(whatever: Observable<T>) =>
       )
     )
   );
-
-if (!isTest()) {
-  const CONFIG_REFRESH_PERIOD = 60000;
-
-  onStartup()
-    .pipe(
-      switchMapTo(
-        timer(0, CONFIG_REFRESH_PERIOD).pipe(
-          flatMap(() => load()),
-          ignoreElements()
-        )
-      )
-    )
-    .subscribe();
-}
