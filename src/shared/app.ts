@@ -43,10 +43,8 @@ function determineGitVersion() {
   if (gitResult.error || gitResult.status !== 0) {
     return null;
   }
-  const gitVersion = (gitResult.output || [])
-    .filter(Boolean)
-    .join('')
-    .trim();
+
+  const gitVersion = gitResult.stdout.trim();
 
   const versionStr = gitVersion.startsWith('v')
     ? gitVersion.substring(1)
