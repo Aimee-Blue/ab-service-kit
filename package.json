@@ -51,7 +51,7 @@
     "@types/node-fetch": "2.3.2",
     "@types/ws": "6.0.1",
     "chokidar": "2.1.5",
-    "clear-module": "3.1.0",
+    "clear-module": "3.2.0",
     "cors": "2.8.5",
     "dotenv": "7.0.0",
     "dotenv-expand": "5.1.0",
@@ -62,7 +62,7 @@
     "rxjs": "6.4.0",
     "rxjs-spy": "7.5.1",
     "rxjs-stream": "3.0.1",
-    "source-map-support": "0.5.11",
+    "source-map-support": "0.5.12",
     "ws": "6.2.1",
     "yargs": "13.2.2"
   },
@@ -72,6 +72,6 @@
     "@types/cors": "2.8.4",
     "@types/node": "10.14.4",
     "rxjs-marbles": "5.0.0",
-    "ts-deps": "0.3.0"
+    "ts-deps": "0.3.1"
   }
 }
