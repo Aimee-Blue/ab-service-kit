@@ -53,7 +53,7 @@ export async function start(config: IServiceConfig) {
   const certPath = params.cert || process.env.HTTPS_CERT_PATH!;
   const keyPath = params.cert || process.env.HTTPS_KEY_PATH!;
   const host = params.host || process.env.SERVER_HOSTNAME;
-  const port = params.port;
+  const port = process.env.PORT || params.port;
 
   if (!params.http) {
     if (!certPath) {
