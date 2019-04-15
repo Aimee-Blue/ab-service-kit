@@ -1,4 +1,5 @@
 import { pathExists, readFile } from 'fs-extra';
+import { spawnSync } from 'child_process';
 
 const packageJson = 'package.json';
 
@@ -30,8 +31,35 @@ async function loadPackageJson() {
   return loadedPackageJson;
 }
 
+function determineGitVersion() {
+  const gitResult = spawnSync(
+    'git',
+    ['describe', '--long', '--dirty=+', '--abbrev=10', '--tags'],
+    {
+      encoding: 'utf8',
+    }
+  );
+
+  if (gitResult.error || gitResult.status !== 0) {
+    return null;
+  }
+  const gitVersion = (gitResult.output || [])
+    .filter(Boolean)
+    .join('')
+    .trim();
+
+  const versionStr = gitVersion.startsWith('v')
+    ? gitVersion.substring(1)
+    : gitVersion;
+
+  return versionStr;
+}
+
 export async function appVersion() {
   const loaded = await loadPackageJson();
+  if (loaded.version === '0.0.0-development') {
+    return determineGitVersion() || loaded.version;
+  }
   return loaded.version;
 }
 
