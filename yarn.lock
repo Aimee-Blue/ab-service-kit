@@ -7541,10 +7541,10 @@ run-queue@^1.0.0, run-queue@^1.0.3:
   dependencies:
     aproba "^1.1.1"
 
-rxjs-marbles@5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/rxjs-marbles/-/rxjs-marbles-5.0.0.tgz#b46b4d6ed8ff62da9b5da6df1bcb423df56c72f4"
-  integrity sha512-Twr69tKSxC4ObE/afKJtSPuw+hVE5Paul8KlHhVsnOpqnSHiOd9Ff94RUx+fsCXYsnEILrf4qLsXpHlYzG4a9Q==
+rxjs-marbles@5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/rxjs-marbles/-/rxjs-marbles-5.0.1.tgz#cb89b811bdc1640e1a1752bfba1c6b0da291250a"
+  integrity sha512-qjKgZojswpIzVuRqrOcN+93C7Nv3GiAvOmhQy4NdeYn0kBwkMZzI2n65aJPIgPKDSsT8QZXIoQZ5euD7zBl+Bw==
   dependencies:
     fast-equals "^1.6.1"
 
