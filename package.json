@@ -71,7 +71,7 @@
     "@types/dotenv": "6.1.1",
     "@types/cors": "2.8.4",
     "@types/node": "10.14.4",
-    "rxjs-marbles": "5.0.0",
+    "rxjs-marbles": "5.0.1",
     "ts-deps": "0.3.1"
   }
 }
