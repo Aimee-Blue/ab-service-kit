@@ -1,6 +1,6 @@
 import chokidar from 'chokidar';
 import path, { dirname, resolve, join } from 'path';
-import { Observable, of, from, defer, concat, empty } from 'rxjs';
+import { Observable, of, from, defer, concat, empty, timer } from 'rxjs';
 import {
   mergeMap,
   map,
@@ -11,6 +11,10 @@ import {
   toArray,
   distinct,
   mapTo,
+  catchError,
+  switchMapTo,
+  bufferTime,
+  bufferWhen,
 } from 'rxjs/operators';
 import clearModule from 'clear-module';
 import { IServiceConfig, isTruthy } from '../shared';
@@ -141,9 +145,10 @@ export async function serviceSetupInWatchMode(
     '.env.local',
   ];
 
-  console.log(`🔍  Watching for file changes in ${WATCH_PATTERNS}`);
-
-  watchMultiple(WATCH_PATTERNS)
+  defer(() => {
+    console.log(`🔍  Watching for file changes in ${WATCH_PATTERNS}`);
+    return watchMultiple(WATCH_PATTERNS);
+  })
     .pipe(
       mergeMap(filePath =>
         from(
@@ -205,6 +210,14 @@ export async function serviceSetupInWatchMode(
             })
           )
         );
+      }),
+
+      catchError((err, self) => {
+        console.log(
+          '💥  Watching error, will wait for 2sec before restart ... ',
+          err
+        );
+        return timer(2000).pipe(switchMapTo(self));
       })
     )
     .subscribe(
