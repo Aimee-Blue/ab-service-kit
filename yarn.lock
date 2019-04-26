@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@aimee-blue/ab-shared@>=1.52.0":
-  version "1.52.0"
-  resolved "https://registry.yarnpkg.com/@aimee-blue/ab-shared/-/ab-shared-1.52.0.tgz#112d2efc02729a784ff0fd2eb08ee99381e83dff"
-  integrity sha512-WjJDpuRsoRtJJVdGyBxImx2P52/VEkG60t/8/9yYHEXb5h+SG4TcYn6NR24Pb6yJaDf9rh/Kjt6n+L7xU25OcA==
+"@aimee-blue/ab-shared@>=1.55.0":
+  version "1.55.0"
+  resolved "https://registry.yarnpkg.com/@aimee-blue/ab-shared/-/ab-shared-1.55.0.tgz#96ac9881d86087ee1b9a14b3747a4ab76c9a08a5"
+  integrity sha512-W7y1dXkoQfs/YHlextlseinAwA/mOZUYq2BuglP1jDrIbznsxqA5M41oC6XC2fhUuxWbiBd8ilZofO1Wt8atog==
   dependencies:
     joi "14.3.1"
 
@@ -1410,10 +1410,10 @@
   resolved "https://registry.yarnpkg.com/@types/minimatch/-/minimatch-3.0.3.tgz#3dca0e3f33b200fc7d1139c0cd96c1268cadfd9d"
   integrity sha512-tHq6qdbT9U1IRSGf14CL0pUlULksvY9OZ+5eEgl1N7t+OA3tGvNpxJCzuKQlsNgCVwbAs670L1vcVQi8j9HjnA==
 
-"@types/node-fetch@2.3.1":
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/@types/node-fetch/-/node-fetch-2.3.1.tgz#a453be56b53ff74e5e3603fe5f9a7e3d7b673efc"
-  integrity sha512-ZEiga4pDXtViK6SZKEXZ/86tiyI3tV8BJWvI9aj2WiRvs0TbX38aLFe9WecMhBmMF3BQpOJJGJM1Cvd7W2y2yg==
+"@types/node-fetch@2.3.2":
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/@types/node-fetch/-/node-fetch-2.3.2.tgz#e01893b176c6fa1367743726380d65bce5d6576b"
+  integrity sha512-yW0EOebSsQme9yKu09XbdDfle4/SmWZMK4dfteWcSLCYNQQcF+YOv0kIrvm+9pO11/ghA4E6A+RNQqvYj4Nr3A==
   dependencies:
     "@types/node" "*"
 
