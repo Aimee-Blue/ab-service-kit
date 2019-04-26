@@ -13,8 +13,6 @@ import {
   mapTo,
   catchError,
   switchMapTo,
-  bufferTime,
-  bufferWhen,
 } from 'rxjs/operators';
 import clearModule from 'clear-module';
 import { IServiceConfig, isTruthy } from '../shared';
