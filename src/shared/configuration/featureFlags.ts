@@ -3,11 +3,8 @@ import { Observable, from, defer } from 'rxjs';
 import { flatMap, map } from 'rxjs/operators';
 
 export function configureFlags<F = {}>(defaultFlags: F) {
-  const load = async ({
-    forceRefresh,
-    revision,
-  }: Config.IGetConfigParams = {}) => {
-    const flagsData = (await Config.load({ forceRefresh, revision }).then(
+  const load = async (params: Config.IGetConfigParams = {}) => {
+    const flagsData = (await Config.load(params).then(
       config => config.featureFlags
     )) as F;
     return {
