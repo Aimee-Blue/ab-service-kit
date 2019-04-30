@@ -50,7 +50,7 @@
     "@types/joi": "14.3.2",
     "@types/node-fetch": "2.3.2",
     "@types/ws": "6.0.1",
-    "chokidar": "2.1.5",
+    "chokidar": "3.0.0",
     "clear-module": "3.2.0",
     "cors": "2.8.5",
     "dotenv": "7.0.0",
