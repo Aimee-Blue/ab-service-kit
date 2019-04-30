@@ -63,7 +63,7 @@
     "rxjs-spy": "7.5.1",
     "rxjs-stream": "3.0.1",
     "source-map-support": "0.5.12",
-    "ws": "6.2.1",
+    "ws": "7.0.0",
     "yargs": "13.2.2"
   },
   "devDependencies": {
