@@ -1,23 +1,23 @@
 import { Config } from '@aimee-blue/ab-shared';
 import { callFn } from '../api';
-import { Observable, from, timer, defer } from 'rxjs';
-import { map, flatMap, ignoreElements, switchMapTo } from 'rxjs/operators';
-import { isTest } from '../isTest';
-import { onStartup } from '../startup';
+import { Observable, from, defer } from 'rxjs';
+import { map, flatMap } from 'rxjs/operators';
 
-const configurationLoad = (revision?: number) =>
-  callFn<Config.IConfig>('configurationLoad')({ revision });
+const configurationLoad = (revision?: number, authToken?: string) =>
+  callFn<Config.IConfig>('configurationLoad')({ revision, authToken });
 
 const configurations = new Map<number | 'no-revision', Config.IConfig>();
 
 export interface IGetConfigParams {
   forceRefresh?: boolean;
   revision?: number;
+  authToken?: string;
 }
 
 export const load = async ({
   forceRefresh,
   revision,
+  authToken,
 }: IGetConfigParams = {}): Promise<Config.IConfig> => {
   const rev = typeof revision === 'number' ? revision : 'no-revision';
 
@@ -25,7 +25,7 @@ export const load = async ({
     return configurations.get(rev) as Config.IConfig;
   } else {
     try {
-      const config = await configurationLoad(revision);
+      const config = await configurationLoad(revision, authToken);
       configurations.set(rev, config);
       if (rev === 'no-revision') {
         configurations.set(config.revision, config);
@@ -50,18 +50,3 @@ export const withLatest = <T>(whatever: Observable<T>) =>
       )
     )
   );
-
-if (!isTest()) {
-  const CONFIG_REFRESH_PERIOD = 60000;
-
-  onStartup()
-    .pipe(
-      switchMapTo(
-        timer(0, CONFIG_REFRESH_PERIOD).pipe(
-          flatMap(() => load()),
-          ignoreElements()
-        )
-      )
-    )
-    .subscribe();
-}
