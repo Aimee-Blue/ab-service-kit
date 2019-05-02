@@ -53,7 +53,7 @@
     "chokidar": "3.0.0",
     "clear-module": "3.2.0",
     "cors": "2.8.5",
-    "dotenv": "7.0.0",
+    "dotenv": "8.0.0",
     "dotenv-expand": "5.1.0",
     "express": "4.16.4",
     "fs-extra": "7.0.1",
