@@ -4,7 +4,7 @@ import { Observable, from, defer } from 'rxjs';
 import { map, flatMap } from 'rxjs/operators';
 
 const configurationLoad = (revision?: Config.Revision, authToken?: string) =>
-  callFn<Config.IConfig>('configurationLoad')({ revision, authToken });
+  callFn<Config.IPartialConfig>('configurationLoad')({ revision, authToken });
 
 export interface IGetConfigParams {
   revision?: Config.Revision;
@@ -17,7 +17,7 @@ export const load = async ({
 }: IGetConfigParams = {}): Promise<Config.IConfig> => {
   try {
     const config = await configurationLoad(revision, authToken);
-    return config;
+    return Config.mergeConfigsWithDefault(config);
   } catch (err) {
     console.error('💥  Failed when fetching config', err, revision);
     return Config.defaultConfiguration;
