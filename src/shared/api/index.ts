@@ -22,23 +22,29 @@ export const callFn = <T, P = unknown>(
   authToken?: string,
   rootEndpoint: string = process.env.CLOUD_FUNCTION_ROOT_ENDPOINT!
 ) => (data: P) =>
-  fetch(constructEndpointUri(rootEndpoint, functionName), {
-    method: 'post',
-    body: JSON.stringify({ data }),
-    headers: {
-      'Content-Type': 'application/json',
-      'cache-control': 'no-cache',
-      ...(authToken && { Authorization: 'Bearer ' + authToken }),
+  fetchFn(
+    functionName,
+    {
+      method: 'post',
+      body: JSON.stringify({ data }),
+      headers: {
+        'Content-Type': 'application/json',
+        'cache-control': 'no-cache',
+        ...(authToken && { Authorization: 'Bearer ' + authToken }),
+      },
+      redirect: 'error',
     },
-    redirect: 'error',
-  }).then(async res => {
-    if (res.ok) {
-      return res.json() as Promise<T>;
-    }
+    rootEndpoint
+  )
+    .then(async res => {
+      if (res.ok) {
+        return res.json() as Promise<{ result: T }>;
+      }
 
-    throw new FetchError(
-      res.statusText,
-      `HTTP STATUS: ${res.status}`,
-      res.type
-    );
-  });
+      throw new FetchError(
+        res.statusText,
+        `HTTP STATUS: ${res.status}`,
+        res.type
+      );
+    })
+    .then(wrapped => wrapped.result);
