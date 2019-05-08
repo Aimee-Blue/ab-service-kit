@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@aimee-blue/ab-shared@>=1.62.2":
-  version "1.62.2"
-  resolved "https://registry.yarnpkg.com/@aimee-blue/ab-shared/-/ab-shared-1.62.2.tgz#c3e98692e6945e3f85f7cd2387183c8ec4d65c99"
-  integrity sha512-0xLaqCLq7r6khGZUgBcDkj68cJ+1rdP+Yh23SYkTMJAKFvgrFwEmzPyl3LNbXDjd9AnYRbgY9I+pzmt62y4r8w==
+"@aimee-blue/ab-shared@>=1.62.3":
+  version "1.62.3"
+  resolved "https://registry.yarnpkg.com/@aimee-blue/ab-shared/-/ab-shared-1.62.3.tgz#8a3214f159f9a874cd5ef1ff36cd4bc81779db5e"
+  integrity sha512-Ryt350qjsZRW9gpMZBIEjpRlYh1NHjAjiBgeBvE4v09FuHU4wpS2v1Jds/BMn5IbtDDa4OPpa97/1DBj1KTr6g==
   dependencies:
     deepmerge "3.2.0"
     joi "14.3.1"
