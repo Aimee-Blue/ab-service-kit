@@ -7992,10 +7992,10 @@ rxjs-spy@7.5.1:
     error-stack-parser "^2.0.1"
     stacktrace-gps "^3.0.2"
 
-rxjs-stream@3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/rxjs-stream/-/rxjs-stream-3.0.1.tgz#c166886f371f467c8ab10e110df3b37117dbd8de"
-  integrity sha512-KZ+B7MWw2mygAsLJJ+mjYkCXHtSeYRXWhUVQBQRX4NgBmEiAEGAmVz7epY+8Gj0REL22W0T8ZbysFbzI/76ikA==
+rxjs-stream@3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/rxjs-stream/-/rxjs-stream-3.0.2.tgz#9af52f97fb90daa7bcc1ecc40c65532eb6f05fed"
+  integrity sha512-DASSTemCVcghTvUGKd6g2QYQ1Y/tCKwxZ2Xj41+PH0GHRLQLknwLIIHtPfbK1Cb7aorf0jZXAe123oSMHXLn7Q==
 
 rxjs-tslint-rules@4.23.1:
   version "4.23.1"
