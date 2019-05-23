@@ -1608,10 +1608,10 @@
     "@types/minimatch" "*"
     "@types/node" "*"
 
-"@types/inquirer@6.0.1":
-  version "6.0.1"
-  resolved "https://registry.yarnpkg.com/@types/inquirer/-/inquirer-6.0.1.tgz#ea9b483a81f16f4f0d27d5c8d9d081dfa36c4ee9"
-  integrity sha512-O9rEHE9iBvYaFAGS0fAlDzqY/3CsOrRKzni4zwnAEce2JrHUEbXAce2Pwwe8ZGzmQkucwSXn1tSiKig37INgfA==
+"@types/inquirer@6.0.2":
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/@types/inquirer/-/inquirer-6.0.2.tgz#2a1fdc089cc65a485c7410bc32e3fc41afcfa2c7"
+  integrity sha512-2gCUmuV+jxyeiERJK2nP8+IqHV/QzonDW9bjzQUAaynK3e0pC9FvOC6e6eEq6qgFHgh42Cm63u3BnESht2ZsxA==
   dependencies:
     "@types/through" "*"
     rxjs ">=6.4.0"
@@ -7277,10 +7277,10 @@ prepend-http@^1.0.1:
   resolved "https://registry.yarnpkg.com/prepend-http/-/prepend-http-1.0.4.tgz#d4f4562b0ce3696e41ac52d0e002e57a635dc6dc"
   integrity sha1-1PRWKwzjaW5BrFLQ4ALlemNdxtw=
 
-prettier@1.17.0:
-  version "1.17.0"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.17.0.tgz#53b303676eed22cc14a9f0cec09b477b3026c008"
-  integrity sha512-sXe5lSt2WQlCbydGETgfm1YBShgOX4HxQkFPvbxkcwgDvGDeqVau8h+12+lmSVlP3rHPz0oavfddSZg/q+Szjw==
+prettier@1.17.1:
+  version "1.17.1"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.17.1.tgz#ed64b4e93e370cb8a25b9ef7fef3e4fd1c0995db"
+  integrity sha512-TzGRNvuUSmPgwivDqkZ9tM/qTGW9hqDKWOE9YHiyQdixlKbv7kvEqsmDPrcHJTKwthU774TQwZXVtaQ/mMsvjg==
 
 pretty-format@^24.8.0:
   version "24.8.0"
@@ -7997,10 +7997,10 @@ rxjs-stream@3.0.1:
   resolved "https://registry.yarnpkg.com/rxjs-stream/-/rxjs-stream-3.0.1.tgz#c166886f371f467c8ab10e110df3b37117dbd8de"
   integrity sha512-KZ+B7MWw2mygAsLJJ+mjYkCXHtSeYRXWhUVQBQRX4NgBmEiAEGAmVz7epY+8Gj0REL22W0T8ZbysFbzI/76ikA==
 
-rxjs-tslint-rules@4.23.1:
-  version "4.23.1"
-  resolved "https://registry.yarnpkg.com/rxjs-tslint-rules/-/rxjs-tslint-rules-4.23.1.tgz#3cc17714a8702ea82c72ee0f2da1035a333355e6"
-  integrity sha512-THyk7uh9IuI/uK+rPNMOFDtmw9mE0CxzKCpZAp/63uKlFvcII1/GQO2qrpaegjEJZTu7vIYFsOoPIV50j9L1eA==
+rxjs-tslint-rules@4.23.2:
+  version "4.23.2"
+  resolved "https://registry.yarnpkg.com/rxjs-tslint-rules/-/rxjs-tslint-rules-4.23.2.tgz#6f8a8f1b547e78559feb041c60131d362c82d0a3"
+  integrity sha512-PuBRjVTRDvs12Gh2LeF5DJzXjw4XlpL3kZjPrXtjc0Qj9n70vM2qlF1o6wbqn4rdKGm5WKen+Gu5HNgppxua0w==
   dependencies:
     "@phenomnomnominal/tsquery" "^3.0.0"
     decamelize "^3.0.0"
@@ -8914,10 +8914,10 @@ trim-right@^1.0.1:
   resolved "https://registry.yarnpkg.com/trim-right/-/trim-right-1.0.1.tgz#cb2e1203067e0c8de1f614094b9fe45704ea6003"
   integrity sha1-yy4SAwZ+DI3h9hQJS5/kVwTqYAM=
 
-ts-deps@0.3.5:
-  version "0.3.5"
-  resolved "https://registry.yarnpkg.com/ts-deps/-/ts-deps-0.3.5.tgz#e8b058bf94c8ff5954bc3a8eefaa967703cce140"
-  integrity sha512-i4jh3sFIJaiLTHGifsLwPkuDwUWnN2vOt8aIUx3A+cyR79kuvUUyWSQrnYbry0jbgxITf+ZJ5Zsxv9Wo1AZ5UA==
+ts-deps@0.3.6:
+  version "0.3.6"
+  resolved "https://registry.yarnpkg.com/ts-deps/-/ts-deps-0.3.6.tgz#4e38dd5b8d56866b3731098167ff81524a29928d"
+  integrity sha512-bZ+Ge+pKwtjBd9IVJFv6KgMNNLmWfOoq0Q+BBF4/RY82ShalhprnON10z9nKmoYD+8BwhP+3ZagU0AuKqL0RYg==
   dependencies:
     "@babel/cli" "7.4.4"
     "@babel/core" "7.4.4"
@@ -8929,7 +8929,7 @@ ts-deps@0.3.5:
     "@commitlint/config-conventional" "7.6.0"
     "@semantic-release/exec" "3.3.2"
     "@types/fs-extra" "5.1.0"
-    "@types/inquirer" "6.0.1"
+    "@types/inquirer" "6.0.2"
     "@types/jest" "24.0.12"
     "@types/yargs" "13.0.0"
     babel-core "7.0.0-bridge.0"
@@ -8942,9 +8942,9 @@ ts-deps@0.3.5:
     inquirer "6.3.1"
     istanbul-api "2.1.6"
     jest "24.8.0"
-    prettier "1.17.0"
+    prettier "1.17.1"
     pretty-quick "1.10.0"
-    rxjs-tslint-rules "4.23.1"
+    rxjs-tslint-rules "4.23.2"
     semantic-release "16.0.0-beta.18"
     source-map-support "0.5.12"
     tar-fs "2.0.0"
