@@ -20,7 +20,7 @@
   },
   "devDependencies": {
     "@semantic-release/exec": "3.3.2",
-    "@aimee-blue/ab-service-kit": "1.0.11",
+    "@aimee-blue/ab-service-kit": "1.0.12",
     "@aimee-blue/ab-scripts": "1.2.3",
     "ts-deps": "0.3.5"
   }
