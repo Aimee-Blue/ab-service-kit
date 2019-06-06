@@ -16,7 +16,7 @@
     "shell-docker": "docker exec -it $(docker ps -aqf name=$npm_package_name) bash"
   },
   "dependencies": {
-    "@aimee-blue/ab-shared": "1.62.2"
+    "@aimee-blue/ab-shared": "1.68.0"
   },
   "devDependencies": {
     "@semantic-release/exec": "3.3.2",
