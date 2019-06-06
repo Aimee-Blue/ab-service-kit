@@ -1,6 +1,10 @@
 import * as PubSub from '@google-cloud/pubsub';
 
-const pubsubClient = new PubSub.PubSub();
+let initializedClient: PubSub.PubSub | null = null;
+
+const pubsubClient = () => {
+  return initializedClient || (initializedClient = new PubSub.PubSub());
+};
 
 const topicMap = new Map<string, PubSub.Topic>();
 
@@ -26,7 +30,8 @@ const retrySettings = {
 };
 
 const addTopicToMap = (topic: string) => {
-  const topicWithOpts = pubsubClient.topic(topic);
+  const topicWithOpts = pubsubClient().topic(topic);
+
   topicWithOpts.setPublishOptions({
     batching: {
       maxMessages: 1,
@@ -37,7 +42,9 @@ const addTopicToMap = (topic: string) => {
       retry: retrySettings,
     },
   });
+
   topicMap.set(topic, topicWithOpts);
+
   return topicMap.get(topic) as PubSub.Topic;
 };
 
@@ -45,9 +52,11 @@ const getTopic = (topic: string): PubSub.Topic => {
   const topicPublisher = topicMap.has(topic)
     ? topicMap.get(topic)
     : addTopicToMap(topic);
+
   if (!topicPublisher) {
     return addTopicToMap(topic);
   }
+
   return topicPublisher;
 };
 
@@ -59,12 +68,15 @@ export async function prepareTopics(topics: string[]) {
 
 export async function publish<T>(topic: string, data: T) {
   const topicPublisher = getTopic(topic);
+
   topicPublisher.publish(
     Buffer.from(JSON.stringify(data), 'utf8'),
-    (err: Error | null, mesId: unknown) => {
+    (err: Error | null, mesId) => {
       if (err) {
         console.error(
-          `💥  Error when publishing to topic ${topic} with message ${mesId}`,
+          `💥  Error when publishing to topic ${topic} ${
+            mesId ? `with message ${mesId}` : ''
+          }`,
           err
         );
       }
