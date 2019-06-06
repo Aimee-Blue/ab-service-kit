@@ -42,7 +42,7 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@aimee-blue/ab-shared": ">=1.67.1"
+    "@aimee-blue/ab-shared": ">=1.68.0"
   },
   "dependencies": {
     "@google-cloud/pubsub": "0.29.1",
