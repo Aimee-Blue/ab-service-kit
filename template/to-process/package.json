@@ -19,7 +19,7 @@
     "@aimee-blue/ab-shared": "1.62.2"
   },
   "devDependencies": {
-    "@semantic-release/exec": "3.3.2",
+    "@semantic-release/exec": "3.3.3",
     "@aimee-blue/ab-service-kit": "1.0.11",
     "@aimee-blue/ab-scripts": "1.2.3",
     "ts-deps": "0.3.5"
