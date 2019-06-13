@@ -15,7 +15,7 @@ export async function setupExpress(
   const corsWhitelist = (process.env.CORS_ORIGIN || '').split(',');
   app.use(
     cors({
-      origin: function(origin, callback) {
+      origin: (origin, callback) => {
         if (origin && corsWhitelist.indexOf(origin) !== -1) {
           callback(null, true);
         } else {
