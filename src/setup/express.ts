@@ -12,9 +12,16 @@ export async function setupExpress(
 ) {
   const app = express();
 
+  const corsWhitelist = (process.env.CORS_ORIGIN || '').split(',');
   app.use(
     cors({
-      origin: process.env.CORS_ORIGIN,
+      origin: (origin, callback) => {
+        if (origin && corsWhitelist.indexOf(origin) !== -1) {
+          callback(null, true);
+        } else {
+          callback(new Error('Not allowed by CORS'));
+        }
+      },
       optionsSuccessStatus: 200,
     })
   );
