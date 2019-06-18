@@ -1,8 +1,14 @@
 import * as PubSub from '@google-cloud/pubsub';
+import { fromEvent, defer, from } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
+import { appName } from '../app';
+import uuid from 'uuid';
+import { AckQueue } from '@google-cloud/pubsub/build/src/message-queues';
+import { localNow } from '../time';
 
 let initializedClient: PubSub.PubSub | null = null;
 
-const pubsubClient = () => {
+export const pubsubClient = () => {
   return initializedClient || (initializedClient = new PubSub.PubSub());
 };
 
@@ -48,7 +54,7 @@ const addTopicToMap = (topic: string) => {
   return topicMap.get(topic) as PubSub.Topic;
 };
 
-const getTopic = (topic: string): PubSub.Topic => {
+export const getTopic = (topic: string): PubSub.Topic => {
   const topicPublisher = topicMap.has(topic)
     ? topicMap.get(topic)
     : addTopicToMap(topic);
@@ -81,5 +87,74 @@ export async function publish<T>(topic: string, data: T) {
         );
       }
     }
+  );
+}
+
+export function subscribe(
+  topic: string,
+  options?: PubSub.SubscriptionOptions & {
+    autoCreateTopic?: boolean;
+    subscriptionName?: string;
+    autoCreateSubscription?: boolean;
+  }
+) {
+  return defer(() => from(appName())).pipe(
+    switchMap(async fullName => {
+      const start = localNow();
+
+      const shortName = fullName.replace('@aimee-blue/', '');
+
+      const {
+        autoCreateTopic,
+        subscriptionName,
+        autoCreateSubscription,
+        ...subOpts
+      } = {
+        autoCreateTopic: true,
+        subscriptionName: `${shortName}-${uuid()}`,
+        autoCreateSubscription: true,
+        ...options,
+      };
+
+      const topicPublisher = getTopic(topic);
+
+      if (autoCreateTopic) {
+        const [topicExists] = await topicPublisher.exists();
+
+        console.log('topic exists', topicExists, localNow() - start);
+
+        if (!topicExists) {
+          await topicPublisher.create();
+
+          console.log('topic created', localNow() - start);
+        }
+      }
+
+      const subscription = topicPublisher.subscription(
+        subscriptionName,
+        subOpts
+      );
+
+      if (autoCreateSubscription) {
+        const [exists] = await subscription.exists();
+
+        console.log('subscription exists', exists, localNow() - start);
+
+        if (!exists) {
+          await subscription.create();
+
+          console.log('subscription created', localNow() - start);
+        }
+      }
+
+      const stop = localNow();
+
+      console.log('Creating topic and subscription took: ', stop - start);
+
+      return subscription;
+    }),
+    switchMap(subscription => {
+      return fromEvent<PubSub.Message>(subscription, 'message');
+    })
   );
 }

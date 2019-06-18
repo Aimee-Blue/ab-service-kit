@@ -19,7 +19,7 @@ export async function setupExpress(
         if (origin && corsWhitelist.indexOf(origin) !== -1) {
           callback(null, true);
         } else {
-          callback(new Error('Not allowed by CORS'));
+          callback(null, false);
         }
       },
       optionsSuccessStatus: 200,
