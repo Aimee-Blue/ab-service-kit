@@ -2,7 +2,7 @@ declare var global: {
   INTEGRATION_TEST: true | false;
 };
 
-export function isTest() {
+export function isUnitTest() {
   return process.env.NODE_ENV === 'test';
 }
 
@@ -11,5 +11,5 @@ export function isIntegrationTest() {
 }
 
 export function isDevBuild() {
-  return isTest() || process.env.NODE_ENV !== 'production';
+  return isUnitTest() || process.env.NODE_ENV !== 'production';
 }

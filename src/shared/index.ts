@@ -9,6 +9,7 @@ export * from './isTest';
 export * from './startup';
 export * from './mergeEpics';
 export * from './eventBus';
+export * from './ofType';
 
 import * as Api from './api';
 import * as Config from './configuration';

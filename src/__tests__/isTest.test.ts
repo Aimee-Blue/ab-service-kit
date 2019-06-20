@@ -1,7 +1,7 @@
-import { isTest } from '../shared/isTest';
+import { isUnitTest } from '../shared/isTest';
 
 describe('isTest', () => {
   it('should work', () => {
-    expect(isTest()).toBe(true);
+    expect(isUnitTest()).toBe(true);
   });
 });
