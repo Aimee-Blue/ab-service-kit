@@ -21,6 +21,7 @@ export interface IServiceConfig {
 
   endpoints?: EndpointsHandler;
   sockets?: () => Promise<ISocketEpicsMap>;
+  background?: () => Promise<Observable<never>>;
   spy?: (spy: ReturnType<typeof import('rxjs-spy').create>) => Promise<void>;
 
   argsBuilder?: ArgsBuilder;
