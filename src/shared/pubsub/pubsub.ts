@@ -1,8 +1,12 @@
 import * as PubSub from '@google-cloud/pubsub';
+import { fromEvent, defer, from, merge } from 'rxjs';
+import { switchMap, map, ignoreElements } from 'rxjs/operators';
+import { appName } from '../app';
+import uuid from 'uuid';
 
 let initializedClient: PubSub.PubSub | null = null;
 
-const pubsubClient = () => {
+export const pubsubClient = () => {
   return initializedClient || (initializedClient = new PubSub.PubSub());
 };
 
@@ -48,7 +52,7 @@ const addTopicToMap = (topic: string) => {
   return topicMap.get(topic) as PubSub.Topic;
 };
 
-const getTopic = (topic: string): PubSub.Topic => {
+export const getTopic = (topic: string): PubSub.Topic => {
   const topicPublisher = topicMap.has(topic)
     ? topicMap.get(topic)
     : addTopicToMap(topic);
@@ -81,5 +85,66 @@ export async function publish<T>(topic: string, data: T) {
         );
       }
     }
+  );
+}
+
+export function subscribe(
+  topic: string,
+  options?: PubSub.SubscriptionOptions & {
+    autoCreateTopic?: boolean;
+    subscriptionName?: string;
+    autoCreateSubscription?: boolean;
+  }
+) {
+  return defer(() => from(appName())).pipe(
+    switchMap(async fullName => {
+      const shortName = fullName.replace('@aimee-blue/', '');
+
+      const {
+        autoCreateTopic,
+        subscriptionName,
+        autoCreateSubscription,
+        ...subOpts
+      } = {
+        autoCreateTopic: true,
+        subscriptionName: `${shortName}-${uuid()}`,
+        autoCreateSubscription: true,
+        ...options,
+      };
+
+      const topicPublisher = getTopic(topic);
+
+      if (autoCreateTopic) {
+        const [topicExists] = await topicPublisher.exists();
+        if (!topicExists) {
+          await topicPublisher.create();
+        }
+      }
+
+      const subscription = topicPublisher.subscription(
+        subscriptionName,
+        subOpts
+      );
+
+      if (autoCreateSubscription) {
+        const [exists] = await subscription.exists();
+        if (!exists) {
+          await subscription.create();
+        }
+      }
+
+      return subscription;
+    }),
+    switchMap(subscription =>
+      merge(
+        fromEvent<PubSub.Message>(subscription, 'message'),
+        fromEvent<Error>(subscription, 'error').pipe(
+          map(err => {
+            throw err;
+          }),
+          ignoreElements()
+        )
+      )
+    )
   );
 }

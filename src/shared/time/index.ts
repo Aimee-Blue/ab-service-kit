@@ -51,6 +51,8 @@ let serverTimeInfo: {
   took: number;
 } | null = null;
 
+let promise: Promise<number> | null = null;
+
 export const time = (deps = defaultDeps) => {
   if (!process.env.TIME_URL) {
     return Promise.resolve(localNow());
@@ -61,8 +63,8 @@ export const time = (deps = defaultDeps) => {
   }
 
   return (
-    // we ignore the first request, to warmup
-    deps
+    promise ||
+    (promise = deps
       .determineTime()
       .then(() => {
         const start = localNow();
@@ -75,6 +77,7 @@ export const time = (deps = defaultDeps) => {
             offset: localNow() - result,
             took,
           };
+          promise = null;
 
           console.log(
             '⏰  Time synchronized, it took',
@@ -87,8 +90,10 @@ export const time = (deps = defaultDeps) => {
         });
       })
       .catch(err => {
+        promise = null;
+
         console.error('💥  Error when synchronizing time', err);
         return localNow();
-      })
+      }))
   );
 };
