@@ -1,5 +1,6 @@
 import yargs from 'yargs';
 import express from 'express';
+import WebSocket from 'ws';
 import { Observable } from 'rxjs';
 import { IncomingMessage } from 'http';
 import { IAction } from './action';
@@ -35,19 +36,20 @@ export interface ISocketEpicsMap {
   [path: string]: AnySocketEpic;
 }
 
-export type AnySocketEpic = (
-  commands: Observable<unknown>,
-  request: IncomingMessage,
-  binary: Observable<Buffer>,
-  deps?: unknown
-) => Observable<IAction | Buffer>;
+export interface ISocketEpic<I, O = unknown, D = unknown> {
+  (
+    commands: Observable<I>,
+    request: IncomingMessage,
+    binary: Observable<Buffer>,
+    deps?: D
+  ): Observable<O>;
 
-export type SocketEpic<I extends IAction, D = unknown> = (
-  commands: Observable<I>,
-  request: IncomingMessage,
-  binary: Observable<Buffer>,
-  deps?: D
-) => Observable<IAction | Buffer>;
+  send?: (socket: WebSocket, data: O) => Promise<void>;
+}
+
+export type AnySocketEpic = ISocketEpic<unknown>;
+
+export type SocketEpic<I, O = unknown, D = unknown> = ISocketEpic<I, D, O>;
 
 type ArgsBuilder = (
   args: yargs.Argv<ICommandLineArgs>

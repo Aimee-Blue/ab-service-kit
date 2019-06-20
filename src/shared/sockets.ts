@@ -1,6 +1,6 @@
 import WebSocket from 'ws';
 import { Observable, empty, of } from 'rxjs';
-import { filter, mergeMap } from 'rxjs/operators';
+import { filter, mergeMap, concatMap } from 'rxjs/operators';
 import { Channels } from '@aimee-blue/ab-shared';
 import * as Joi from 'joi';
 
@@ -129,35 +129,46 @@ export const binaryStreamFromSocket = (data: Observable<WebSocket.Data>) => {
   return data.pipe(filter(isBuffer));
 };
 
-export const pipeStreamIntoSocket = (
-  stream: Observable<{}>,
-  socket: WebSocket
-) => {
-  const clientSend = (data: object) => {
+const defaultSend = <T>(socket: WebSocket, data: T): Promise<void> => {
+  return new Promise<void>((res, rej) => {
     if (socket.readyState === socket.OPEN) {
-      socket.send(JSON.stringify(data), err => {
+      socket.send(data instanceof Buffer ? data : JSON.stringify(data), err => {
         if (err) {
-          console.error('💥  Cannot send', err);
+          rej(err);
+        } else {
+          res();
         }
       });
     } else {
-      console.error(
-        '💥  Trying to send data while socket is not ready',
-        data,
-        new Error()
-      );
+      rej(new Error('Trying to send data while socket is not ready'));
     }
-  };
+  });
+};
 
-  const subscription = stream.subscribe(
-    data => {
-      clientSend(data);
-    },
-    error => {
+const defaultErrorHandler = <T>(_data: T, error: Error) => {
+  console.error('💥 Error when sending data', error);
+};
+
+export const pipeStreamIntoSocket = <T>(
+  stream: Observable<T>,
+  socket: WebSocket,
+  send: typeof defaultSend = defaultSend,
+  onSendError: typeof defaultErrorHandler = defaultErrorHandler
+) => {
+  const subscription = stream
+    .pipe(
+      concatMap(data =>
+        send(socket, data).catch((err: Error) => {
+          onSendError(data, err);
+
+          return Promise.reject(err);
+        })
+      )
+    )
+    .subscribe(error => {
       console.error('💥  Outgoing stream error', error);
       socket.close(1011, 'Outgoing stream error');
-    }
-  );
+    });
 
   socket.on('close', () => {
     subscription.unsubscribe();

@@ -73,7 +73,8 @@ export const socketHandlerBuilder = (
           socket.close(1000, 'OK');
         })
       ),
-      socket
+      socket,
+      handler.send
     )
   );
   subscription.add(data.connect());
