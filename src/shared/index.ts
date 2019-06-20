@@ -7,6 +7,8 @@ export * from './publishStream';
 export * from './time';
 export * from './isTest';
 export * from './startup';
+export * from './mergeEpics';
+export * from './eventBus';
 
 import * as Api from './api';
 import * as Config from './configuration';
