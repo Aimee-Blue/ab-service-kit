@@ -3,7 +3,6 @@ import express from 'express';
 import WebSocket from 'ws';
 import { Observable } from 'rxjs';
 import { IncomingMessage } from 'http';
-import { IAction } from './action';
 
 export interface ICommandLineArgs {
   http: boolean;
