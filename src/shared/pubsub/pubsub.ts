@@ -142,7 +142,7 @@ export function subscribe(
     }),
     switchMap(
       subscription =>
-        new Observable(subscriber => {
+        new Observable<Message>(subscriber => {
           const name = subscription.name;
 
           console.log(
