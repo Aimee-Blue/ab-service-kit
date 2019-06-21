@@ -1,5 +1,5 @@
 import * as PubSub from '@google-cloud/pubsub';
-import { fromEvent, defer, from, merge } from 'rxjs';
+import { fromEvent, defer, from, merge, Observable } from 'rxjs';
 import { switchMap, map, ignoreElements } from 'rxjs/operators';
 import { appName } from '../app';
 import uuid from 'uuid';
@@ -94,6 +94,7 @@ export function subscribe(
     autoCreateTopic?: boolean;
     subscriptionName?: string;
     autoCreateSubscription?: boolean;
+    subscriptionOptions?: PubSub.CreateSubscriptionOptions;
   }
 ) {
   return defer(() => from(appName())).pipe(
@@ -104,11 +105,13 @@ export function subscribe(
         autoCreateTopic,
         subscriptionName,
         autoCreateSubscription,
+        subscriptionOptions,
         ...subOpts
       } = {
         autoCreateTopic: true,
         subscriptionName: `${shortName}-${uuid()}`,
         autoCreateSubscription: true,
+        subscriptionOptions: undefined,
         ...options,
       };
 
@@ -129,22 +132,30 @@ export function subscribe(
       if (autoCreateSubscription) {
         const [exists] = await subscription.exists();
         if (!exists) {
-          await subscription.create();
+          await subscription.create(subscriptionOptions);
         }
       }
 
       return subscription;
     }),
-    switchMap(subscription =>
-      merge(
-        fromEvent<PubSub.Message>(subscription, 'message'),
-        fromEvent<Error>(subscription, 'error').pipe(
-          map(err => {
-            throw err;
-          }),
-          ignoreElements()
-        )
-      )
+    switchMap(
+      subscription =>
+        new Observable(subscriber => {
+          subscriber.add(
+            merge(
+              fromEvent<PubSub.Message>(subscription, 'message'),
+              fromEvent<Error>(subscription, 'error').pipe(
+                map(err => {
+                  throw err;
+                }),
+                ignoreElements()
+              )
+            ).subscribe(subscriber)
+          );
+          subscriber.add(() => {
+            subscription.close();
+          });
+        })
     )
   );
 }
