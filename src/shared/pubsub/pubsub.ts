@@ -88,6 +88,8 @@ export async function publish<T>(topic: string, data: T) {
   );
 }
 
+export type Message = PubSub.Message;
+
 export function subscribe(
   topic: string,
   options?: PubSub.SubscriptionOptions & {
