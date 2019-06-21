@@ -1,6 +1,6 @@
 import WebSocket from 'ws';
 import { Observable, empty, of } from 'rxjs';
-import { filter, mergeMap, concatMap } from 'rxjs/operators';
+import { filter, mergeMap, concatMap, ignoreElements } from 'rxjs/operators';
 import { Channels } from '@aimee-blue/ab-shared';
 import * as Joi from 'joi';
 
@@ -163,11 +163,14 @@ export const pipeStreamIntoSocket = <T>(
 
           return Promise.reject(err);
         })
-      )
+      ),
+      ignoreElements()
     )
-    .subscribe(error => {
-      console.error('💥  Outgoing stream error', error);
-      socket.close(1011, 'Outgoing stream error');
+    .subscribe({
+      error: error => {
+        console.error('💥  Outgoing stream error', error);
+        socket.close(1011, 'Outgoing stream error');
+      },
     });
 
   socket.on('close', () => {
