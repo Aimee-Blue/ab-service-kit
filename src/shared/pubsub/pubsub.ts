@@ -141,6 +141,12 @@ export function subscribe(
     switchMap(
       subscription =>
         new Observable(subscriber => {
+          const name = subscription.name;
+
+          console.log(
+            `🎬 Subscribing to topic "${topic}" with subscription "${name}"`
+          );
+
           subscriber.add(
             merge(
               fromEvent<PubSub.Message>(subscription, 'message'),
@@ -153,7 +159,17 @@ export function subscribe(
             ).subscribe(subscriber)
           );
           subscriber.add(() => {
-            subscription.close();
+            subscription
+              .close()
+              .then(() => {
+                console.log(`🏁 Unsubscribed from "${subscription.name}"`);
+              })
+              .catch((err: Error) => {
+                console.error(
+                  `💥 Error when unsubscribing from "${subscription.name}"`,
+                  err
+                );
+              });
           });
         })
     )
