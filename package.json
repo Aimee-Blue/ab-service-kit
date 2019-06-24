@@ -73,7 +73,7 @@
     "@types/dotenv": "6.1.1",
     "@types/node": "10.14.4",
     "chokidar": "3.0.1",
-    "husky": "2.4.1",
+    "husky": "2.5.0",
     "rxjs-marbles": "5.0.2",
     "ts-deps": "0.3.7"
   }
