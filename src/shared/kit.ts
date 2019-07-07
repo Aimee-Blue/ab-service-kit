@@ -3,6 +3,7 @@ import express from 'express';
 import WebSocket from 'ws';
 import { Observable } from 'rxjs';
 import { IncomingMessage } from 'http';
+import * as Joi from 'joi';
 
 export interface ICommandLineArgs {
   http: boolean;
@@ -29,6 +30,7 @@ export interface IServiceConfig {
   watchPatterns?: string[];
 
   shouldUseDefaultEndpoints?: boolean;
+  shouldLoadEnvFiles?: boolean;
 }
 
 export interface ISocketEpicsMap {
@@ -44,6 +46,7 @@ export interface ISocketEpic<I, O = unknown, D = unknown> {
   ): Observable<O>;
 
   send?: (socket: WebSocket, data: O) => Promise<void>;
+  actionSchemaByType?: (type: string) => Joi.ObjectSchema | null;
 }
 
 export type AnySocketEpic = ISocketEpic<unknown>;

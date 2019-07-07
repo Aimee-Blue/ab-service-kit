@@ -40,15 +40,22 @@ const buildArgumentsParser = (config: IServiceConfig) =>
       description: 'Path to an HTTPS private-key',
     });
 
-export async function start(config: IServiceConfig) {
+export async function start(config: IServiceConfig, args?: ICommandLineArgs) {
   const parser = buildArgumentsParser(config);
   const effectiveParser = config.argsBuilder
     ? config.argsBuilder(parser)
     : parser;
 
-  const params = effectiveParser.parse();
+  const params = args || effectiveParser.parse();
 
-  await loadEnv(params.envFile);
+  const shouldLoadEnvFiles =
+    typeof config.shouldLoadEnvFiles === 'boolean'
+      ? config.shouldLoadEnvFiles
+      : true;
+
+  if (shouldLoadEnvFiles) {
+    await loadEnv(params.envFile);
+  }
 
   const certPath = params.cert || process.env.HTTPS_CERT_PATH!;
   const keyPath = params.cert || process.env.HTTPS_KEY_PATH!;
@@ -102,15 +109,15 @@ export async function start(config: IServiceConfig) {
         );
       }
 
-      await serviceSetupInWatchMode(configFilePath, async newConfig => {
+      return await serviceSetupInWatchMode(configFilePath, async newConfig => {
         return await serviceSetup(server, newConfig, params);
       });
     } else {
-      await serviceSetup(server, config, params);
+      return await serviceSetup(server, config, params);
     }
   };
 
-  await handleServerRequestsWithDevTools();
+  const teardown = await handleServerRequestsWithDevTools();
 
   server.listen(
     {
@@ -127,4 +134,17 @@ export async function start(config: IServiceConfig) {
       );
     }
   );
+
+  return async () => {
+    await teardown('destroy');
+    await new Promise((res, rej) =>
+      server.close(err => {
+        if (err) {
+          rej(err);
+        } else {
+          res();
+        }
+      })
+    );
+  };
 }

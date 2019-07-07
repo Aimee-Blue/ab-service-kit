@@ -1,6 +1,6 @@
 import { socketHandlerBuilder } from '../setup/sockets';
 import { marbles } from 'rxjs-marbles/jest';
-import { takeUntil, filter, map } from 'rxjs/operators';
+import { takeUntil, filter, map, tap } from 'rxjs/operators';
 import { EventEmitter } from 'events';
 import { publishStream } from '../shared';
 
@@ -20,7 +20,13 @@ function buildDeps(incoming) {
 function resultStream({ pipelines, incoming }) {
   const deps = buildDeps(incoming);
 
-  const handler = socketHandlerBuilder(pipelines, deps);
+  const handler = socketHandlerBuilder(
+    () => pipelines,
+    jest.fn(),
+    jest.fn(),
+    jest.fn(),
+    deps
+  );
 
   const socket = new EventEmitter();
   socket.close = jest.fn();
@@ -99,7 +105,6 @@ describe('given a terminatable pipeline', () => {
    */
   const terminatableEchoEpic = commands => {
     return commands.pipe(
-      //
       takeUntil(
         commands.pipe(
           //
@@ -117,7 +122,7 @@ describe('given a terminatable pipeline', () => {
       'should work',
       marbles(m => {
         const incoming = m.hot('a--t--|'); // prettier-ignore
-        const subscriptions =  '^--!'; // prettier-ignore
+        const subscriptions =  '^-----!'; // prettier-ignore
         const expected =       'a--|'; // prettier-ignore
 
         const result = resultStream({ incoming, pipelines });
