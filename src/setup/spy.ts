@@ -1,6 +1,9 @@
 import { IServiceConfig } from '../shared';
+import { TeardownHandler, noop } from './teardown';
 
-export async function setupSpy(config: IServiceConfig) {
+export async function setupSpy(
+  config: IServiceConfig
+): Promise<TeardownHandler> {
   if (config.spy) {
     const { create } = require('rxjs-spy') as typeof import('rxjs-spy');
     const spy = create();
@@ -9,12 +12,10 @@ export async function setupSpy(config: IServiceConfig) {
 
     console.log('👀  RxJs Spy initialized');
 
-    return () => {
+    return async () => {
       spy.teardown();
     };
   } else {
-    return () => {
-      return;
-    };
+    return noop;
   }
 }

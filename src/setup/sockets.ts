@@ -11,26 +11,16 @@ import {
   dataStreamFromSocket,
 } from '../shared/sockets';
 import { Subscription } from 'rxjs';
-import { finalize } from 'rxjs/operators';
 import { publishStream } from '../shared/publishStream';
+import uuid from 'uuid';
+import { TeardownHandler } from './teardown';
 
-type SocketHandler = (socket: WebSocket, request: http.IncomingMessage) => void;
+type Server = http.Server | https.Server;
 
-function createSocket(handler: SocketHandler): WebSocket.Server {
-  const wss = new WebSocket.Server({ noServer: true });
-
-  wss.on('error', error => {
-    console.log('💥  ', error);
-  });
-
-  wss.on('connection', handler);
-
-  return wss;
-}
-
-function noop() {
-  return;
-}
+type SocketHandler = (
+  socket: WebSocket & { id: string },
+  request: http.IncomingMessage
+) => void;
 
 const builderDeps = {
   dataStreamFromSocket,
@@ -40,7 +30,10 @@ const builderDeps = {
 };
 
 export const socketHandlerBuilder = (
-  pipelines: Map<string, AnySocketEpic>,
+  epicsByPath: () => Map<string, AnySocketEpic>,
+  detachFromSocket: (id: string) => void,
+  closeSocket: (id: string) => void,
+  attachToSocket: (id: string, subscription: Subscription) => void,
   deps = builderDeps
 ): SocketHandler => (socket, message) => {
   if (!message.url) {
@@ -52,51 +45,103 @@ export const socketHandlerBuilder = (
     return;
   }
 
-  const handler = pipelines.get(pathname);
+  detachFromSocket(socket.id);
+
+  const handler = epicsByPath().get(pathname);
   if (!handler) {
+    closeSocket(socket.id);
     return;
   }
 
   const data = publishStream(deps.dataStreamFromSocket(socket));
 
-  const commands = deps.actionStreamFromSocket(data);
+  const commands = deps.actionStreamFromSocket(
+    data,
+    handler.actionSchemaByType
+  );
   const binary = deps.binaryStreamFromSocket(data);
 
   const results = handler(commands, message, binary);
 
   const subscription = new Subscription();
-  subscription.add(
-    deps.pipeStreamIntoSocket(
-      results.pipe(
-        finalize(() => {
-          subscription.unsubscribe();
-          socket.close(1000, 'OK');
-        })
-      ),
-      socket,
-      handler.send
-    )
-  );
+  subscription.add(deps.pipeStreamIntoSocket(results, socket, handler.send));
   subscription.add(data.connect());
+
+  attachToSocket(socket.id, subscription);
 };
 socketHandlerBuilder.defaultDeps = builderDeps;
 
-export async function setupSockets(
-  server: http.Server | https.Server,
-  config: IServiceConfig
+interface IConnectedSocket {
+  id: string;
+  pathname: string;
+  ws: WebSocket & { id: string };
+  socket: Socket;
+  request: http.IncomingMessage;
+  subscription?: Subscription;
+}
+
+type SocketRegistry = ReturnType<typeof createSocketRegistry>;
+
+function createSocketRegistry(
+  server: Server,
+  epicsByPath: Map<string, AnySocketEpic>
 ) {
-  if (!config.sockets) {
-    return noop;
-  }
+  const state = {
+    epicsByPath,
+    sockets: new Map<string, IConnectedSocket>(),
+  };
 
-  const pipelines = await config.sockets();
+  const wss = new WebSocket.Server({ noServer: true });
 
-  const epicsByPath = new Map<string, AnySocketEpic>(Object.entries(pipelines));
-  if (epicsByPath.size === 0) {
-    return noop;
-  }
+  wss.on('error', error => {
+    console.log('💥  ', error);
+  });
 
-  const wss = createSocket(socketHandlerBuilder(epicsByPath));
+  const detachFromSocket = (id: string) => {
+    const socketState = state.sockets.get(id);
+    if (!socketState) {
+      return;
+    }
+
+    const { subscription, ...rest } = socketState;
+
+    if (subscription) {
+      state.sockets.set(id, rest);
+
+      subscription.unsubscribe();
+    }
+  };
+
+  const closeSocket = (id: string) => {
+    const socketState = state.sockets.get(id);
+    if (!socketState) {
+      return;
+    }
+
+    socketState.ws.close();
+    state.sockets.delete(id);
+  };
+
+  const attachToSocket = (id: string, subscription: Subscription) => {
+    const socketState = state.sockets.get(id);
+    if (!socketState) {
+      return;
+    }
+
+    state.sockets.set(id, {
+      ...socketState,
+      subscription,
+    });
+  };
+
+  const onConnection: SocketHandler = socketHandlerBuilder(
+    () => state.epicsByPath,
+    detachFromSocket,
+    closeSocket,
+    attachToSocket
+  );
+
+  wss.on('connection', onConnection);
 
   const upgradeListener = function upgrade(
     request: http.IncomingMessage,
@@ -110,18 +155,100 @@ export async function setupSockets(
 
     const pathname = url.parse(request.url).pathname;
 
-    if (typeof pathname === 'string' && epicsByPath.has(pathname)) {
-      wss.handleUpgrade(request, socket, head, function done(ws) {
-        wss.emit('connection', ws, request);
-      });
-    } else {
+    if (typeof pathname !== 'string' || !state.epicsByPath.has(pathname)) {
+      console.log("🤷‍  Path doesn't have a handler", pathname);
       socket.destroy();
+      return;
+    }
+
+    wss.handleUpgrade(request, socket, head, function done(
+      ws: WebSocket & { id: string }
+    ) {
+      const id = uuid();
+
+      ws.id = id;
+
+      state.sockets.set(id, {
+        id,
+        pathname,
+        ws,
+        socket,
+        request,
+      });
+
+      ws.once('close', () => {
+        detachFromSocket(id);
+        state.sockets.delete(id);
+      });
+
+      wss.emit('connection', ws, request);
+    });
+  };
+
+  const onServerClose = async () => {
+    server.removeListener('upgrade', upgradeListener);
+
+    for (const socketState of state.sockets.values()) {
+      detachFromSocket(socketState.id);
+
+      socketState.ws.close(1012);
+
+      state.sockets.delete(socketState.id);
     }
   };
 
   server.addListener('upgrade', upgradeListener);
 
-  return () => {
-    server.removeListener('upgrade', upgradeListener);
+  return {
+    initialize: (newEpicsByPath: Map<string, AnySocketEpic>) => {
+      state.epicsByPath = newEpicsByPath;
+
+      for (const socketState of state.sockets.values()) {
+        onConnection(socketState.ws, socketState.request);
+      }
+    },
+    deinitialize: async () => {
+      for (const socketState of state.sockets.values()) {
+        detachFromSocket(socketState.id);
+      }
+    },
+    destroy: async () => {
+      await onServerClose();
+    },
+  };
+}
+
+function getRegistry(
+  server: Server & { registry?: SocketRegistry },
+  epicsByPath: Map<string, AnySocketEpic>
+) {
+  if (server.registry) {
+    return server.registry;
+  }
+  return (server.registry = createSocketRegistry(server, epicsByPath));
+}
+
+export async function setupSockets(
+  server: http.Server | https.Server,
+  config: IServiceConfig,
+  deps = {
+    getRegistry,
+  }
+): Promise<TeardownHandler> {
+  const pipelines = await ((config.sockets && config.sockets()) ||
+    Promise.resolve({}));
+
+  const epicsByPath = new Map<string, AnySocketEpic>(Object.entries(pipelines));
+
+  const registry = deps.getRegistry(server, epicsByPath);
+
+  registry.initialize(epicsByPath);
+
+  return async mode => {
+    if (mode === 'destroy') {
+      await registry.destroy();
+    } else {
+      await registry.deinitialize();
+    }
   };
 }

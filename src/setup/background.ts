@@ -1,15 +1,20 @@
 import { IServiceConfig } from '../shared';
-import { Subscription } from 'rxjs';
+import { TeardownHandler, noop } from './teardown';
 
-export async function setupBackground(config: IServiceConfig) {
+export async function setupBackground(
+  config: IServiceConfig
+): Promise<TeardownHandler> {
   if (config.background) {
     const result = await config.background();
-    return result.subscribe({
+    const subscription = result.subscribe({
       error: err => {
         console.error(`💥  CRITICAL! Background operation has failed`, err);
       },
     });
+    return async () => {
+      subscription.unsubscribe();
+    };
   } else {
-    return Promise.resolve(new Subscription());
+    return noop;
   }
 }

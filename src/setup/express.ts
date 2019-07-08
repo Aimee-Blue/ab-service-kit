@@ -5,11 +5,12 @@ import cors from 'cors';
 
 import { IServiceConfig } from '../shared';
 import { defaultEndpoints } from '../endpoints';
+import { TeardownHandler } from './teardown';
 
 export async function setupExpress(
   server: http.Server | https.Server,
   config: IServiceConfig
-) {
+): Promise<TeardownHandler> {
   const app = express();
 
   app.use(
@@ -31,7 +32,7 @@ export async function setupExpress(
 
   server.addListener('request', app);
 
-  return () => {
+  return async () => {
     server.removeListener('request', app);
   };
 }

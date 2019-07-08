@@ -50,7 +50,7 @@ const isString = (value: WebSocket.Data): value is string => {
   return typeof value === 'string';
 };
 
-export const dataStreamFromSocket = (client: WebSocket) => {
+export const dataStreamFromSocket = (client: WebSocket & { id?: string }) => {
   return new Observable<WebSocket.Data>(subscriber => {
     const messageHandler = (data: WebSocket.Data) => {
       subscriber.next(data);
@@ -91,7 +91,8 @@ const tryParse = <T>(text: string): T | null => {
 };
 
 export const actionStreamFromSocket = <T extends { type: string }>(
-  data: Observable<WebSocket.Data>
+  data: Observable<WebSocket.Data>,
+  actionSchemaByType = Channels.actionSchemaByType
 ) => {
   return data.pipe(
     filter(isString),
@@ -106,7 +107,7 @@ export const actionStreamFromSocket = <T extends { type: string }>(
         return empty();
       }
 
-      const schema = Channels.actionSchemaByType(value.type);
+      const schema = actionSchemaByType(value.type);
 
       if (!schema) {
         console.error('💥  No schema found for type', value.type);
@@ -170,6 +171,9 @@ export const pipeStreamIntoSocket = <T>(
       error: error => {
         console.error('💥  Outgoing stream error', error);
         socket.close(1011, 'Outgoing stream error');
+      },
+      complete: () => {
+        socket.close(1000, 'Outgoing stream completed');
       },
     });
 
