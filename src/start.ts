@@ -119,21 +119,38 @@ export async function start(config: IServiceConfig, args?: ICommandLineArgs) {
 
   const teardown = await handleServerRequestsWithDevTools();
 
-  server.listen(
-    {
-      port,
-      host,
-    },
-    () => {
-      const mode = params.http
-        ? ' (un-encrypted http/ws)'
-        : " (https/wss) - Pass '--http' argument to disable encryption";
-      console.log(
-        `👍  PID ${process.pid}; Currently listening on ${host ||
-          ''}${port}${mode}`
-      );
-    }
-  );
+  await new Promise((res, rej) => {
+    let handled = false;
+    server.on('error', err => {
+      if (handled) {
+        return;
+      }
+
+      handled = true;
+      rej(err);
+    });
+    server.listen(
+      {
+        port,
+        host,
+      },
+      () => {
+        if (handled) {
+          return;
+        }
+
+        handled = true;
+        const mode = params.http
+          ? ' (un-encrypted http/ws)'
+          : " (https/wss) - Pass '--http' argument to disable encryption";
+        console.log(
+          `👍  PID ${process.pid}; Currently listening on ${host ||
+            ''}${port}${mode}`
+        );
+        res();
+      }
+    );
+  });
 
   return async () => {
     await teardown('destroy');

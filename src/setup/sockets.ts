@@ -200,11 +200,16 @@ function createSocketRegistry(
   server.addListener('upgrade', upgradeListener);
 
   return {
-    switch: (newEpicsByPath: Map<string, AnySocketEpic>) => {
+    initialize: (newEpicsByPath: Map<string, AnySocketEpic>) => {
       state.epicsByPath = newEpicsByPath;
 
       for (const socketState of state.sockets.values()) {
         onConnection(socketState.ws, socketState.request);
+      }
+    },
+    deinitialize: async () => {
+      for (const socketState of state.sockets.values()) {
+        detachFromSocket(socketState.id);
       }
     },
     destroy: async () => {
@@ -225,22 +230,25 @@ function getRegistry(
 
 export async function setupSockets(
   server: http.Server | https.Server,
-  config: IServiceConfig
+  config: IServiceConfig,
+  deps = {
+    getRegistry,
+  }
 ): Promise<TeardownHandler> {
   const pipelines = await ((config.sockets && config.sockets()) ||
     Promise.resolve({}));
 
   const epicsByPath = new Map<string, AnySocketEpic>(Object.entries(pipelines));
 
-  const registry = getRegistry(server, epicsByPath);
+  const registry = deps.getRegistry(server, epicsByPath);
 
-  registry.switch(epicsByPath);
+  registry.initialize(epicsByPath);
 
   return async mode => {
     if (mode === 'destroy') {
       await registry.destroy();
     } else {
-      // done in switch ...
+      await registry.deinitialize();
     }
   };
 }

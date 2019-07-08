@@ -34,7 +34,6 @@ async function initTestEpic(epic: SocketEpic<unknown>) {
     },
     shouldLoadEnvFiles: false,
   };
-
   const teardown = await startTestService(config);
 
   return {

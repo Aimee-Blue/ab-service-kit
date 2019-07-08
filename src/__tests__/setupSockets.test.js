@@ -1,135 +1,43 @@
-import { socketHandlerBuilder } from '../setup/sockets';
-import { marbles } from 'rxjs-marbles/jest';
-import { takeUntil, filter, map, tap } from 'rxjs/operators';
+import { setupSockets } from '../setup/sockets';
 import { EventEmitter } from 'events';
-import { publishStream } from '../shared';
 
-function buildDeps(incoming) {
-  const dataStreamFromSocket = () => incoming;
-
-  const deps = {
-    dataStreamFromSocket,
-    pipeStreamIntoSocket: jest.fn(),
-    actionStreamFromSocket: stream => stream,
-    binaryStreamFromSocket: stream => stream,
-  };
-
-  return deps;
+function mockServer() {
+  const server = new EventEmitter();
+  return server;
 }
 
-function resultStream({ pipelines, incoming }) {
-  const deps = buildDeps(incoming);
-
-  const handler = socketHandlerBuilder(
-    () => pipelines,
-    jest.fn(),
-    jest.fn(),
-    jest.fn(),
-    deps
-  );
-
-  const socket = new EventEmitter();
-  socket.close = jest.fn();
-
-  handler(socket, {
-    url: 'http://some-server.com/endpoint',
-  });
-
-  expect(deps.pipeStreamIntoSocket).toBeCalledTimes(1);
-
-  const result = deps.pipeStreamIntoSocket.mock.calls[0][0];
-
-  return result;
+function prepareTestArgsAndMocks() {
+  const registry = {
+    initialize: jest.fn(),
+    destroy: jest.fn(),
+  };
+  return {
+    registry,
+    server: mockServer(),
+    config: {},
+    deps: {
+      getRegistry: jest.fn(() => registry),
+    },
+  };
 }
 
-describe('given an echoing pipeline', () => {
-  const echoEpic = commands => {
-    return commands.pipe(map(x => x));
-  };
+describe('setupSockets', () => {
+  it('should initialize registry', async () => {
+    const data = prepareTestArgsAndMocks();
+    await setupSockets(data.server, data.config, data.deps);
 
-  const pipelines = new Map();
-  pipelines.set('/endpoint', echoEpic);
-
-  describe('when closed on client side', () => {
-    it(
-      'should work',
-      marbles(m => {
-        const incoming = m.hot('a|'); // prettier-ignore
-        const subscriptions =  '^!'; // prettier-ignore
-        const expected =       'a|'; // prettier-ignore
-
-        const result = resultStream({ incoming, pipelines });
-
-        m.expect(result).toBeObservable(expected);
-        m.expect(incoming).toHaveSubscriptions(subscriptions);
-      })
-    );
+    expect(data.deps.getRegistry).toBeCalledTimes(1);
+    expect(data.deps.getRegistry.mock.calls[0][0]).toBe(data.server);
+    expect(data.deps.getRegistry.mock.calls[0][1]).toEqual(new Map());
+    expect(data.registry.initialize).toBeCalledTimes(1);
   });
 
-  describe('when never closed on client side', () => {
-    it(
-      'should work',
-      marbles(m => {
-        const incoming = m.hot('a---'); // prettier-ignore
-        const subscriptions =  '^---'; // prettier-ignore
-        const expected =       'a---'; // prettier-ignore
+  it('should dispose correctly', async () => {
+    const data = prepareTestArgsAndMocks();
+    const result = await setupSockets(data.server, data.config, data.deps);
 
-        const result = resultStream({ incoming, pipelines });
+    await result('destroy');
 
-        m.expect(result).toBeObservable(expected);
-        m.expect(incoming).toHaveSubscriptions(subscriptions);
-      })
-    );
-  });
-
-  describe('when no data on client side', () => {
-    it(
-      'should work',
-      marbles(m => {
-        const incoming = m.hot('----'); // prettier-ignore
-        const subscriptions =  '^---'; // prettier-ignore
-        const expected =       '----'; // prettier-ignore
-
-        const result = resultStream({ incoming, pipelines });
-
-        m.expect(result).toBeObservable(expected);
-        m.expect(incoming).toHaveSubscriptions(subscriptions);
-      })
-    );
-  });
-});
-
-describe('given a terminatable pipeline', () => {
-  /**
-   * @param {import('rxjs').Observable<string>} commands
-   */
-  const terminatableEchoEpic = commands => {
-    return commands.pipe(
-      takeUntil(
-        commands.pipe(
-          //
-          filter(cmd => cmd === 't')
-        )
-      )
-    );
-  };
-
-  const pipelines = new Map();
-  pipelines.set('/endpoint', terminatableEchoEpic);
-
-  describe('when closed on server side', () => {
-    it(
-      'should work',
-      marbles(m => {
-        const incoming = m.hot('a--t--|'); // prettier-ignore
-        const subscriptions =  '^-----!'; // prettier-ignore
-        const expected =       'a--|'; // prettier-ignore
-
-        const result = resultStream({ incoming, pipelines });
-
-        m.expect(result).toBeObservable(expected);
-        m.expect(incoming).toHaveSubscriptions(subscriptions);
-      })
-    );
+    expect(data.registry.destroy).toBeCalledTimes(1);
   });
 });
