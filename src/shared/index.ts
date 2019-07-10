@@ -15,6 +15,7 @@ import * as Api from './api';
 import * as Config from './configuration';
 import * as PubSub from './pubsub';
 import * as Time from './time';
+import * as Epics from './epics';
 
 export {
   //
@@ -22,4 +23,5 @@ export {
   Config,
   PubSub,
   Time,
+  Epics,
 };
