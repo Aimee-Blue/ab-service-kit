@@ -14,7 +14,9 @@ function prepareTestArgsAndMocks() {
   return {
     registry,
     server: mockServer(),
-    config: {},
+    config: {
+      shouldUseDefaultEndpoints: false,
+    },
     deps: {
       getRegistry: jest.fn(() => registry),
     },

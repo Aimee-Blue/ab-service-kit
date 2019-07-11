@@ -10,6 +10,7 @@ export * from './startup';
 export * from './mergeEpics';
 export * from './eventBus';
 export * from './ofType';
+export * from './retryWithBackoff';
 
 import * as Api from './api';
 import * as Config from './configuration';
