@@ -14,6 +14,7 @@ import { Subscription } from 'rxjs';
 import { publishStream } from '../shared/publishStream';
 import uuid from 'uuid';
 import { TeardownHandler } from './teardown';
+import { defaultSocketsMap } from '../shared/epics';
 
 type Server = http.Server | https.Server;
 
@@ -235,8 +236,13 @@ export async function setupSockets(
     getRegistry,
   }
 ): Promise<TeardownHandler> {
-  const pipelines = await ((config.sockets && config.sockets()) ||
-    Promise.resolve({}));
+  const pipelines = {
+    ...(((typeof config.shouldUseDefaultEndpoints !== 'boolean' ||
+      config.shouldUseDefaultEndpoints) &&
+      defaultSocketsMap()) ||
+      {}),
+    ...(await ((config.sockets && config.sockets()) || Promise.resolve({}))),
+  };
 
   const epicsByPath = new Map<string, AnySocketEpic>(Object.entries(pipelines));
 
