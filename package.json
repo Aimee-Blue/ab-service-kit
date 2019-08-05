@@ -71,7 +71,7 @@
     "@types/node": "10.14.4",
     "@types/node-fetch": "2.3.7",
     "@types/uuid": "3.4.4",
-    "@types/ws": "6.0.1",
+    "@types/ws": "6.0.2",
     "chokidar": "3.0.1",
     "husky": "2.4.1",
     "rxjs-marbles": "5.0.2",
