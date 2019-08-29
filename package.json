@@ -75,7 +75,7 @@
     "chokidar": "3.0.1",
     "husky": "2.4.1",
     "rxjs-marbles": "5.0.2",
-    "ts-deps": "0.3.7",
+    "ts-deps": "0.4.0",
     "utility-types": "3.7.0"
   }
 }
