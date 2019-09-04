@@ -77,5 +77,8 @@
     "rxjs-marbles": "5.0.2",
     "ts-deps": "0.4.1",
     "utility-types": "3.7.0"
+  },
+  "resolutions": {
+    "ts-deps/semantic-release/marked": "^0.7.0"
   }
 }
