@@ -3,7 +3,7 @@
 module.exports = {
   branches: [
     //
-    '+([1-9])?(.{+([1-9]),x}).x',
+    '+([0-9])?(.{+([0-9]),x}).x',
     { name: 'master' },
     { name: 'alpha', channel: 'alpha', prerelease: true },
     { name: 'betta', channel: 'betta', prerelease: true },
