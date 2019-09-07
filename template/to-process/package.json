@@ -20,7 +20,7 @@
     "@aimee-blue/ab-shared": "1.106.1"
   },
   "devDependencies": {
-    "@aimee-blue/ab-service-kit": "1.6.3",
+    "@aimee-blue/ab-service-kit": "1.6.4",
     "@aimee-blue/ab-scripts": "1.2.3",
     "ts-deps": "0.4.3"
   }
