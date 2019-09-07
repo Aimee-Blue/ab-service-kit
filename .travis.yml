@@ -24,4 +24,4 @@ jobs:
         skip_cleanup: true
         on:
           all_branches: true
-          condition: $TRAVIS_BRANCH =~ ^(master|alpha|beta|\d+.x$|\d+.x.x$|\d+.\d+.x)$
+          condition: $TRAVIS_BRANCH =~ ^(master|alpha|beta|v\d+.x$|v\d+.x.x$|v\d+.\d+.x)$
