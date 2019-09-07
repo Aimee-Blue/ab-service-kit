@@ -2,14 +2,16 @@
 
 module.exports = {
   branches: [
+    //
     '+([1-9])?(.{+([1-9]),x}).x',
     { name: 'master' },
-    { name: 'dev', channel: 'dev', prerelease: true },
+    { name: 'alpha', channel: 'alpha', prerelease: true },
+    { name: 'betta', channel: 'betta', prerelease: true },
   ],
   plugins: [
     '@semantic-release/commit-analyzer',
     '@semantic-release/release-notes-generator',
-    '@semantic-release/github',
     '@semantic-release/npm',
+    '@semantic-release/github',
   ],
 };
