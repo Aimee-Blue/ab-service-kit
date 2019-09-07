@@ -5,3 +5,8 @@ start(config).catch((exc: unknown) => {
   console.error('💥  ', exc);
   process.exit(1);
 });
+
+process.setUncaughtExceptionCaptureCallback(exc => {
+  console.error('💥  ', exc);
+  process.exit(1);
+});
