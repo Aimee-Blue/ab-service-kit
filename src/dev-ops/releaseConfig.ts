@@ -1,7 +1,7 @@
 interface IReleaseOpts {
   appName: string;
-  shouldReleaseToDocker: boolean;
-  shouldPatchInfra: boolean;
+  docker: boolean;
+  infra: boolean;
 }
 
 export function buildReleaseConfig(opts: IReleaseOpts) {
@@ -66,8 +66,8 @@ export function buildReleaseConfig(opts: IReleaseOpts) {
       '@semantic-release/commit-analyzer',
       '@semantic-release/release-notes-generator',
       '@semantic-release/npm',
-      ...((opts.shouldReleaseToDocker && dockerReleasePlugins) || []),
-      ...((opts.shouldPatchInfra && patchInfraPlugins) || []),
+      ...((opts.docker && dockerReleasePlugins) || []),
+      ...((opts.infra && patchInfraPlugins) || []),
       '@semantic-release/github',
     ],
   };
