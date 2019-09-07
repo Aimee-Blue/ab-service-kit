@@ -2,7 +2,7 @@
 
 module.exports = {
   branches: [
-    '+([1-9])?(.{+([1-9]),x}).x',
+    '+([0-9])?(.{+([0-9]),x}).x',
     { name: 'master' },
     { name: 'alpha', channel: 'alpha', prerelease: true },
     { name: 'beta', channel: 'beta', prerelease: true },
@@ -10,7 +10,7 @@ module.exports = {
   plugins: [
     '@semantic-release/commit-analyzer',
     '@semantic-release/release-notes-generator',
-    '@semantic-release/github',
     '@semantic-release/npm',
+    '@semantic-release/github',
   ],
 };
