@@ -1,17 +1,16 @@
-export interface IAppFlags {
-  featureEnabled: boolean;
-}
+export interface IAppFlags {}
 
-const defaultFlags: IAppFlags = {
-  featureEnabled: false,
+const defaultFlags: IAppFlags = {};
+
+import { Config } from '@aimee-blue/ab-shared';
+
+const fromConfig = (config: Config.IConfig) => {
+  return {
+    ...defaultFlags,
+    ...config.featureFlags,
+  } as IAppFlags;
 };
 
-import { Config } from '@shared';
-
-const api = Config.configureFlags(defaultFlags);
-
 export const Flags = {
-  load: api.load,
-  latest: api.latest,
-  withLatest: api.withLatest,
+  fromConfig,
 };

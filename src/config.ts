@@ -2,6 +2,7 @@ import { IServiceConfig, SocketEpic, IAction } from './shared';
 import * as Joi from 'joi';
 import { tag } from 'rxjs-spy/operators';
 import { takeUntil, filter } from 'rxjs/operators';
+import { empty } from 'rxjs';
 
 const config: IServiceConfig = {
   defaultPort: 4010,
@@ -12,6 +13,10 @@ const config: IServiceConfig = {
 
   endpoints: async _app => {
     return;
+  },
+
+  background: async () => {
+    return empty();
   },
 
   sockets: async () => {

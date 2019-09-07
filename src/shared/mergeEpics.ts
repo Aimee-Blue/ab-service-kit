@@ -1,18 +1,14 @@
-import { merge, empty } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { merge, empty, defer } from 'rxjs';
 import { AnySocketEpic } from './kit';
+import { retryWithBackoff } from './retryWithBackoff';
 
-export function mergeEpics(...epics: AnySocketEpic[]): AnySocketEpic {
+export function mergeActionEpics(...epics: AnySocketEpic[]): AnySocketEpic {
   const mergedEpic: AnySocketEpic = (commands, request, _binary, deps) => {
     return merge(
       ...epics.map(val =>
-        val(commands, request, empty(), deps).pipe(
-          catchError((err, self) => {
-            console.error(
-              `💥  CRITICAL! Epic with name ${val.name} has failed`,
-              err
-            );
-            return self;
+        defer(() => val(commands, request, empty(), deps)).pipe(
+          retryWithBackoff({
+            sourceDescription: `${val.name} epic`,
           })
         )
       )

@@ -5,22 +5,32 @@ cache:
     - node_modules
 node_js:
   - '10'
-branches:
-  except:
-    - /^v\d+\.\d+\.\d+(-\w+(\.\d+)?(@\w+))?$/
+services:
+  - docker
+if: tag IS blank
 before_install:
   - curl -o- -L https://yarnpkg.com/install.sh | bash
   - export PATH="$HOME/.yarn/bin:$PATH"
+stages:
+  - name: checks and publish
 jobs:
   include:
-    - stage: test and lint
+    - stage: checks and publish
+      name: Build, Lint, Test and Possibly Publish
       script:
         - time yarn run check
-    - stage: test and lint
+        - time yarn test
+      deploy:
+        provider: script
+        script:
+          - yarn release
+        skip_cleanup: true
+        on:
+          all_branches: true
+          condition: $TRAVIS_BRANCH =~ ^(master|alpha|beta|release|[0-9]+\.x$|[0-9]+\.x\.x$|[0-9]+\.[0-9]+\.x)$
+    - stage: checks and publish
+      name: Build Container and Test Publish
       script:
-        - time yarn build-docker
-      if: NOT branch IN (master, release, test) OR type = pull_request
-    - stage: deploy
-      script:
-        - yarn release
-      if: branch IN (master, release, test) AND type = push AND fork = false
+        - time yarn ci-build-docker
+        - yarn release --dry-run
+      if: type = pull_request

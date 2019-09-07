@@ -11,6 +11,7 @@
     "start": "node lib/server.js",
     "start:watch": "node lib/server.js --watch",
     "build-docker": "docker build -t aimeeblue/$npm_package_name .",
+    "ci-build-docker": "docker build -t aimeeblue/$npm_package_name .",
     "run-docker": "docker run -p 80:8080 --restart unless-stopped --name $npm_package_name $npm_package_name",
     "run-docker:dev": "docker run -p 80:8080 --name $npm_package_name aimeeblue/$npm_package_name",
     "shell-docker": "docker exec -it $(docker ps -aqf name=$npm_package_name) bash"
@@ -19,9 +20,8 @@
     "@aimee-blue/ab-shared": "1.106.1"
   },
   "devDependencies": {
-    "@semantic-release/exec": "3.3.2",
-    "@aimee-blue/ab-service-kit": "1.5.2",
+    "@aimee-blue/ab-service-kit": "1.6.3",
     "@aimee-blue/ab-scripts": "1.2.3",
-    "ts-deps": "0.4.2"
+    "ts-deps": "0.4.3"
   }
 }
