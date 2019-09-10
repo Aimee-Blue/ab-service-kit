@@ -21,7 +21,7 @@
   },
   "devDependencies": {
     "@aimee-blue/ab-service-kit": "1.6.3",
-    "@aimee-blue/ab-scripts": "1.2.3",
+    "@aimee-blue/ab-scripts": "1.3.0",
     "ts-deps": "0.4.3"
   }
 }
