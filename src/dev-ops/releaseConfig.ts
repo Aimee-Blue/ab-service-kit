@@ -39,19 +39,21 @@ export function buildReleaseConfig(opts: IReleaseOpts) {
   ];
 
   const patchInfraPlugins = [
-    '@semantic-release/exec',
-    {
-      verifyReleaseCmd:
-        `patch-infra-config -p ${appName}.image -v ` +
-        dockApp +
-        ':${nextRelease.version} ' +
-        '-b ${branch.name} --dry-run',
-      publishCmd:
-        `patch-infra-config -p ${appName}.image -v ` +
-        dockApp +
-        ':${nextRelease.version} ' +
-        '-b ${branch.name}',
-    },
+    [
+      '@semantic-release/exec',
+      {
+        verifyReleaseCmd:
+          `patch-infra-config -p ${appName}.image -v ` +
+          dockApp +
+          ':${nextRelease.version} ' +
+          '-b ${branch.name} --dry-run',
+        publishCmd:
+          `patch-infra-config -p ${appName}.image -v ` +
+          dockApp +
+          ':${nextRelease.version} ' +
+          '-b ${branch.name}',
+      },
+    ],
   ];
 
   return {
