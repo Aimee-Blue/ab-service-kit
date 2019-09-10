@@ -151,7 +151,7 @@ async function createTopicAndSubscription(
 
 export function subscribe(topic: string, options?: SubscribeOptions) {
   return defer(() => from(appName())).pipe(
-    switchMap(appName => createTopicAndSubscription(topic, appName, options)),
+    switchMap(name => createTopicAndSubscription(topic, name, options)),
     switchMap(
       subscription =>
         new Observable<Message>(subscriber => {
