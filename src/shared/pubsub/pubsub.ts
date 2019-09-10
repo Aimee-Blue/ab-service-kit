@@ -90,56 +90,68 @@ export async function publish<T>(topic: string, data: T) {
 
 export type Message = PubSub.Message;
 
-export function subscribe(
+type SubscribeOptions = PubSub.SubscriptionOptions & {
+  autoCreateTopic?: boolean;
+  subscriptionName?: string;
+  autoCreateSubscription?: boolean;
+  autoDeleteSubscription?: boolean;
+  subscriptionOptions?: PubSub.CreateSubscriptionOptions;
+};
+
+const subscriptionNamesByTopic = new Map<string, string>();
+
+async function createTopicAndSubscription(
   topic: string,
-  options?: PubSub.SubscriptionOptions & {
-    autoCreateTopic?: boolean;
-    subscriptionName?: string;
-    autoCreateSubscription?: boolean;
-    subscriptionOptions?: PubSub.CreateSubscriptionOptions;
-  }
+  fullName: string,
+  options?: SubscribeOptions
 ) {
+  const shortName = fullName.replace('@aimee-blue/', '');
+
+  const lastName = subscriptionNamesByTopic.get(topic);
+
+  const {
+    autoCreateTopic,
+    subscriptionName,
+    autoCreateSubscription,
+    subscriptionOptions,
+    ...subOpts
+  } = {
+    autoCreateTopic: true,
+    subscriptionName: lastName || `${shortName}-${uuid()}`,
+    autoCreateSubscription: true,
+    subscriptionOptions: undefined,
+    ...options,
+  };
+
+  const topicPublisher = getTopic(topic);
+
+  if (autoCreateTopic && !lastName) {
+    const [topicExists] = await topicPublisher.exists();
+    if (!topicExists) {
+      await topicPublisher.create();
+    }
+  }
+
+  const subscription = topicPublisher.subscription(subscriptionName, subOpts);
+
+  if (autoCreateSubscription && !lastName) {
+    const [exists] = await subscription.exists();
+    if (!exists) {
+      await subscription.create(subscriptionOptions);
+    }
+  }
+
+  // if success, then remember:
+  if (!subscriptionNamesByTopic.get(topic)) {
+    subscriptionNamesByTopic.set(topic, subscriptionName);
+  }
+
+  return subscription;
+}
+
+export function subscribe(topic: string, options?: SubscribeOptions) {
   return defer(() => from(appName())).pipe(
-    switchMap(async fullName => {
-      const shortName = fullName.replace('@aimee-blue/', '');
-
-      const {
-        autoCreateTopic,
-        subscriptionName,
-        autoCreateSubscription,
-        subscriptionOptions,
-        ...subOpts
-      } = {
-        autoCreateTopic: true,
-        subscriptionName: `${shortName}-${uuid()}`,
-        autoCreateSubscription: true,
-        subscriptionOptions: undefined,
-        ...options,
-      };
-
-      const topicPublisher = getTopic(topic);
-
-      if (autoCreateTopic) {
-        const [topicExists] = await topicPublisher.exists();
-        if (!topicExists) {
-          await topicPublisher.create();
-        }
-      }
-
-      const subscription = topicPublisher.subscription(
-        subscriptionName,
-        subOpts
-      );
-
-      if (autoCreateSubscription) {
-        const [exists] = await subscription.exists();
-        if (!exists) {
-          await subscription.create(subscriptionOptions);
-        }
-      }
-
-      return subscription;
-    }),
+    switchMap(appName => createTopicAndSubscription(topic, appName, options)),
     switchMap(
       subscription =>
         new Observable<Message>(subscriber => {
