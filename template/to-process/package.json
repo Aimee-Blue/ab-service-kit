@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@aimee-blue/ab-shared": "1.106.1",
-    "@aimee-blue/ab-service-kit": "1.6.7"
+    "@aimee-blue/ab-service-kit": "1.6.8"
   },
   "devDependencies": {
     "@aimee-blue/ab-scripts": "1.3.1",
