@@ -6,8 +6,8 @@ import { tag } from 'rxjs-spy/operators';
 const subject = new Subject<IAction>();
 
 const sharedSubject = subject.asObservable().pipe(
-  share(),
-  tag('event-bus')
+  tag('event-bus'),
+  share()
 );
 
 export function fromEventBus() {
