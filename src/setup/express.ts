@@ -5,7 +5,7 @@ import cors from 'cors';
 
 import { IServiceConfig } from '../shared';
 import { defaultEndpoints } from '../endpoints';
-import { TeardownHandler } from './teardown';
+import { TeardownHandler } from '../shared/teardown';
 
 export async function setupExpress(
   server: http.Server | https.Server,

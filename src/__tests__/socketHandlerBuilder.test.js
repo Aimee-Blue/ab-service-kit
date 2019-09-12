@@ -1,8 +1,9 @@
-import { socketHandlerBuilder } from '../setup/sockets';
+import { socketHandlerBuilder } from '../shared/sockets';
 import { marbles } from 'rxjs-marbles/jest';
 import { takeUntil, filter, map, tap } from 'rxjs/operators';
 import { EventEmitter } from 'events';
 import { publishStream } from '../shared';
+import { empty } from 'rxjs';
 
 function buildDeps(incoming) {
   const dataStreamFromSocket = () => incoming;
@@ -12,6 +13,15 @@ function buildDeps(incoming) {
     pipeStreamIntoSocket: jest.fn(),
     actionStreamFromSocket: stream => stream,
     binaryStreamFromSocket: stream => stream,
+    logWarningIfOutgoingStreamNotComplete: () => empty(),
+    logSocketStats: () => empty(),
+    logConnected: () => {
+      return;
+    },
+    prepareWaitForCompletionFn: () => ({
+      connect: jest.fn(),
+      waitForCompletion: jest.fn(),
+    }),
   };
 
   return deps;
@@ -22,7 +32,6 @@ function resultStream({ pipelines, incoming }) {
 
   const handler = socketHandlerBuilder(
     () => pipelines,
-    jest.fn(),
     jest.fn(),
     jest.fn(),
     deps

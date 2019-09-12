@@ -1,5 +1,5 @@
 import { IServiceConfig } from '../shared';
-import { TeardownHandler, noop } from './teardown';
+import { TeardownHandler, noop } from '../shared/teardown';
 
 export async function setupBackground(
   config: IServiceConfig

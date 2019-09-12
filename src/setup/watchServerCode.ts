@@ -22,7 +22,7 @@ import {
   isIntegrationTest,
 } from '../shared';
 import { pathExists } from 'fs-extra';
-import { TeardownHandler } from './teardown';
+import { TeardownHandler } from '../shared/teardown';
 
 if (process.env.NODE_ENV === 'production') {
   throw new Error('This file should not be imported in production');
@@ -172,9 +172,7 @@ export async function serviceSetupInWatchMode(
       filter(pair => {
         if (!pair.exists) {
           console.log(
-            `Cannot resolve changes to ${pair.filePath} (tried ${
-              pair.resolved
-            }), ignoring`
+            `Cannot resolve changes to ${pair.filePath} (tried ${pair.resolved}), ignoring`
           );
         }
 

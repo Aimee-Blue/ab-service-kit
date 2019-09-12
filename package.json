@@ -21,6 +21,7 @@
     "clean": "node ./scripts/clean.js",
     "test": "jest --color",
     "integration": "jest --config ./jest.config.integration.js --color -i",
+    "integration:inspect": "node --inspect-brk ./node_modules/.bin/jest --config ./jest.config.integration.js --color -i",
     "combine-coverage": "node ./scripts/combineCoverage.js",
     "type-check": "tsc",
     "lint": "tslint -p . -t verbose",
@@ -29,7 +30,8 @@
     "release": "semantic-release",
     "prepublishOnly": "yarn run build && yarn run declarations",
     "start": "node lib/test",
-    "start:watch": "node lib/test --watch"
+    "start:watch": "node lib/test --watch",
+    "start:inspect": "node --inspect lib/test"
   },
   "husky": {
     "hooks": {

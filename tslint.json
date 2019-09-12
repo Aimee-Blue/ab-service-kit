@@ -3,5 +3,8 @@
     "tslint:recommended",
     "tslint-config-prettier",
     "ts-deps/lib/config/tslint.default.json"
-  ]
+  ],
+  "rules": {
+    "cyclomatic-complexity": [true, 16]
+  }
 }

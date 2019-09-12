@@ -7,7 +7,7 @@ import { setupSpy } from './spy';
 import { loadEnv } from './env';
 import { startup } from '../shared/startup';
 import { setupBackground } from './background';
-import { TeardownHandler } from './teardown';
+import { TeardownHandler } from '../shared/teardown';
 
 export async function serviceSetup(
   server: http.Server | https.Server,

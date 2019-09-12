@@ -2,47 +2,9 @@ import WebSocket from 'ws';
 import { fromEvent, merge, of, bindNodeCallback } from 'rxjs';
 import { mergeMap, take, timeoutWith, mapTo, map } from 'rxjs/operators';
 import { PromiseType } from 'utility-types';
-import * as Joi from 'joi';
 
-import { IServiceConfig, SocketEpic } from '../shared';
-import { start } from '../start';
-
-const startTestService = async (config: IServiceConfig) => {
-  return await start(config, {
-    port: 8080,
-    host: 'localhost',
-    http: true,
-    watch: false,
-  });
-};
-
-async function initTestEpic(epic: SocketEpic<unknown>) {
-  const handler = jest.fn(epic);
-
-  const actionSchemaByType = jest.fn(() => {
-    return Joi.object();
-  });
-
-  const config: IServiceConfig = {
-    defaultPort: 8080,
-    sockets: async () => {
-      const events: SocketEpic<unknown> = handler;
-      events.actionSchemaByType = actionSchemaByType;
-      return {
-        '/events': events,
-      };
-    },
-    shouldLoadEnvFiles: false,
-  };
-  const teardown = await startTestService(config);
-
-  return {
-    handler,
-    actionSchemaByType,
-    config,
-    teardown,
-  };
-}
+import { SocketEpic } from '../shared';
+import { initTestEpic } from './helpers';
 
 describe('given service with echo pipeline', () => {
   const echoingEpic: SocketEpic<unknown> = commands => commands;
