@@ -4,6 +4,8 @@ import { Subscription } from 'rxjs';
 import { SocketWithInfo } from './types';
 import { AnySocketEpic } from '../kit';
 
+export type WaitForCompletionFn = () => Promise<'completed' | 'timed-out'>;
+
 export interface IConnectedSocket {
   id: string;
   pathname: string;
@@ -11,7 +13,7 @@ export interface IConnectedSocket {
   socket: Socket;
   request: http.IncomingMessage;
   subscription?: Subscription;
-  waitForCompletion?: () => Promise<void>;
+  waitForCompletion?: WaitForCompletionFn;
 }
 
 export interface ISocketRegistryState {
@@ -43,7 +45,7 @@ const detachFromSocketInWatchMode = (state: ISocketRegistryState) => (
 const attachToSocket = (state: ISocketRegistryState) => (
   id: string,
   subscription: Subscription,
-  waitForCompletion: () => Promise<void>
+  waitForCompletion: WaitForCompletionFn
 ) => {
   const socketState = state.sockets.get(id);
   if (!socketState) {
@@ -57,25 +59,47 @@ const attachToSocket = (state: ISocketRegistryState) => (
   });
 };
 
+const buildTeardown = (state: ISocketRegistryState, id: string) => () => {
+  const socketState = state.sockets.get(id);
+  if (!socketState) {
+    return;
+  }
+
+  if (socketState.subscription) {
+    socketState.subscription.unsubscribe();
+  }
+  state.sockets.delete(socketState.id);
+};
+
+const waitForCompletionThenTeardown = (
+  wait: WaitForCompletionFn,
+  teardown: ReturnType<typeof buildTeardown>
+) => {
+  wait()
+    .then(teardown)
+    .catch(err => {
+      console.error('💥  Error while waiting for epic to complete', err);
+      teardown();
+    });
+};
+
 const clientSideCloseHandler = (
   state: ISocketRegistryState,
-  socketState: IConnectedSocket
+  id: string
 ) => () => {
-  const teardown = () => {
-    if (socketState.subscription) {
-      socketState.subscription.unsubscribe();
-    }
-    state.sockets.delete(socketState.id);
-  };
+  const socketState = state.sockets.get(id);
+  if (!socketState) {
+    return;
+  }
+
+  if (socketState.ws.closingByKit) {
+    return;
+  }
+
+  const teardown = buildTeardown(state, id);
 
   if (socketState.waitForCompletion) {
-    socketState
-      .waitForCompletion()
-      .then(teardown)
-      .catch(err => {
-        console.error('💥  Error while waiting for epic to complete', err);
-        teardown();
-      });
+    waitForCompletionThenTeardown(socketState.waitForCompletion, teardown);
   } else {
     teardown();
   }
@@ -94,7 +118,7 @@ const addSocket = (state: ISocketRegistryState) => (
     );
   }
 
-  socketState.ws.on('close', clientSideCloseHandler(state, socketState));
+  socketState.ws.on('close', clientSideCloseHandler(state, socketState.id));
 
   state.sockets.set(socketState.id, socketState);
 };
@@ -120,7 +144,9 @@ const waitForAllToComplete = async (all: IConnectedSocket[]) =>
   await all.reduce(
     (previous, state) =>
       previous.then(() =>
-        state.waitForCompletion ? state.waitForCompletion() : Promise.resolve()
+        state.waitForCompletion
+          ? state.waitForCompletion()
+          : Promise.resolve('completed')
       ),
     Promise.resolve()
   );
@@ -131,7 +157,7 @@ const onServerClose = (state: ISocketRegistryState) => async () => {
   // close sockets and possibly start teardown/completion process
   // on the epic handlers:
   for (const socketState of all) {
-    closeSocketCore(socketState);
+    closeSocketCore(socketState, 1012);
   }
 
   // wait for all the epics to complete:
@@ -139,6 +165,9 @@ const onServerClose = (state: ISocketRegistryState) => async () => {
 
   // cleanup all the data in the state:
   for (const socketState of all) {
+    if (socketState.subscription) {
+      socketState.subscription.unsubscribe();
+    }
     state.sockets.delete(socketState.id);
   }
 };

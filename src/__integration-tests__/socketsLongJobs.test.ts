@@ -61,7 +61,7 @@ describe('given service with long running tasks', () => {
     await data.teardown();
   });
 
-  it.only('should allow observables to complete', async () => {
+  it('should allow observables to complete', async () => {
     const socket = new WebSocket('ws://localhost:8080/events');
 
     const onOpen = fromEvent(socket, 'open');

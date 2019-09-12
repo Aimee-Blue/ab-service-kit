@@ -48,6 +48,7 @@ export interface ISocketEpic<I, O = unknown, D = unknown> {
   send?: (socket: WebSocket, data: O) => Promise<void>;
   actionSchemaByType?: (type: string) => Joi.ObjectSchema | null;
   completedSocketWarningTimeout?: number;
+  completedSocketWaitTimeout?: number;
   debugStats?: boolean;
 }
 

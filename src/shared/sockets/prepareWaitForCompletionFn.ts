@@ -1,21 +1,25 @@
-import { Observable } from 'rxjs';
-import { defaultIfEmpty } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { defaultIfEmpty, timeoutWith } from 'rxjs/operators';
 import { whenCompleted } from '../whenCompleted';
 import { publishReplayStream } from '../publishStream';
 
-export function prepareWaitForCompletionFn(results: Observable<unknown>) {
-  const completed = publishReplayStream(
+export function prepareWaitForCompletionFn(
+  results: Observable<unknown>,
+  timeout: number
+) {
+  const completedOrTimedOut = publishReplayStream(
     results.pipe(
       whenCompleted(),
-      defaultIfEmpty('completed')
+      defaultIfEmpty('completed' as const),
+      timeoutWith(timeout, of('timed-out' as const))
     ),
     1
   );
 
   return {
-    connect: () => completed.connect(),
+    connect: () => completedOrTimedOut.connect(),
     waitForCompletion: async () => {
-      await completed.toPromise();
+      return await completedOrTimedOut.toPromise();
     },
   };
 }

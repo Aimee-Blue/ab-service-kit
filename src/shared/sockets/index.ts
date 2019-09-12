@@ -9,4 +9,4 @@ export * from './logSocketStats';
 export * from './logWarningIfOutgoingStreamNotComplete';
 export * from './prepareWaitForCompletionFn';
 export * from './socketRegistry';
-export * from './socketHandlerBuilder';
+export * from './buildOnConnectionListener';

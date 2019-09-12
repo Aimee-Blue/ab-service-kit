@@ -2,6 +2,8 @@ import { Observable } from 'rxjs';
 import { concatMap, ignoreElements } from 'rxjs/operators';
 import { SocketWithInfo } from './types';
 
+const SOCKET_CLOSED = 'Trying to send data while socket already closed';
+
 const defaultSend = <T>(socket: SocketWithInfo, data: T): Promise<void> => {
   return new Promise<void>((res, rej) => {
     if (socket.readyState === socket.OPEN) {
@@ -13,26 +15,17 @@ const defaultSend = <T>(socket: SocketWithInfo, data: T): Promise<void> => {
         }
       });
     } else {
-      rej(new Error('Trying to send data while socket already closed'));
+      rej(new Error(SOCKET_CLOSED));
     }
   });
 };
 
 const defaultErrorHandler = <T>(_data: T, error: Error) => {
-  console.error('💥 Error when sending data', error);
+  console.error('💥  Error when sending data', error);
 };
 
-const defaultClose = (
-  socket: SocketWithInfo,
-  reason: 'epic-error' | 'epic-completed'
-) => {
-  if (reason === 'epic-error') {
-    socket.close(1011, 'Epic stream error');
-  } else if (reason === 'epic-completed') {
-    socket.close(1000, 'Epic stream completed');
-  } else {
-    socket.close();
-  }
+const defaultClose = (socket: SocketWithInfo, code?: number) => {
+  socket.close(code);
 };
 
 export const pipeStreamIntoSocket = <T>(
@@ -55,11 +48,13 @@ export const pipeStreamIntoSocket = <T>(
     )
     .subscribe({
       error: error => {
-        console.error('💥  Outgoing stream error', error);
-        close(socket, 'epic-error');
+        if (!(error instanceof Error && error.message === SOCKET_CLOSED)) {
+          console.error('💥  Outgoing stream error', error);
+        }
+        close(socket, 1011);
       },
       complete: () => {
-        close(socket, 'epic-completed');
+        close(socket, 1000);
       },
     });
 
