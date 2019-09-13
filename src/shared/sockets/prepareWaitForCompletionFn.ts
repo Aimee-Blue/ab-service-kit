@@ -10,8 +10,7 @@ export function prepareWaitForCompletionFn(
   const completedOrTimedOut = publishReplayStream(
     results.pipe(
       whenCompleted(),
-      defaultIfEmpty('completed' as const),
-      timeoutWith(timeout, of('timed-out' as const))
+      defaultIfEmpty('completed' as const)
     ),
     1
   );
@@ -19,7 +18,9 @@ export function prepareWaitForCompletionFn(
   return {
     connect: () => completedOrTimedOut.connect(),
     waitForCompletion: async () => {
-      return await completedOrTimedOut.toPromise();
+      return await completedOrTimedOut
+        .pipe(timeoutWith(timeout, of('timed-out' as const)))
+        .toPromise();
     },
   };
 }

@@ -3,6 +3,7 @@ import { fromEvent, defer, from, merge, Observable } from 'rxjs';
 import { switchMap, map, ignoreElements } from 'rxjs/operators';
 import { appName } from '../app';
 import uuid from 'uuid';
+import { EOL } from 'os';
 
 let initializedClient: PubSub.PubSub | null = null;
 
@@ -158,7 +159,8 @@ export function subscribe(topic: string, options?: SubscribeOptions) {
           const name = subscription.name;
 
           console.log(
-            `🎬 Subscribing to topic "${topic}" with subscription "${name}"`
+            `${EOL}🎬  Subscribing to topic "${topic}" with subscription "${name}"`,
+            EOL
           );
 
           subscriber.add(
@@ -176,12 +178,16 @@ export function subscribe(topic: string, options?: SubscribeOptions) {
             subscription
               .close()
               .then(() => {
-                console.log(`🏁 Unsubscribed from "${subscription.name}"`);
+                console.log(
+                  `${EOL}🏁  Unsubscribed from "${subscription.name}"`,
+                  EOL
+                );
               })
               .catch((err: Error) => {
                 console.error(
-                  `💥 Error when unsubscribing from "${subscription.name}"`,
-                  err
+                  `${EOL}💥  Error when unsubscribing from "${subscription.name}"`,
+                  err,
+                  EOL
                 );
               });
           });
