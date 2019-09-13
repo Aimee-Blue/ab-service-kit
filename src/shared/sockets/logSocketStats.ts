@@ -12,14 +12,15 @@ import {
 } from 'rxjs/operators';
 import { EOL } from 'os';
 import { localNow } from '../time';
+import { isString, isBuffer } from './helpers';
 
 export function logSocketStats(data: Observable<WebSocket.Data>, id: string) {
   const numberOfMessages = data.pipe(
-    filter(item => typeof item === 'object' || typeof item === 'string'),
+    filter(isString),
     map((_, i) => i + 1)
   );
   const bytesReceived = data.pipe(
-    filter(item => item instanceof Buffer),
+    filter(isBuffer),
     scan((sum, item: Buffer) => item.byteLength + sum, 0)
   );
 
