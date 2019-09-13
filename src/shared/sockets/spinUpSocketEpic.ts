@@ -23,6 +23,18 @@ const logConnected = (
   const ip =
     message.headers['x-forwarded-for'] || message.connection.remoteAddress;
 
+  let info = {};
+  if (epic.logInfo) {
+    try {
+      info = epic.logInfo(socket, message);
+    } catch (e) {
+      console.error(
+        '💥  Couldnt get information for logging (your custom SocketEpic.logInfo has thrown!)',
+        e
+      );
+    }
+  }
+
   console.log(
     `${EOL}✊  Client connected`,
     {
@@ -30,6 +42,7 @@ const logConnected = (
       url: message.url,
       epic: epic.name,
       ip,
+      ...info,
     },
     EOL
   );
