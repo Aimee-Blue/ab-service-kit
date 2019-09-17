@@ -1,13 +1,20 @@
 import { Logs } from '@aimee-blue/ab-shared';
-import { publish } from './pubsub';
 import { time } from './time';
+import * as PubSub from './pubsub';
 import { appVersion, appName } from './app';
-import { Observable, merge } from 'rxjs';
-import { flatMap, ignoreElements, catchError, filter } from 'rxjs/operators';
+import { Observable, merge, empty, defer } from 'rxjs';
+import {
+  ignoreElements,
+  catchError,
+  filter,
+  publish,
+  mergeMap,
+} from 'rxjs/operators';
 import { IAction } from './action';
 
 interface IProfilerLogParams {
   event: string;
+  traceKey?: string;
   data?: {
     [key: string]: unknown;
   };
@@ -26,8 +33,11 @@ export const profilerLog = async (params: IProfilerLogParams) => {
     },
     source: 'server',
     timestamp,
+    ...(params.traceKey && {
+      traceKey: params.traceKey,
+    }),
   };
-  return publish('profiler', data);
+  return PubSub.publish('profiler', data);
 };
 
 function optionalFilter<A extends IAction, AOut extends A = A>(
@@ -42,24 +52,58 @@ function optionalFilter<A extends IAction, AOut extends A = A>(
   };
 }
 
-export const profileActionStream = <
-  A extends IAction,
-  AOut extends A = A
->() => (input: Observable<A>, actionsFilter?: (action: A) => action is AOut) =>
-  merge(
-    input,
-    input.pipe(
-      optionalFilter(actionsFilter),
-      flatMap(({ type, ...rest }) =>
-        profilerLog({
-          event: type,
-          data: rest,
-        })
-      ),
-      ignoreElements(),
-      catchError((err, self) => {
-        console.error('💥  An error when profiling actions', err);
-        return self;
-      })
+export interface IProfileParams<A extends IAction, AOut extends A = A> {
+  event?: string;
+  traceKey?: string;
+  filter?: (action: A) => action is AOut;
+  transform?: (
+    action: A,
+    params?: IProfileParams<A, AOut>
+  ) => IProfilerLogParams;
+}
+
+function defaultTransform(
+  action: IAction,
+  params?: IProfileParams<IAction>
+): IProfilerLogParams {
+  const { filter: _, transform: __, ...logParams } = params || {};
+  return {
+    event: action.type,
+    data: (action as unknown) as { [key: string]: unknown },
+    ...logParams,
+  };
+}
+
+export const profileActions = <A extends IAction, AOut extends A = A>(
+  params?: IProfileParams<A, AOut>,
+  deps = {
+    profilerLog,
+  }
+) => (input: Observable<A>) =>
+  input.pipe(
+    publish(shared =>
+      merge(
+        shared,
+        shared.pipe(
+          optionalFilter(params && params.filter),
+          mergeMap(action =>
+            defer(() =>
+              deps.profilerLog(
+                ((params && params.transform) || defaultTransform)(
+                  action,
+                  params
+                )
+              )
+            ).pipe(
+              catchError(err => {
+                console.error('💥  An error when profiling actions', err);
+
+                return empty();
+              })
+            )
+          ),
+          ignoreElements()
+        )
+      )
     )
   );
