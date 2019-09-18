@@ -1,4 +1,4 @@
-import { Config } from '@aimee-blue/ab-shared';
+import { Config } from '@aimee-blue/ab-contracts';
 import { callFn } from '../api';
 import { Observable, from, defer } from 'rxjs';
 import { map, flatMap } from 'rxjs/operators';

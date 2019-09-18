@@ -1,5 +1,5 @@
 import { IServiceConfig, SocketEpic, IAction } from './shared';
-import * as Joi from 'joi';
+import * as Joi from '@hapi/joi';
 import { tag } from 'rxjs-spy/operators';
 import { takeUntil, filter } from 'rxjs/operators';
 import { empty } from 'rxjs';

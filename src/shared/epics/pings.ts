@@ -1,5 +1,5 @@
 import { SocketEpic, ofType, localNow } from '..';
-import { Apps } from '@aimee-blue/ab-shared';
+import { Apps } from '@aimee-blue/ab-contracts';
 import { map } from 'rxjs/operators';
 
 export const pingsEpic: SocketEpic<Apps.IPingAction, Apps.IPongAction> = cmd =>
