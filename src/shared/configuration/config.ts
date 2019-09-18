@@ -2,9 +2,18 @@ import { Config } from '@aimee-blue/ab-contracts';
 import { callFn } from '../api';
 import { Observable, from, defer } from 'rxjs';
 import { map, flatMap } from 'rxjs/operators';
+import { currentSelfSignedToken } from '../auth';
 
-const configurationLoad = (revision?: Config.Revision, authToken?: string) =>
-  callFn<Config.IPartialConfig>('configurationLoad')({ revision, authToken });
+const configurationLoad = async (
+  revision?: Config.Revision,
+  authToken?: string
+) => {
+  const token = authToken || (await currentSelfSignedToken());
+  return callFn<Config.IPartialConfig>('configurationLoad')({
+    revision,
+    authToken: token,
+  });
+};
 
 export interface IGetConfigParams {
   revision?: Config.Revision;
