@@ -37,14 +37,7 @@ export interface ISocketEpicsMap {
   [path: string]: AnySocketEpic;
 }
 
-export interface ISocketEpic<I, O = unknown, D = unknown> {
-  (
-    commands: Observable<I>,
-    request: IncomingMessage,
-    binary: Observable<Buffer>,
-    deps?: D
-  ): Observable<O>;
-
+export interface ISocketEpicAttributes<O = unknown> {
   send?: (socket: WebSocket, data: O) => Promise<void>;
   actionSchemaByType?: (type: string) => Joi.ObjectSchema | null;
   logInfo?: (
@@ -55,6 +48,16 @@ export interface ISocketEpic<I, O = unknown, D = unknown> {
   completedSocketWarningTimeout?: number;
   completedSocketWaitTimeout?: number;
   debugStats?: boolean;
+}
+
+export interface ISocketEpic<I, O = unknown, D = unknown>
+  extends ISocketEpicAttributes<O> {
+  (
+    commands: Observable<I>,
+    request: IncomingMessage,
+    binary: Observable<Buffer>,
+    deps?: D
+  ): Observable<O>;
 }
 
 export type AnySocketEpic = ISocketEpic<unknown>;

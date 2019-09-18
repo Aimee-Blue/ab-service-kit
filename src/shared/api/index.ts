@@ -38,7 +38,7 @@ export const callFn = <T, P = unknown>(
   )
     .then(async res => {
       if (res.ok) {
-        return res.json() as Promise<{ result: T }>;
+        return res.json() as Promise<{ result?: T } | T>;
       }
 
       throw new FetchError(
@@ -47,4 +47,7 @@ export const callFn = <T, P = unknown>(
         res.type
       );
     })
-    .then(wrapped => wrapped.result);
+    .then(
+      wrapped =>
+        ('result' in wrapped && wrapped.result ? wrapped.result : wrapped) as T
+    );
