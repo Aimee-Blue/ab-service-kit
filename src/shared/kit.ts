@@ -3,7 +3,7 @@ import express from 'express';
 import WebSocket from 'ws';
 import { Observable } from 'rxjs';
 import { IncomingMessage } from 'http';
-import * as Joi from 'joi';
+import * as Joi from '@hapi/joi';
 
 export interface ICommandLineArgs {
   http: boolean;

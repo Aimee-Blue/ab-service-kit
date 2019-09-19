@@ -1,4 +1,4 @@
-import { Logs } from '@aimee-blue/ab-shared';
+import { Logs } from '@aimee-blue/ab-contracts';
 import { time } from './time';
 import * as PubSub from './pubsub';
 import { appVersion, appName } from './app';

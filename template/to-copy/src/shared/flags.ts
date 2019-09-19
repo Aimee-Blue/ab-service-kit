@@ -2,7 +2,7 @@ export interface IAppFlags {}
 
 const defaultFlags: IAppFlags = {};
 
-import { Config } from '@aimee-blue/ab-shared';
+import { Config } from '@aimee-blue/ab-contracts';
 
 const fromConfig = (config: Config.IConfig) => {
   return {

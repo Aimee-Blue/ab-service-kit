@@ -1,8 +1,8 @@
 import WebSocket from 'ws';
 import { Observable, empty, of } from 'rxjs';
 import { filter, mergeMap } from 'rxjs/operators';
-import { Channels } from '@aimee-blue/ab-shared';
-import * as Joi from 'joi';
+import { Channels } from '@aimee-blue/ab-contracts';
+import * as Joi from '@hapi/joi';
 import { isString, tryParse } from './helpers';
 
 export const actionStreamFromSocket = <T extends { type: string }>(

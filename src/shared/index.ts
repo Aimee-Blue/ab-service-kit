@@ -14,15 +14,15 @@ export * from './retryWithBackoff';
 
 import * as Api from './api';
 import * as Config from './configuration';
+import * as Epics from './epics';
 import * as PubSub from './pubsub';
 import * as Time from './time';
-import * as Epics from './epics';
 
 export {
   //
   Api,
   Config,
+  Epics,
   PubSub,
   Time,
-  Epics,
 };
