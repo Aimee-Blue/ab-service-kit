@@ -13,6 +13,7 @@ export * from './ofType';
 export * from './retryWithBackoff';
 
 import * as Api from './api';
+import * as Auth from './auth';
 import * as Config from './configuration';
 import * as Epics from './epics';
 import * as PubSub from './pubsub';
@@ -21,6 +22,7 @@ import * as Time from './time';
 export {
   //
   Api,
+  Auth,
   Config,
   Epics,
   PubSub,
