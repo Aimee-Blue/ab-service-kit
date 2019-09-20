@@ -2,8 +2,8 @@ import { marbles, Context } from 'rxjs-marbles/jest';
 import { ISocketEpic } from 'src/shared/kit';
 import { epicWithAuth } from '../epicWithAuth';
 import { Auth, Apps } from '@aimee-blue/ab-contracts';
-import { empty, of } from 'rxjs';
-import { take } from 'rxjs/operators';
+import { empty, timer } from 'rxjs';
+import { take, mapTo } from 'rxjs/operators';
 
 const possibleInput = {
   a: Auth.auth({
@@ -40,8 +40,8 @@ function buildTestData(inputCmds: string, m: Context) {
   const epic = epicWithAuth([], echoingEpic as any, {
     verifyToken: jest.fn(data =>
       data.token === 'TOKEN'
-        ? of({ status: 200, message: 'Ok' })
-        : of({ status: 400, message: 'Oops!' })
+        ? timer(1, m.scheduler).pipe(mapTo({ status: 200, message: 'Ok' }))
+        : timer(1, m.scheduler).pipe(mapTo({ status: 400, message: 'Oops!' }))
     ),
     decodeJwt: jest.fn(() => ({
       header: {},
@@ -94,15 +94,17 @@ describe(epicWithAuth.name, () => {
   });
 
   describe('given token and then another command', () => {
-    const inputCmds = 'ad|';
-    const outputCmds = '-d|';
+    const inputCmds = 'adddd|';
+    const outputCmd = '-dddd|';
+    const inputSubs = '^----!';
 
     it(
       'should complete',
       marbles(m => {
-        const { output, originalEpic } = buildTestData(inputCmds, m);
+        const { input, output, originalEpic } = buildTestData(inputCmds, m);
 
-        m.expect(output).toBeObservable(outputCmds, possibleOutput);
+        m.expect(input).toHaveSubscriptions([inputSubs]);
+        m.expect(output).toBeObservable(outputCmd, possibleOutput);
         m.flush();
 
         expect(originalEpic.mock.calls.length).toBe(1);
