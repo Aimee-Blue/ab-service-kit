@@ -48,7 +48,7 @@
   },
   "dependencies": {
     "@aimee-blue/ab-auth": "1.1.0",
-    "@aimee-blue/ab-shared": "1.114.1",
+    "@aimee-blue/ab-shared": "1.114.2",
     "@google-cloud/pubsub": "0.31.1",
     "@hapi/joi": "15.1.1",
     "clear-module": "4.0.0",

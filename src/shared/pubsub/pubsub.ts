@@ -4,6 +4,7 @@ import { switchMap, map, ignoreElements } from 'rxjs/operators';
 import { appName } from '../app';
 import uuid from 'uuid';
 import { EOL } from 'os';
+import { isDevBuild } from '../isTest';
 
 let initializedClient: PubSub.PubSub | null = null;
 
@@ -108,6 +109,10 @@ async function createTopicAndSubscription(
 ) {
   const shortName = fullName.replace('@aimee-blue/', '');
 
+  const genName = isDevBuild()
+    ? `${shortName}-${process.env.USER}`
+    : `${shortName}-${uuid()}`;
+
   const lastName = subscriptionNamesByTopic.get(topic);
 
   const {
@@ -118,7 +123,7 @@ async function createTopicAndSubscription(
     ...subOpts
   } = {
     autoCreateTopic: true,
-    subscriptionName: lastName || `${shortName}-${uuid()}`,
+    subscriptionName: lastName || genName,
     autoCreateSubscription: true,
     subscriptionOptions: undefined,
     ...options,
