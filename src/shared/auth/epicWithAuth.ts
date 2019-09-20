@@ -3,12 +3,21 @@ import {
   concatMap,
   catchError,
   switchMap,
-  publish,
   ignoreElements,
   map,
-  share,
+  withLatestFrom,
+  buffer,
+  skip,
 } from 'rxjs/operators';
-import { Observable, from, of, merge, empty } from 'rxjs';
+import {
+  Observable,
+  from,
+  of,
+  merge,
+  empty,
+  concat,
+  ObservedValueOf,
+} from 'rxjs';
 import { IncomingMessage } from 'http';
 import { Auth, Apps } from '@aimee-blue/ab-contracts';
 import { IJwt, decodeJwt } from '@aimee-blue/ab-auth';
@@ -17,6 +26,7 @@ import { ISocketEpicAttributes } from '../kit';
 import { ofType } from '../ofType';
 import { verifyToken } from './verifyToken';
 import { IAction } from '../action';
+import { publishStream } from '../publishStream';
 
 export interface IInjectedAuthDetails {
   auth?: IJwt;
@@ -86,51 +96,64 @@ export function epicWithAuth<E extends ISocketEpicWithAuth<unknown>>(
   deps = defaultDeps
 ) {
   const authForEpic = (...args: Parameters<E>) => {
-    const sharedCommands = args[0].pipe(share());
+    const [cmd, req, binary, ...rest] = args;
 
-    const authCmd = sharedCommands.pipe(
-      //
-      firstMessageShouldBeAuth()
-    );
+    return new Observable<Apps.IErrorAction | ObservedValueOf<ReturnType<E>>>(
+      subscriber => {
+        const commands = publishStream(cmd);
+        const authOp = publishStream(
+          commands.pipe(
+            firstMessageShouldBeAuth(),
+            verifyTokensUsingAuthMessage(allow, deps)
+          )
+        );
 
-    const verifyAuth = authCmd.pipe(
-      //
-      verifyTokensUsingAuthMessage(allow, deps)
-    );
+        const authSuccessOrEmpty = authOp.pipe(catchError(() => empty()));
 
-    return verifyAuth.pipe(
-      publish(shared =>
-        merge(
-          shared.pipe(
-            catchError(() => empty()),
-            switchMap(auth => {
+        const authFailed = authOp.pipe(
+          ignoreElements(),
+          catchError(err => {
+            console.error('💥  Verify token failed', err);
+
+            const appError: Apps.IErrorAction = {
+              type: Apps.ERROR,
+              payload: {
+                status: 'UNAUTHENTICATED',
+                message: 'Unauthenticated',
+              },
+            };
+
+            return of(appError);
+          })
+        );
+
+        const result = merge(
+          authFailed,
+          authSuccessOrEmpty.pipe(
+            // buffer commands while authOp is in progress:
+            withLatestFrom(
+              commands.pipe(
+                skip(1),
+                buffer(authSuccessOrEmpty.pipe(take(1))),
+                take(1)
+              )
+            ),
+            switchMap(([auth, buffered]) => {
               args[1].auth = auth;
               return epic(
-                sharedCommands,
-                args[1],
-                args[2],
-                args[3]
+                concat(from(buffered), commands),
+                req,
+                binary,
+                ...rest
               ) as ReturnType<E>;
             })
-          ),
-          shared.pipe(
-            ignoreElements(),
-            catchError(err => {
-              console.error('💥  Verify token failed', err);
-
-              const appError: Apps.IErrorAction = {
-                type: Apps.ERROR,
-                payload: {
-                  status: 'UNAUTHENTICATED',
-                  message: 'Unauthenticated',
-                },
-              };
-
-              return of(appError);
-            })
           )
-        )
-      )
+        );
+
+        subscriber.add(result.subscribe(subscriber));
+        subscriber.add(authOp.connect());
+        subscriber.add(commands.connect());
+      }
     );
   };
 
