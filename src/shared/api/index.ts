@@ -1,4 +1,5 @@
-import fetch, { FetchError, RequestInit } from 'node-fetch';
+import fetch, { RequestInit } from 'node-fetch';
+import { Errors } from '@aimee-blue/ab-shared';
 
 const constructEndpointUri = (rootEndpoint: string, functionName: string) =>
   rootEndpoint + functionName;
@@ -41,11 +42,9 @@ export const callFn = <T, P = unknown>(
         return res.json() as Promise<{ result?: T } | T>;
       }
 
-      throw new FetchError(
-        res.statusText,
-        `HTTP STATUS: ${res.status}`,
-        res.type
-      );
+      const message = await Errors.errorMessageFromFetchResponse(res);
+
+      throw new Error(message);
     })
     .then(
       wrapped =>
