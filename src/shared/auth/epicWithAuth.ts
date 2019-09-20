@@ -27,6 +27,7 @@ import { ofType } from '../ofType';
 import { verifyToken } from './verifyToken';
 import { IAction } from '../action';
 import { publishStream } from '../publishStream';
+import { Utils } from '@aimee-blue/ab-shared';
 
 export interface IInjectedAuthDetails {
   auth?: IJwt;
@@ -95,67 +96,70 @@ export function epicWithAuth<E extends ISocketEpicWithAuth<unknown>>(
   epic: E,
   deps = defaultDeps
 ) {
-  const authForEpic = (...args: Parameters<E>) => {
-    const [cmd, req, binary, ...rest] = args;
+  const authForEpic = Utils.setFunctionName(
+    `withAuth.${epic.name}`,
+    (...args: Parameters<E>) => {
+      const [cmd, req, binary, ...rest] = args;
 
-    return new Observable<Apps.IErrorAction | ObservedValueOf<ReturnType<E>>>(
-      subscriber => {
-        const commands = publishStream(cmd);
-        const authOp = publishStream(
-          commands.pipe(
-            firstMessageShouldBeAuth(),
-            verifyTokensUsingAuthMessage(allow, deps)
-          )
-        );
+      return new Observable<Apps.IErrorAction | ObservedValueOf<ReturnType<E>>>(
+        subscriber => {
+          const commands = publishStream(cmd);
+          const authOp = publishStream(
+            commands.pipe(
+              firstMessageShouldBeAuth(),
+              verifyTokensUsingAuthMessage(allow, deps)
+            )
+          );
 
-        const authSuccessOrEmpty = authOp.pipe(catchError(() => empty()));
+          const authSuccessOrEmpty = authOp.pipe(catchError(() => empty()));
 
-        const authFailed = authOp.pipe(
-          ignoreElements(),
-          catchError(err => {
-            console.error('💥  Verify token failed', err);
+          const authFailed = authOp.pipe(
+            ignoreElements(),
+            catchError(err => {
+              console.error('💥  Verify token failed', err);
 
-            const appError: Apps.IErrorAction = {
-              type: Apps.ERROR,
-              payload: {
-                status: 'UNAUTHENTICATED',
-                message: 'Unauthenticated',
-              },
-            };
+              const appError: Apps.IErrorAction = {
+                type: Apps.ERROR,
+                payload: {
+                  status: 'UNAUTHENTICATED',
+                  message: 'Unauthenticated',
+                },
+              };
 
-            return of(appError);
-          })
-        );
-
-        const result = merge(
-          authFailed,
-          authSuccessOrEmpty.pipe(
-            // buffer commands while authOp is in progress:
-            withLatestFrom(
-              commands.pipe(
-                skip(1),
-                buffer(authSuccessOrEmpty.pipe(take(1))),
-                take(1)
-              )
-            ),
-            switchMap(([auth, buffered]) => {
-              args[1].auth = auth;
-              return epic(
-                concat(from(buffered), commands),
-                req,
-                binary,
-                ...rest
-              ) as ReturnType<E>;
+              return of(appError);
             })
-          )
-        );
+          );
 
-        subscriber.add(result.subscribe(subscriber));
-        subscriber.add(authOp.connect());
-        subscriber.add(commands.connect());
-      }
-    );
-  };
+          const result = merge(
+            authFailed,
+            authSuccessOrEmpty.pipe(
+              // buffer commands while authOp is in progress:
+              withLatestFrom(
+                commands.pipe(
+                  skip(1),
+                  buffer(authSuccessOrEmpty.pipe(take(1))),
+                  take(1)
+                )
+              ),
+              switchMap(([auth, buffered]) => {
+                args[1].auth = auth;
+                return epic(
+                  concat(from(buffered), commands),
+                  req,
+                  binary,
+                  ...rest
+                ) as ReturnType<E>;
+              })
+            )
+          );
+
+          subscriber.add(result.subscribe(subscriber));
+          subscriber.add(authOp.connect());
+          subscriber.add(commands.connect());
+        }
+      );
+    }
+  );
 
   return authForEpic;
 }
