@@ -30,6 +30,7 @@ import { publishStream } from '../publishStream';
 import { Utils } from '@aimee-blue/ab-shared';
 
 export interface IInjectedAuthDetails {
+  id: string;
   auth?: IJwt;
 }
 
