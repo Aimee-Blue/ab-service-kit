@@ -1,9 +1,8 @@
 import { Socket } from 'net';
 import WebSocket from 'ws';
-import * as http from 'http';
 import uuid from 'uuid';
 import url from 'url';
-import { SocketWithInfo } from './types';
+import { SocketWithInfo, MessageWithInfo } from './types';
 import { AnySocketEpic } from '../kit';
 import { RegistryStateApi } from './socketRegistryState';
 
@@ -12,11 +11,7 @@ export const buildServerUpgradeListener = (
   epicsByPath: () => Map<string, AnySocketEpic>,
   add: RegistryStateApi['addSocket']
 ) =>
-  function upgrade(
-    request: http.IncomingMessage,
-    socket: Socket,
-    head: Buffer
-  ) {
+  function upgrade(request: MessageWithInfo, socket: Socket, head: Buffer) {
     if (!request.url) {
       socket.destroy();
       return;
@@ -33,7 +28,15 @@ export const buildServerUpgradeListener = (
     wss.handleUpgrade(request, socket, head, function done(ws: SocketWithInfo) {
       const id = uuid();
 
+      if ('id' in ws) {
+        throw new Error('id already exists in socket');
+      }
+      if ('id' in request) {
+        throw new Error('id already exists in request');
+      }
+
       ws.id = id;
+      request.id = id;
 
       add({
         id,
