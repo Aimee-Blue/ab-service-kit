@@ -2,7 +2,7 @@ import { EOL } from 'os';
 import { Subscription, merge } from 'rxjs';
 import { ignoreElements } from 'rxjs/operators';
 import { publishStream } from '../publishStream';
-import { SocketWithInfo } from './types';
+import { SocketWithInfo, MessageWithInfo } from './types';
 import { AnySocketEpic } from '../kit';
 import { isTruthy } from '../isTruthy';
 import { prepareWaitForCompletionFn } from './prepareWaitForCompletionFn';
@@ -12,12 +12,11 @@ import { actionStreamFromSocket } from './actionStreamFromSocket';
 import { binaryStreamFromSocket } from './binaryStreamFromSocket';
 import { logSocketStats } from './logSocketStats';
 import { logWarningIfOutgoingStreamNotComplete } from './logWarningIfOutgoingStreamNotComplete';
-import { IncomingMessage } from 'http';
 import { RegistryStateApi } from './socketRegistryState';
 
 const logConnected = (
   socket: SocketWithInfo,
-  message: IncomingMessage,
+  message: MessageWithInfo,
   epic: AnySocketEpic
 ) => {
   const ip =
@@ -38,7 +37,7 @@ const logConnected = (
   console.log(
     `${EOL}✊  Client connected`,
     {
-      id: socket.id,
+      id: message.id,
       url: message.url,
       epic: epic.name,
       ip,
@@ -50,7 +49,7 @@ const logConnected = (
 
 export const spinUpSocketEpic = (
   socket: SocketWithInfo,
-  message: IncomingMessage,
+  message: MessageWithInfo,
   epic: AnySocketEpic,
   closeSocket: RegistryStateApi['closeSocket']
 ) => {

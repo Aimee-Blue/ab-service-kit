@@ -1,7 +1,6 @@
-import * as http from 'http';
 import { Socket } from 'net';
 import { Subscription } from 'rxjs';
-import { SocketWithInfo } from './types';
+import { SocketWithInfo, MessageWithInfo } from './types';
 import { AnySocketEpic } from '../kit';
 
 export type WaitForCompletionFn = () => Promise<'completed' | 'timed-out'>;
@@ -11,7 +10,7 @@ export interface IConnectedSocket {
   pathname: string;
   ws: SocketWithInfo;
   socket: Socket;
-  request: http.IncomingMessage;
+  request: MessageWithInfo;
   subscription?: Subscription;
   waitForCompletion?: WaitForCompletionFn;
 }

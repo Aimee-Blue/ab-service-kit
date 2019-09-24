@@ -42,7 +42,7 @@ export interface ISocketEpicAttributes<O = unknown> {
   actionSchemaByType?: (type: string) => Joi.ObjectSchema | null;
   logInfo?: (
     socket: WebSocket,
-    request: IncomingMessage
+    request: IncomingMessage & { id: string }
   ) => { [key: string]: string | undefined };
 
   completedSocketWarningTimeout?: number;
@@ -54,7 +54,7 @@ export interface ISocketEpic<I, O = unknown, D = unknown>
   extends ISocketEpicAttributes<O> {
   (
     commands: Observable<I>,
-    request: IncomingMessage,
+    request: IncomingMessage & { id: string },
     binary: Observable<Buffer>,
     deps?: D
   ): Observable<O>;
