@@ -8,11 +8,19 @@ const configurationLoad = async (
   revision?: Config.Revision,
   authToken?: string
 ) => {
-  const token = authToken || (await currentSelfSignedToken());
-  return callFn<Config.IPartialConfig>('configurationLoad')({
-    revision,
-    authToken: token,
-  });
+  if (authToken) {
+    return callFn<Config.IPartialConfig>('configurationLoadUser')({
+      revision,
+      authToken,
+    });
+  } else {
+    // self-signed token is not associated with any user:
+    const token = await currentSelfSignedToken();
+    return callFn<Config.IPartialConfig>('configurationLoad')({
+      revision,
+      authToken: token,
+    });
+  }
 };
 
 export interface IGetConfigParams {
