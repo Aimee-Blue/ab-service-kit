@@ -22,7 +22,6 @@ import {
 import { pathExists } from 'fs-extra';
 import { TeardownHandler } from '../shared/teardown';
 import { clearModule } from '../shared/clearModule';
-import { tag } from 'rxjs-spy/operators';
 
 if (process.env.NODE_ENV === 'production') {
   throw new Error('This file should not be imported in production');

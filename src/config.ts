@@ -12,9 +12,6 @@ const config: IServiceConfig = {
   },
 
   endpoints: async app => {
-    app.get('/test', (req, res) => {
-      res.status(200).send('OK - 2');
-    });
     app.get('/verify', (_req, res, next) => {
       const fn = async () => {
         const token = await currentSelfSignedToken();
