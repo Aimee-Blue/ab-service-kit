@@ -1,10 +1,8 @@
-import { IServiceConfig, SocketEpic, IAction } from './shared';
-import * as Joi from '@hapi/joi';
-import { tag } from 'rxjs-spy/operators';
-import { takeUntil, filter } from 'rxjs/operators';
+import { IServiceConfig } from './shared';
 import { empty } from 'rxjs';
 import { verifyToken, currentSelfSignedToken } from './shared/auth';
 import { expressWithAuth } from './shared/auth/expressWithAuth';
+import { createTestEpic } from './testEpic';
 
 const config: IServiceConfig = {
   defaultPort: 4010,
@@ -14,6 +12,9 @@ const config: IServiceConfig = {
   },
 
   endpoints: async app => {
+    app.get('/test', (req, res) => {
+      res.status(200).send('OK - 2');
+    });
     app.get('/verify', (_req, res, next) => {
       const fn = async () => {
         const token = await currentSelfSignedToken();
@@ -49,14 +50,8 @@ const config: IServiceConfig = {
   },
 
   sockets: async () => {
-    const epic: SocketEpic<IAction> = cmd =>
-      cmd.pipe(
-        takeUntil(cmd.pipe(filter(action => action.type === 'STOP'))),
-        tag('debug-cmd')
-      );
-    epic.actionSchemaByType = () => Joi.object();
     return {
-      '/events': epic,
+      '/events': createTestEpic(),
     };
   },
 };
