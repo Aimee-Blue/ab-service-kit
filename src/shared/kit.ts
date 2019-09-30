@@ -47,7 +47,7 @@ export interface ISocketEpicAttributes<O = unknown> {
 
   completedSocketWarningTimeout?: number;
   completedSocketWaitTimeout?: number;
-  disconnectInWatchMode?: boolean;
+  watchModeDetachBehaviour?: 'disconnect' | 'unsubscribe';
   debugStats?: boolean;
 }
 

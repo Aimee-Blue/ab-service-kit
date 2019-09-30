@@ -5,6 +5,8 @@ import { AnySocketEpic } from '../kit';
 
 export type WaitForCompletionFn = () => Promise<'completed' | 'timed-out'>;
 
+export type WatchModeDetachBehavior = 'unsubscribe' | 'disconnect';
+
 export interface IConnectedSocket {
   id: string;
   pathname: string;
@@ -13,6 +15,7 @@ export interface IConnectedSocket {
   request: MessageWithInfo;
   subscription?: Subscription;
   waitForCompletion?: WaitForCompletionFn;
+  onDetach: WatchModeDetachBehavior;
 }
 
 export interface ISocketRegistryState {
@@ -39,12 +42,17 @@ const detachFromSocketInWatchMode = (state: ISocketRegistryState) => (
   // detachFromSocket should only be called in case if we want to unload
   // previous version of the code from memory
   subscription.unsubscribe();
+
+  if (rest.onDetach === 'disconnect') {
+    closeSocketCore(socketState, 1012);
+  }
 };
 
 const attachToSocket = (state: ISocketRegistryState) => (
   id: string,
   subscription: Subscription,
-  waitForCompletion: WaitForCompletionFn
+  waitForCompletion: WaitForCompletionFn,
+  onDetach: WatchModeDetachBehavior
 ) => {
   const socketState = state.sockets.get(id);
   if (!socketState) {
@@ -55,6 +63,7 @@ const attachToSocket = (state: ISocketRegistryState) => (
     ...socketState,
     subscription,
     waitForCompletion,
+    onDetach,
   });
 };
 

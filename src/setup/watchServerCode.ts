@@ -202,7 +202,6 @@ export async function serviceSetupInWatchMode(
       ),
 
       concatMap(mods => {
-        console.log('mods', mods);
         for (const mod of mods) {
           if (mod.mod.id === '.') {
             // we do not reload the main module
@@ -215,7 +214,9 @@ export async function serviceSetupInWatchMode(
           clearModule(mod.mod.id);
         }
 
-        clearModule(setupFilePath);
+        if (!mods.find(item => item.filePath === setupFilePath)) {
+          clearModule(setupFilePath);
+        }
 
         return defer(() =>
           from(
