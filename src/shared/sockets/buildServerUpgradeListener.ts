@@ -44,6 +44,7 @@ export const buildServerUpgradeListener = (
         ws,
         socket,
         request,
+        onDetach: 'disconnect',
       });
 
       wss.emit('connection', ws, request);
