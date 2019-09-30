@@ -1,7 +1,7 @@
 import { Logs } from '@aimee-blue/ab-contracts';
-import { time } from './time';
-import * as PubSub from './pubsub';
-import { appVersion, appName } from './app';
+import { time } from '../time';
+import * as PubSub from '../pubsub';
+import { appVersion, appName } from '../app';
 import { Observable, merge, empty, defer } from 'rxjs';
 import {
   ignoreElements,
@@ -9,10 +9,12 @@ import {
   filter,
   publish,
   mergeMap,
+  map,
 } from 'rxjs/operators';
-import { IAction } from './action';
+import { IAction } from '../action';
+import { timesRegistered } from './streams';
 
-interface IProfilerLogParams {
+interface ISendParams {
   event: string;
   traceKey?: string;
   data?: {
@@ -20,7 +22,7 @@ interface IProfilerLogParams {
   };
 }
 
-export const profilerLog = async (params: IProfilerLogParams) => {
+export const sendOne = async (params: ISendParams) => {
   const timestamp = await time();
   const version = await appVersion();
   const name = await appName();
@@ -52,20 +54,17 @@ function optionalFilter<A extends IAction, AOut extends A = A>(
   };
 }
 
-export interface IProfileParams<A extends IAction, AOut extends A = A> {
+export interface ISendActionsParams<A extends IAction, AOut extends A = A> {
   event?: string;
   traceKey?: string;
   filter?: (action: A) => action is AOut;
-  transform?: (
-    action: A,
-    params?: IProfileParams<A, AOut>
-  ) => IProfilerLogParams;
+  transform?: (action: A, params?: ISendActionsParams<A, AOut>) => ISendParams;
 }
 
 function defaultTransform(
   action: IAction,
-  params?: IProfileParams<IAction>
-): IProfilerLogParams {
+  params?: ISendActionsParams<IAction>
+): ISendParams {
   const { filter: _, transform: __, ...logParams } = params || {};
   return {
     event: action.type,
@@ -74,10 +73,10 @@ function defaultTransform(
   };
 }
 
-export const profileActions = <A extends IAction, AOut extends A = A>(
-  params?: IProfileParams<A, AOut>,
+export const sendActions = <A extends IAction, AOut extends A = A>(
+  params?: ISendActionsParams<A, AOut>,
   deps = {
-    profilerLog,
+    sendOne,
   }
 ) => (input: Observable<A>) =>
   input.pipe(
@@ -88,7 +87,7 @@ export const profileActions = <A extends IAction, AOut extends A = A>(
           optionalFilter(params && params.filter),
           mergeMap(action =>
             defer(() =>
-              deps.profilerLog(
+              deps.sendOne(
                 ((params && params.transform) || defaultTransform)(
                   action,
                   params
@@ -107,3 +106,15 @@ export const profileActions = <A extends IAction, AOut extends A = A>(
       )
     )
   );
+
+export function sendAllTimings() {
+  return timesRegistered().pipe(
+    map(timing => ({
+      type: `PROFILER/${timing.name.toUpperCase()}`,
+      timeTook: timing.time,
+      ...timing.details,
+    })),
+    sendActions(),
+    ignoreElements()
+  );
+}
