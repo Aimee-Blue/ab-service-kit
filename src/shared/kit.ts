@@ -47,6 +47,7 @@ export interface ISocketEpicAttributes<O = unknown> {
 
   completedSocketWarningTimeout?: number;
   completedSocketWaitTimeout?: number;
+  disconnectInWatchMode?: boolean;
   debugStats?: boolean;
 }
 
