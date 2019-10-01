@@ -1,6 +1,6 @@
 import chokidar from 'chokidar';
 import path, { dirname, resolve, join } from 'path';
-import { Observable, of, from, defer, concat, empty, timer, never } from 'rxjs';
+import { Observable, of, from, defer, concat, timer, never, empty } from 'rxjs';
 import {
   mergeMap,
   map,
@@ -9,12 +9,10 @@ import {
   find,
   concatMap,
   toArray,
-  distinct,
   mapTo,
   catchError,
   switchMapTo,
 } from 'rxjs/operators';
-import clearModule from 'clear-module';
 import {
   IServiceConfig,
   isTruthy,
@@ -23,6 +21,7 @@ import {
 } from '../shared';
 import { pathExists } from 'fs-extra';
 import { TeardownHandler } from '../shared/teardown';
+import { clearModule } from '../shared/clearModule';
 
 if (process.env.NODE_ENV === 'production') {
   throw new Error('This file should not be imported in production');
@@ -47,7 +46,6 @@ const watchMultiple = (patterns: string[]) => {
     };
 
     const onClose = () => {
-      console.log('closeDD');
       subscriber.complete();
     };
 
@@ -118,6 +116,16 @@ function findModule(
   );
 }
 
+function allParentModules(module: NodeModule) {
+  return defer(() => {
+    return of(module.parent).pipe(
+      filter(isTruthy),
+      expand(next => (next.parent ? of(next.parent) : empty())),
+      map(mod => moduleInfo(mod))
+    );
+  });
+}
+
 type ServiceSetupFunc = (config: IServiceConfig) => Promise<TeardownHandler>;
 
 function requireSetupModule(moduleId: string): IServiceConfig {
@@ -179,20 +187,15 @@ export async function serviceSetupInWatchMode(
         return pair.exists;
       }),
 
-      mergeMap(fileInfo => findModule(fileInfo.resolved)),
-
-      concatMap(pair =>
-        concat(
-          findModule(setupFilePath).pipe(
-            filter(isTruthy),
-            concatMap(setupModule => allChildModules(setupModule.mod))
-          ),
-          pair ? allChildModules(pair.mod) : empty()
-        ).pipe(
-          distinct(mod => mod.filePath),
+      mergeMap(fileInfo =>
+        findModule(fileInfo.resolved).pipe(
+          filter(isTruthy),
+          concatMap(mod => concat(of(mod), allParentModules(mod.mod))),
           toArray()
         )
       ),
+
+      filter(mods => mods.length > 0),
 
       concatMap(mods =>
         from(teardownOldServer('watch-mode')).pipe(mapTo(mods))
@@ -207,7 +210,12 @@ export async function serviceSetupInWatchMode(
           if (dirname(mod.mod.id) === __dirname) {
             continue;
           }
+
           clearModule(mod.mod.id);
+        }
+
+        if (!mods.find(item => item.filePath === setupFilePath)) {
+          clearModule(setupFilePath);
         }
 
         return defer(() =>

@@ -27,7 +27,7 @@ import { ofType } from '../ofType';
 import { verifyToken } from './verifyToken';
 import { IAction } from '../action';
 import { publishStream } from '../publishStream';
-import { Utils } from '@aimee-blue/ab-shared';
+import { Utils, Errors } from '@aimee-blue/ab-shared';
 
 export interface IInjectedAuthDetails {
   id: string;
@@ -117,7 +117,11 @@ export function epicWithAuth<E extends ISocketEpicWithAuth<unknown>>(
           const authFailed = authOp.pipe(
             ignoreElements(),
             catchError(err => {
-              console.error('💥  Verify token failed', err);
+              console.log(
+                'Verify token failed:',
+                Errors.ensureError(err).message,
+                (req.id && `for ${req.id}`) || ''
+              );
 
               const appError: Apps.IErrorAction = {
                 type: Apps.ERROR,

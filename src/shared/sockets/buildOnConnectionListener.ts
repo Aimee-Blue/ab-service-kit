@@ -31,5 +31,10 @@ export const buildOnConnectionListener = (
     closeSocket
   );
 
-  attachToSocket(socket.id, subscription, waitForCompletion);
+  attachToSocket(
+    socket.id,
+    subscription,
+    waitForCompletion,
+    epic.watchModeDetachBehaviour || 'disconnect'
+  );
 };

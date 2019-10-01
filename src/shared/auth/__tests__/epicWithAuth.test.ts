@@ -1,9 +1,9 @@
 import { marbles, Context } from 'rxjs-marbles/jest';
-import { ISocketEpic } from 'src/shared/kit';
 import { epicWithAuth } from '../epicWithAuth';
 import { Auth, Apps } from '@aimee-blue/ab-contracts';
 import { empty, timer } from 'rxjs';
 import { take, mapTo } from 'rxjs/operators';
+import { ISocketEpic } from '../../kit';
 
 const possibleInput = {
   a: Auth.auth({

@@ -1,10 +1,10 @@
 import { marbles } from 'rxjs-marbles/jest';
-import { profileActions } from '../shared';
+import { sendActions } from '../send';
 
-describe(profileActions.name, () => {
+describe(sendActions.name, () => {
   describe('given default parameters', () => {
     const deps = {
-      profilerLog: jest.fn(),
+      sendOne: jest.fn(),
     };
 
     const map = {
@@ -21,14 +21,14 @@ describe(profileActions.name, () => {
         const subs =         '^--!'; // prettier-ignore
         const expected =     'aaa|'; // prettier-ignore
 
-        const result = source.pipe(profileActions(undefined, deps));
+        const result = source.pipe(sendActions(undefined, deps));
 
         m.expect(result).toBeObservable(expected, map);
         m.expect(source).toHaveSubscriptions(subs);
         m.flush();
 
-        expect(deps.profilerLog).toHaveBeenCalledTimes(3);
-        expect(deps.profilerLog).toHaveBeenNthCalledWith(1, {
+        expect(deps.sendOne).toHaveBeenCalledTimes(3);
+        expect(deps.sendOne).toHaveBeenNthCalledWith(1, {
           event: map.a.type,
           data: map.a,
         });
