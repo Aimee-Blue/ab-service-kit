@@ -65,7 +65,7 @@
     "source-map-support": "0.5.13",
     "uuid": "3.3.3",
     "ws": "7.1.2",
-    "yargs": "14.0.0"
+    "yargs": "14.2.0"
   },
   "devDependencies": {
     "@aimee-blue/ab-contracts": "1.117.0",
