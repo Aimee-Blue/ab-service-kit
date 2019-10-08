@@ -19,14 +19,12 @@ import * as Epics from './epics';
 import * as PubSub from './pubsub';
 import * as Time from './time';
 import * as Profiler from './profiler';
-import * as CloudError from './cloudError';
 
 export {
   //
   Api,
   Auth,
   Config,
-  CloudError,
   Epics,
   PubSub,
   Time,
