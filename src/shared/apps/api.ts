@@ -1,7 +1,7 @@
 import { Apps } from '@aimee-blue/ab-contracts';
-import { Api } from '..';
+import { apiOf } from '../api';
 
 export const appsLogError = async (params: Apps.ILogErrorParams) => {
-  const api = Api.apiOf<Apps.IApi>();
+  const api = apiOf<Apps.IApi>();
   await api.callFn('appsLogError', params);
 };
