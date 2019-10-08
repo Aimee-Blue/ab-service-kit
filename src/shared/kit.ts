@@ -29,6 +29,7 @@ export interface IServiceConfig {
   serviceConfigModuleId?: string;
   watchPatterns?: string[];
 
+  shouldUseDefaultBackgroundOperations?: boolean;
   shouldUseDefaultEndpoints?: boolean;
   shouldLoadEnvFiles?: boolean;
 }
