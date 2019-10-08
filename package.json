@@ -44,7 +44,7 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@aimee-blue/ab-contracts": ">=1.117.0"
+    "@aimee-blue/ab-contracts": ">=1.118.0"
   },
   "dependencies": {
     "@aimee-blue/ab-auth": "1.1.0",
