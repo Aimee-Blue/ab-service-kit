@@ -1,4 +1,4 @@
-import { sendAppErrorsToCloud } from './cloudError';
+import { reportErrorsToCloud } from './reportErrorsToCloud';
 import { merge } from 'rxjs';
 
-export const defaultBackground = merge(sendAppErrorsToCloud());
+export const defaultBackground = merge(reportErrorsToCloud());
