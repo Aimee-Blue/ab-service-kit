@@ -17,7 +17,7 @@
     "shell-docker": "docker exec -it $(docker ps -aqf name=$npm_package_name) bash"
   },
   "dependencies": {
-    "@aimee-blue/ab-contracts": "1.114.0",
+    "@aimee-blue/ab-contracts": "1.118.0",
     "@aimee-blue/ab-service-kit": "1.7.0"
   },
   "devDependencies": {
