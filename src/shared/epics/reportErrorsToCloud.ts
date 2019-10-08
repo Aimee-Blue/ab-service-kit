@@ -1,7 +1,7 @@
 import { Apps } from '@aimee-blue/ab-contracts';
-import { from, empty, of } from 'rxjs';
+import { from, empty } from 'rxjs';
 import { mergeMap, catchError, ignoreElements } from 'rxjs/operators';
-import { fromEventBus, pushToEventBus } from '../eventBus';
+import { fromEventBus } from '../eventBus';
 import { ofType } from '../ofType';
 import { appName, appVersion } from '../app';
 import { appsLogError } from '../apps';
@@ -14,9 +14,6 @@ const reportError = async (errorAction: Apps.IErrorAction) => {
     version,
   });
 };
-
-export const registerError = (error: unknown) =>
-  of(Apps.error(error)).pipe(pushToEventBus());
 
 export const reportErrorsToCloud = () => {
   return fromEventBus().pipe(

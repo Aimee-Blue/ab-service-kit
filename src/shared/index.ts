@@ -11,6 +11,7 @@ export * from './eventBus';
 export * from './ofType';
 export * from './retryWithBackoff';
 export * from './logEpic';
+export * from './registerError';
 
 import * as Api from './api';
 import * as Auth from './auth';
