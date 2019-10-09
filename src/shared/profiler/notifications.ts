@@ -45,7 +45,6 @@ export function executeOnNotification(
           return;
         },
         error: err => {
-          registerError(err);
           console.error('💥  Profiler error', err);
         },
       });

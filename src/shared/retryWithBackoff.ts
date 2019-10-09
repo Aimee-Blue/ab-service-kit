@@ -32,7 +32,6 @@ function timeBeforeNextRetry(opts: IRetryOptsAll, numberOfErrors: number) {
 export function retryWithBackoff<T>(optsRaw?: RetryOpts) {
   const opts: IRetryOptsAll = {
     shouldRetry: info => {
-      registerError(info);
       console.error(
         `💥  The ${opts.sourceDescription || 'process'} has failed ${
           info.numberOfErrors

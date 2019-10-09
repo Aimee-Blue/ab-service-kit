@@ -118,7 +118,6 @@ export function epicWithAuth<E extends ISocketEpicWithAuth<unknown>>(
           const authFailed = authOp.pipe(
             ignoreElements(),
             catchError(err => {
-              registerError(err);
               console.log(
                 'Verify token failed:',
                 Errors.ensureError(err).message,

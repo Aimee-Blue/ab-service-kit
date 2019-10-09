@@ -30,7 +30,6 @@ const config: IServiceConfig = {
           res.json(result).status(200);
         })
         .catch(err => {
-          registerError(err);
           console.error('Error', err);
           next(err);
         });

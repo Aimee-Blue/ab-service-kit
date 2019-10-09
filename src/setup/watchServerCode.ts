@@ -234,7 +234,6 @@ export async function serviceSetupInWatchMode(
           '💥  Watching error, will wait for 2sec before restart ... ',
           err
         );
-        registerError(err);
         return timer(2000).pipe(switchMapTo(self));
       })
     )

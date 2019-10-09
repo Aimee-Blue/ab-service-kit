@@ -96,9 +96,7 @@ export const sendActions = <A extends IAction, AOut extends A = A>(
               )
             ).pipe(
               catchError(err => {
-                registerError(err);
                 console.error('💥  An error when profiling actions', err);
-
                 return empty();
               })
             )
