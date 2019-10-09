@@ -4,6 +4,7 @@ import { Observable, from, defer } from 'rxjs';
 import { map, flatMap } from 'rxjs/operators';
 import { currentSelfSignedToken } from '../auth';
 import { isNumber } from 'util';
+import { registerError } from '../registerError';
 
 function last<T>(elements: T[]) {
   if (elements.length === 0) {
@@ -67,6 +68,7 @@ export const load = async (
   try {
     return await configurationLoad(params);
   } catch (err) {
+    registerError(err);
     console.error(
       '💥  Failed when fetching config',
       ...[err, params.revision].filter(Boolean)

@@ -2,6 +2,7 @@ import { Socket } from 'net';
 import { Subscription } from 'rxjs';
 import { SocketWithInfo, MessageWithInfo } from './types';
 import { AnySocketEpic } from '../kit';
+import { registerError } from '../registerError';
 
 export type WaitForCompletionFn = () => Promise<'completed' | 'timed-out'>;
 
@@ -86,6 +87,7 @@ const waitForCompletionThenTeardown = (
   wait()
     .then(teardown)
     .catch(err => {
+      registerError(err);
       console.error('💥  Error while waiting for epic to complete', err);
       teardown();
     });

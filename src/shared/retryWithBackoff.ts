@@ -1,5 +1,6 @@
 import { Observable, timer, from } from 'rxjs';
 import { catchError, switchMapTo, tap } from 'rxjs/operators';
+import { registerError } from './registerError';
 
 interface IErrorInfo {
   error: Error;
@@ -31,6 +32,7 @@ function timeBeforeNextRetry(opts: IRetryOptsAll, numberOfErrors: number) {
 export function retryWithBackoff<T>(optsRaw?: RetryOpts) {
   const opts: IRetryOptsAll = {
     shouldRetry: info => {
+      registerError(info);
       console.error(
         `💥  The ${opts.sourceDescription || 'process'} has failed ${
           info.numberOfErrors
@@ -67,6 +69,7 @@ export function retryWithBackoff<T>(optsRaw?: RetryOpts) {
             )
           : stream,
       catchError((error: Error) => {
+        registerError(error);
         const numberOfErrors = reset ? 0 : errors;
         const time = timeBeforeNextRetry(opts, numberOfErrors + 1);
         return opts.shouldRetry({

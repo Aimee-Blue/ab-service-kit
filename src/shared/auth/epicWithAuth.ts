@@ -28,6 +28,7 @@ import { verifyToken } from './verifyToken';
 import { IAction } from '../action';
 import { publishStream } from '../publishStream';
 import { Utils, Errors } from '@aimee-blue/ab-shared';
+import { registerError } from '../registerError';
 
 export interface IInjectedAuthDetails {
   id: string;
@@ -117,6 +118,7 @@ export function epicWithAuth<E extends ISocketEpicWithAuth<unknown>>(
           const authFailed = authOp.pipe(
             ignoreElements(),
             catchError(err => {
+              registerError(err);
               console.log(
                 'Verify token failed:',
                 Errors.ensureError(err).message,

@@ -5,6 +5,7 @@ import { appName } from '../app';
 import uuid from 'uuid';
 import { EOL } from 'os';
 import { isDevBuild } from '../isTest';
+import { registerError } from '../registerError';
 
 let initializedClient: PubSub.PubSub | null = null;
 
@@ -79,6 +80,7 @@ export async function publish<T>(topic: string, data: T) {
     Buffer.from(JSON.stringify(data), 'utf8'),
     (err: Error | null, mesId) => {
       if (err) {
+        registerError(err);
         console.error(
           `💥  Error when publishing to topic ${topic} ${
             mesId ? `with message ${mesId}` : ''
@@ -189,6 +191,7 @@ export function subscribe(topic: string, options?: SubscribeOptions) {
                 );
               })
               .catch((err: Error) => {
+                registerError(err);
                 console.error(
                   `${EOL}💥  Error when unsubscribing from "${subscription.name}"`,
                   err,
