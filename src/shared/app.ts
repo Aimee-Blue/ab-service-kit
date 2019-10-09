@@ -1,5 +1,6 @@
 import { pathExists, readFile } from 'fs-extra';
 import { spawnSync } from 'child_process';
+import { Utils } from '@aimee-blue/ab-shared';
 
 const packageJson = 'package.json';
 
@@ -53,15 +54,15 @@ function determineGitVersion() {
   return versionStr;
 }
 
-export async function appVersion() {
+export const appVersion = Utils.onceAsync(async () => {
   const loaded = await loadPackageJson();
   if (loaded.version === '0.0.0-development') {
     return determineGitVersion() || loaded.version;
   }
   return loaded.version;
-}
+});
 
-export async function appName() {
+export const appName = Utils.onceAsync(async () => {
   const loaded = await loadPackageJson();
   return loaded.name;
-}
+});

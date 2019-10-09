@@ -22,10 +22,10 @@
     "@hapi/joi" "15.1.1"
     deepmerge "4.0.0"
 
-"@aimee-blue/ab-shared@1.114.4":
-  version "1.114.4"
-  resolved "https://registry.yarnpkg.com/@aimee-blue/ab-shared/-/ab-shared-1.114.4.tgz#1ef4333c44b50e4f1a09f85bed4ecdc7761853d8"
-  integrity sha512-wHuyK+ECTzqgGYp9qhtaRd/RNppEyvFQKha6sn7w0JZeyPnofMUj5CFfQiZsbVZOMORSprFA5/Rbkpdl+tU+ew==
+"@aimee-blue/ab-shared@1.115.0":
+  version "1.115.0"
+  resolved "https://registry.yarnpkg.com/@aimee-blue/ab-shared/-/ab-shared-1.115.0.tgz#e03f4275e3aba0a81bfe29727237deb7c6dba0db"
+  integrity sha512-DXctzTuNS1CbKRnKpCuUZCpYwbfqrtHhxltlFHoxRFZskpk1kRLTmPbeEwyUwjKdEb7WHUszOX39tNy5ySOAmw==
 
 "@babel/cli@7.6.2":
   version "7.6.2"

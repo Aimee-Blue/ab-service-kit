@@ -1,4 +1,5 @@
 import { serverTime } from './serverTime';
+import { registerError } from '../registerError';
 
 // in the docs is mentioned that `hrtime` is more stable
 // that the Date.now and doesn't drift, so we use it to
@@ -90,6 +91,7 @@ export const time = (deps = defaultDeps) => {
         });
       })
       .catch(err => {
+        registerError(err);
         promise = null;
 
         console.error('💥  Error when synchronizing time', err);
