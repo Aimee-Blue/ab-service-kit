@@ -72,6 +72,8 @@ export async function prepareTopics(topics: string[]) {
   });
 }
 
+const TIMEOUT_ERROR = 'Retry total timeout exceeded before any response';
+
 export async function publish<T>(topic: string, data: T) {
   const topicPublisher = getTopic(topic);
 
@@ -79,6 +81,9 @@ export async function publish<T>(topic: string, data: T) {
     Buffer.from(JSON.stringify(data), 'utf8'),
     (err: Error | null, mesId) => {
       if (err) {
+        if (err.message.includes(TIMEOUT_ERROR)) {
+          topicMap.delete(topic);
+        }
         console.error(
           `💥  Error when publishing to topic ${topic} ${
             mesId ? `with message ${mesId}` : ''
