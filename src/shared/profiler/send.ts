@@ -13,7 +13,6 @@ import {
 } from 'rxjs/operators';
 import { IAction } from '../action';
 import { timesRegistered } from './streams';
-import { registerError } from '../registerError';
 
 interface ISendParams {
   event: string;

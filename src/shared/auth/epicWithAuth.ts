@@ -28,7 +28,6 @@ import { verifyToken } from './verifyToken';
 import { IAction } from '../action';
 import { publishStream } from '../publishStream';
 import { Utils, Errors } from '@aimee-blue/ab-shared';
-import { registerError } from '../registerError';
 
 export interface IInjectedAuthDetails {
   id: string;

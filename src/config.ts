@@ -3,7 +3,6 @@ import { empty } from 'rxjs';
 import { verifyToken, currentSelfSignedToken } from './shared/auth';
 import { expressWithAuth } from './shared/auth/expressWithAuth';
 import { createTestEpic } from './testEpic';
-import { registerError } from './shared/registerError';
 
 const config: IServiceConfig = {
   defaultPort: 4010,

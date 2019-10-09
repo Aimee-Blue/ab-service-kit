@@ -18,7 +18,6 @@ import {
   isTruthy,
   isUnitTest,
   isIntegrationTest,
-  registerError,
 } from '../shared';
 import { pathExists } from 'fs-extra';
 import { TeardownHandler } from '../shared/teardown';

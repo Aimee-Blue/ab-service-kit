@@ -1,7 +1,6 @@
 import { Observable, of, Subscriber } from 'rxjs';
 import { ignoreElements, endWith, tap } from 'rxjs/operators';
 import { publishStream } from '../publishStream';
-import { registerError } from '../registerError';
 
 export type TagNotification =
   | 'next'
