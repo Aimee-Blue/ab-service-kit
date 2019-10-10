@@ -5,6 +5,7 @@ import { fromEventBus } from '../eventBus';
 import { ofType } from '../ofType';
 import { appName, appVersion } from '../app';
 import { appsLogError } from '../apps';
+import { isDevBuild } from '../isTest';
 
 const reportError = async (errorAction: Apps.IErrorAction) => {
   const [source, version] = await Promise.all([appName(), appVersion()]);
@@ -16,6 +17,9 @@ const reportError = async (errorAction: Apps.IErrorAction) => {
 };
 
 export const reportErrorsToCloud = () => {
+  if (isDevBuild()) {
+    return empty();
+  }
   return fromEventBus().pipe(
     ofType<Apps.IErrorAction>(Apps.ERROR),
     mergeMap(errorAction => {
