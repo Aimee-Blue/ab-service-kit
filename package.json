@@ -49,7 +49,7 @@
   "dependencies": {
     "@aimee-blue/ab-auth": "1.1.0",
     "@aimee-blue/ab-shared": "1.115.0",
-    "@google-cloud/pubsub": "1.1.1",
+    "@google-cloud/pubsub": "1.1.4",
     "@hapi/joi": "15.1.1",
     "cors": "2.8.5",
     "dotenv": "8.1.0",
