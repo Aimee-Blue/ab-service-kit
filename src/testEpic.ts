@@ -3,7 +3,7 @@ import { SocketEpic, IAction } from './shared';
 import { map } from 'rxjs/operators';
 
 export function createTestEpic() {
-  const epic: SocketEpic<IAction> = (...args) =>
+  const epic: SocketEpic<IAction, IAction> = (...args) =>
     echoEpic(...args).pipe(
       //
       map((item, i) => ({ ...item, i: i * 2 }))
