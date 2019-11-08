@@ -24,9 +24,9 @@ export function logSocketStats(data: Observable<WebSocket.Data>, id: string) {
     scan((sum, item: Buffer) => item.byteLength + sum, 0)
   );
 
-  const log = ([msgs, bytes]: [number, number]) => {
+  const logMsg = (prefix: string) => ([msgs, bytes]: [number, number]) => {
     console.log(
-      `${EOL}🔃  Connection stats`,
+      `${EOL}${prefix}`,
       {
         id,
         bytesReceived: bytes,
@@ -36,6 +36,9 @@ export function logSocketStats(data: Observable<WebSocket.Data>, id: string) {
       EOL
     );
   };
+
+  const log = logMsg('🔃  Connection stats');
+  const logFinal = logMsg('🔃  Connection stats upon closure');
 
   let latestState = [0, 0] as [number, number];
   const stats = combineLatest(
@@ -48,7 +51,7 @@ export function logSocketStats(data: Observable<WebSocket.Data>, id: string) {
     auditTime(5000),
     tap(log),
     finalize(() => {
-      log(latestState);
+      logFinal(latestState);
     }),
     ignoreElements()
   );
