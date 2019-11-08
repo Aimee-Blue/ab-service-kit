@@ -55,7 +55,9 @@ const watchMultiple = (patterns: string[]) => {
       .on('close', onClose);
 
     return () => {
-      watcher.close();
+      watcher.close().catch(err => {
+        console.log('Couldnt close file watcher', err);
+      });
     };
   });
 };
@@ -162,7 +164,9 @@ export async function serviceSetupInWatchMode(
   ];
 
   const subscription = defer(() => {
-    console.log(`🔍  Watching for file changes in ${WATCH_PATTERNS}`);
+    console.log(
+      `🔍  Watching for file changes in ${WATCH_PATTERNS.join(', ')}`
+    );
     return watchMultiple(WATCH_PATTERNS);
   })
     .pipe(

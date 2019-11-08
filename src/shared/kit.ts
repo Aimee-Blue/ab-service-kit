@@ -64,7 +64,7 @@ export interface ISocketEpic<I, O = unknown, D = unknown>
 
 export type AnySocketEpic = ISocketEpic<unknown>;
 
-export type SocketEpic<I, O = unknown, D = unknown> = ISocketEpic<I, D, O>;
+export type SocketEpic<I, O = unknown, D = unknown> = ISocketEpic<I, O, D>;
 
 type ArgsBuilder = (
   args: yargs.Argv<ICommandLineArgs>

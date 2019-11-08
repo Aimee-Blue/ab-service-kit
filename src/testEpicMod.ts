@@ -3,7 +3,7 @@ import { takeUntil, filter, map } from 'rxjs/operators';
 import { tag } from 'rxjs-spy/operators';
 import Joi from '@hapi/joi';
 
-export const echoEpic: SocketEpic<IAction> = cmd =>
+export const echoEpic: SocketEpic<IAction, IAction> = cmd =>
   cmd.pipe(
     map(action => ({
       ...action,
