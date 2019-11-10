@@ -1,3 +1,4 @@
 {
-  "cSpell.words": ["Apps", "Millis", "deinitialize", "startup", "teardown"]
+  "cSpell.words": ["Apps", "Millis", "deinitialize", "startup", "teardown"],
+  "typescript.tsdk": "node_modules/typescript/lib"
 }
