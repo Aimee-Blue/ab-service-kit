@@ -1,24 +1,29 @@
-import { IServiceConfig, registerError } from '../shared';
+import { IServiceConfig, registerError, mergeBackgroundEpics } from '../shared';
 import { TeardownHandler, noop } from '../shared/teardown';
-import { merge } from 'rxjs';
 import { defaultBackground } from '../shared/epics';
+import { fromEventBus, pushToEventBus } from '../shared/eventBus';
 
 export async function setupBackground(
   config: IServiceConfig
 ): Promise<TeardownHandler> {
-  if (config.background) {
-    const backgroundConfig = await config.background();
-    const result =
-      config.shouldUseDefaultBackgroundOperations ||
-      typeof config.shouldUseDefaultBackgroundOperations !== 'boolean'
-        ? merge(backgroundConfig, defaultBackground)
-        : backgroundConfig;
+  const useDefault = config.shouldUseDefaultBackgroundOperations ?? true;
+  if (config.background || useDefault) {
+    const backgroundEpics = await (config.background?.() ??
+      Promise.resolve([]));
+
+    const epic = useDefault
+      ? mergeBackgroundEpics(...backgroundEpics, ...defaultBackground)
+      : mergeBackgroundEpics(...backgroundEpics);
+
+    const result = epic(fromEventBus()).pipe(pushToEventBus());
+
     const subscription = result.subscribe({
       error: err => {
         registerError(err);
         console.error(`💥  CRITICAL! Background operation has failed`, err);
       },
     });
+
     return async () => {
       subscription.unsubscribe();
     };

@@ -1,14 +1,8 @@
-import { Observable, merge, Subject } from 'rxjs';
-import {
-  ignoreElements,
-  tap,
-  finalize,
-  filter,
-  scan,
-  map,
-} from 'rxjs/operators';
+import { Observable, Subject } from 'rxjs';
+import { ignoreElements, tap, filter, scan, map } from 'rxjs/operators';
 import { EOL } from 'os';
 import { TagNotification, executeOnNotifications } from '../notifications';
+import { Logger, defaultLogger, logStream, LogStreamParams } from '../logging';
 
 type Timestamp = [number, number];
 
@@ -303,59 +297,24 @@ interface ISummary {
   max: number;
 }
 
-const logSummaryForTag = (name: string, summary: ISummary | null) => {
-  if (!summary) {
-    console.log(`${EOL}🤷‍  No profiler results registered for [${name}]`, EOL);
-    return;
-  }
-
-  console.log(
-    `${EOL}🔃  Profiler results for [${name}]; most of the times: ${summary.mostOfTheTimesLessThan.toFixed(
-      2
-    )}ms; min: ${summary.min.toFixed(2)}ms; max: ${summary.max.toFixed(
-      2
-    )}ms; samples: ${summary.numberOfSamples}`,
-    EOL
-  );
-};
-
-export function consoleLog(params: {
+export function logSummaries(params: {
   name: string;
-  on?: Observable<unknown>;
-  cb?: (summary: ISummary) => void;
+  on?: LogStreamParams['on'];
+  logger?: Logger;
 }) {
   const summaries = createSummary(params.name);
-  const notifications = params.on || summaries;
+  const logger = params.logger ?? defaultLogger;
 
-  const log = (summary: ISummary | null) => {
-    logSummaryForTag(params.name, summary);
-  };
-
-  let cachedSummary: ISummary | null = null;
-
-  return merge(
-    summaries.pipe(
-      tap((summary: ISummary) => {
-        cachedSummary = summary;
-        allSummaries.next({
-          name: params.name,
-          summary: cachedSummary,
-        });
-        if (params.cb) {
-          params.cb(summary);
-        }
+  return summaries.pipe(
+    logStream({
+      prefix: `${EOL}🔃  Profiler results for [${params.name}]`,
+      suffix: [EOL],
+      logger,
+      ...(params.on && {
+        on: params.on,
       }),
-      ignoreElements()
-    ),
-    notifications.pipe(
-      tap(() => {
-        log(cachedSummary);
-      }),
-      finalize(() => {
-        log(cachedSummary);
-      }),
-      ignoreElements()
-    )
+    }),
+    ignoreElements()
   );
 }
 

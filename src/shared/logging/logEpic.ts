@@ -11,8 +11,8 @@ export const logEpic = <E extends AnySocketEpic>(
   log = logStream,
   params: ILogEpicParams
 ) => {
-  const fn = (...args: Parameters<AnySocketEpic>) => {
-    const [commands, ...rest] = args;
+  const fn = (...args: Parameters<E>) => {
+    const [commands, ctx] = args;
     const incomingName = `commands@${params.name || epic.name}`;
     const outgoingName = `results@${params.name || epic.name}`;
     return epic(
@@ -21,7 +21,7 @@ export const logEpic = <E extends AnySocketEpic>(
           prefix: incomingName,
         })
       ),
-      ...rest
+      ctx
     ).pipe(
       log({
         prefix: outgoingName,
