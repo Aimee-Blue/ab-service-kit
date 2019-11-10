@@ -8,7 +8,7 @@ import {
   map,
 } from 'rxjs/operators';
 import { EOL } from 'os';
-import { TagNotification, executeOnNotification } from './notifications';
+import { TagNotification, executeOnNotifications } from '../notifications';
 
 type Timestamp = [number, number];
 
@@ -201,15 +201,9 @@ export function attach(params: {
 
     return source.pipe(stream => {
       if (params.till === 'unsubscribe' && params.from === 'complete') {
-        return stream.pipe(
-          startOp(),
-          stopOp()
-        );
+        return stream.pipe(startOp(), stopOp());
       } else {
-        return stream.pipe(
-          stopOp(),
-          startOp()
-        );
+        return stream.pipe(stopOp(), startOp());
       }
     });
   };
@@ -226,10 +220,7 @@ export function registerStarts(
     state.hit(params.name);
   };
 
-  return params.on.pipe(
-    tap(hit),
-    ignoreElements()
-  );
+  return params.on.pipe(tap(hit), ignoreElements());
 }
 
 export function start(
@@ -248,7 +239,7 @@ export function start(
       state.hit(params.name);
     };
 
-    return stream.pipe(executeOnNotification(params.on, hit));
+    return stream.pipe(executeOnNotifications([params.on], hit));
   };
 }
 
@@ -264,10 +255,7 @@ export function registerStops(
   const setMemo = () => {
     state.memo(params.name, params.details, params.transformTookTime);
   };
-  return params.on.pipe(
-    tap(setMemo),
-    ignoreElements()
-  );
+  return params.on.pipe(tap(setMemo), ignoreElements());
 }
 
 export function stop(
@@ -287,7 +275,7 @@ export function stop(
     const setMemo = () => {
       state.memo(params.name, params.details, params.transformTookTime);
     };
-    return stream.pipe(executeOnNotification(params.till, setMemo));
+    return stream.pipe(executeOnNotifications([params.till], setMemo));
   };
 }
 
