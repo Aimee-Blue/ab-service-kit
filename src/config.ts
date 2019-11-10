@@ -1,5 +1,4 @@
 import { IServiceConfig } from './shared';
-import { empty } from 'rxjs';
 import { verifyToken, currentSelfSignedToken } from './shared/auth';
 import { expressWithAuth } from './shared/auth/expressWithAuth';
 import { createTestEpic } from './testEpic';
@@ -40,10 +39,6 @@ const config: IServiceConfig = {
     app.get('/test-auth', (_req, res) => {
       res.sendStatus(200);
     });
-  },
-
-  background: async () => {
-    return empty();
   },
 
   sockets: async () => {
