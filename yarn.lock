@@ -7224,11 +7224,6 @@ prepend-http@^1.0.1:
   resolved "https://registry.yarnpkg.com/prepend-http/-/prepend-http-1.0.4.tgz#d4f4562b0ce3696e41ac52d0e002e57a635dc6dc"
   integrity sha1-1PRWKwzjaW5BrFLQ4ALlemNdxtw=
 
-prettier@1.19.0:
-  version "1.19.0"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.19.0.tgz#3bec4489d5eebcd52b95ddd2c22467b5c852fde1"
-  integrity sha512-GlAIjk6DjkNT6u/Bw5QCWrbzh9YlLKwwmJT//1YiCR3WDpZDnyss64aXHQZgF8VKeGlWnX6+tGsKSVxsZT/gtA==
-
 prettier@1.19.1:
   version "1.19.1"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.19.1.tgz#f7d7f5ff8a9cd872a7be4ca142095956a60797cb"
@@ -8840,10 +8835,10 @@ trim-off-newlines@^1.0.0:
   resolved "https://registry.yarnpkg.com/trim-off-newlines/-/trim-off-newlines-1.0.1.tgz#9f9ba9d9efa8764c387698bcbfeb2c848f11adb3"
   integrity sha1-n5up2e+odkw4dpi8v+sshI8RrbM=
 
-ts-deps@0.8.0-alpha.1:
-  version "0.8.0-alpha.1"
-  resolved "https://registry.yarnpkg.com/ts-deps/-/ts-deps-0.8.0-alpha.1.tgz#b763f9012cb5d4f807ef0e9fcf0d6d4682b32933"
-  integrity sha512-XT2u6eHQNebvillaLA5zLdd7yt9vw9uDEVCQ88/Es4RJMW6bD6CC9ZtVlA/DPe3jJA9epWz9HbnonD7x2nHgkw==
+ts-deps@0.8.1:
+  version "0.8.1"
+  resolved "https://registry.yarnpkg.com/ts-deps/-/ts-deps-0.8.1.tgz#ab6d2f41eaf4477968dad77afc9f43a3e41f166a"
+  integrity sha512-Egv+otPy6IA6LYDoi6JzHODxqJ9YcUHZMXHTMY9kkhQ/gQjHoxFHWc/fyxs+FfcskCUbPUGlRQym5f6EY6yGlA==
   dependencies:
     "@babel/cli" "7.7.0"
     "@babel/core" "7.7.2"
@@ -8870,7 +8865,7 @@ ts-deps@0.8.0-alpha.1:
     inquirer "7.0.0"
     istanbul-api "2.1.6"
     jest "24.9.0"
-    prettier "1.19.0"
+    prettier "1.19.1"
     pretty-quick "2.0.1"
     semantic-release "16.0.0-beta.26"
     source-map-support "0.5.16"
@@ -9150,10 +9145,10 @@ util.promisify@^1.0.0:
     define-properties "^1.1.2"
     object.getownpropertydescriptors "^2.0.3"
 
-utility-types@3.9.0:
-  version "3.9.0"
-  resolved "https://registry.yarnpkg.com/utility-types/-/utility-types-3.9.0.tgz#c322d974e7062ec967077384c3b75077a955d83b"
-  integrity sha512-bUUsGr7NuI1p/6GpDCI/PUCJ1y5KWO4xul8RWOcmUwXSjLoi6WoV9YLNqBF7lH4RRy/jgmhYCE49eM0bnaijMQ==
+utility-types@3.10.0:
+  version "3.10.0"
+  resolved "https://registry.yarnpkg.com/utility-types/-/utility-types-3.10.0.tgz#ea4148f9a741015f05ed74fd615e1d20e6bed82b"
+  integrity sha512-O11mqxmi7wMKCo6HKFt5AhO4BwY3VV68YU07tgxfz8zJTIxr4BpsezN49Ffwy9j3ZpwwJp4fkRwjRzq3uWE6Rg==
 
 utils-merge@1.0.1:
   version "1.0.1"
