@@ -1,13 +1,20 @@
 import WebSocket from 'ws';
 import { fromEvent, merge, of, bindNodeCallback } from 'rxjs';
-import { mergeMap, take, timeoutWith, mapTo, map } from 'rxjs/operators';
+import { mergeMap, take, timeoutWith, mapTo, map, tap } from 'rxjs/operators';
 import { PromiseType } from 'utility-types';
 
 import { SocketEpic } from '../shared';
 import { initTestEpic } from './helpers';
+import { EOL } from 'os';
 
 describe('given service with echo pipeline', () => {
-  const echoingEpic: SocketEpic<unknown> = commands => commands;
+  const echoingEpic: SocketEpic<unknown> = (commands, { logger }) =>
+    commands.pipe(
+      tap(item => {
+        logger.log(`${EOL}A new message was received`, item);
+      })
+    );
+  echoingEpic.debugStats = true;
 
   let data: PromiseType<ReturnType<typeof initTestEpic>>;
   beforeEach(async () => {
@@ -29,11 +36,7 @@ describe('given service with echo pipeline', () => {
     );
 
     const connected = await merge(onOpen, onError)
-      .pipe(
-        mapTo('connected'),
-        timeoutWith(1000, of('timed-out')),
-        take(1)
-      )
+      .pipe(mapTo('connected'), timeoutWith(1000, of('timed-out')), take(1))
       .toPromise();
 
     expect(connected).toBe('connected');
@@ -56,11 +59,7 @@ describe('given service with echo pipeline', () => {
     );
 
     const connected = await merge(onOpen, onError)
-      .pipe(
-        mapTo('connected'),
-        timeoutWith(1000, of('timed-out')),
-        take(1)
-      )
+      .pipe(mapTo('connected'), timeoutWith(1000, of('timed-out')), take(1))
       .toPromise();
 
     expect(connected).toBe('connected');

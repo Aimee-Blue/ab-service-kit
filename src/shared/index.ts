@@ -7,10 +7,9 @@ export * from './time';
 export * from './isTest';
 export * from './startup';
 export * from './mergeEpics';
-export * from './eventBus';
 export * from './ofType';
 export * from './retryWithBackoff';
-export * from './logEpic';
+export * from './logging';
 export * from './registerError';
 export * from './publishAs';
 export * from './env';
@@ -22,6 +21,7 @@ import * as Epics from './epics';
 import * as PubSub from './pubsub';
 import * as Time from './time';
 import * as Profiler from './profiler';
+import * as EventBus from './eventBus';
 
 export {
   //
@@ -32,4 +32,5 @@ export {
   PubSub,
   Time,
   Profiler,
+  EventBus,
 };

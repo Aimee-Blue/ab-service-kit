@@ -1,4 +1,3 @@
-import { EOL } from 'os';
 import { Subscription, merge } from 'rxjs';
 import { ignoreElements } from 'rxjs/operators';
 import { publishStream } from '../publishStream';
@@ -13,78 +12,53 @@ import { binaryStreamFromSocket } from './binaryStreamFromSocket';
 import { logSocketStats } from './logSocketStats';
 import { logWarningIfOutgoingStreamNotComplete } from './logWarningIfOutgoingStreamNotComplete';
 import { RegistryStateApi } from './socketRegistryState';
-import { registerError } from '../registerError';
-
-const logConnected = (
-  socket: SocketWithInfo,
-  message: MessageWithInfo,
-  epic: AnySocketEpic
-) => {
-  const ip =
-    message.headers['x-forwarded-for'] || message.connection.remoteAddress;
-
-  let info = {};
-  if (epic.logInfo) {
-    try {
-      info = epic.logInfo(socket, message);
-    } catch (e) {
-      registerError(e);
-      console.error(
-        '💥  Couldnt get information for logging (your custom SocketEpic.logInfo has thrown!)',
-        e
-      );
-    }
-  }
-
-  console.log(
-    `${EOL}✊  Client connected`,
-    {
-      id: message.id,
-      url: message.url,
-      epic: epic.name,
-      ip,
-      ...info,
-    },
-    EOL
-  );
-};
+import { createSocketEpicContext } from './createSocketEpicContext';
+import { logConnected } from './logConnected';
+import { createTaggedLogger } from '../logging';
 
 export const spinUpSocketEpic = (
   socket: SocketWithInfo,
-  message: MessageWithInfo,
+  request: MessageWithInfo,
   epic: AnySocketEpic,
   closeSocket: RegistryStateApi['closeSocket']
 ) => {
-  logConnected(socket, message, epic);
+  const requestIdTag = {
+    rid: request.id.substr(0, 8),
+  };
 
-  const allData = publishStream(dataStreamFromSocket(socket));
+  const logger = createTaggedLogger(requestIdTag);
 
-  const commands = actionStreamFromSocket(allData, epic.actionSchemaByType);
+  const allData = publishStream(dataStreamFromSocket(socket, logger));
+
+  const commands = actionStreamFromSocket(
+    allData,
+    epic.actionSchemaByType,
+    logger
+  );
 
   const binary = binaryStreamFromSocket(allData);
 
-  const outgoing = publishStream(epic(commands, message, binary));
+  const ctx = createSocketEpicContext(request, commands, binary, logger);
+
+  logConnected(logger, socket, request, epic);
+
+  const outgoing = publishStream(epic(commands, ctx));
 
   const subscription = new Subscription();
 
-  const warningTimeout =
-    typeof epic.completedSocketWarningTimeout === 'number'
-      ? epic.completedSocketWarningTimeout
-      : 2500;
+  const warningTimeout = epic.completedSocketWarningTimeout ?? 2500;
 
-  const completeWaitTimeout =
-    typeof epic.completedSocketWaitTimeout === 'number'
-      ? epic.completedSocketWaitTimeout
-      : 5000;
+  const completeWaitTimeout = epic.completedSocketWaitTimeout ?? 5000;
 
   const logging = [
     logWarningIfOutgoingStreamNotComplete(
+      logger,
       allData,
       outgoing,
       warningTimeout,
       socket.id
     ),
-    epic.debugStats && logSocketStats(allData, socket.id),
+    epic.debugStats && logSocketStats(logger, allData),
   ].filter(isTruthy);
 
   const allEpicJobs = merge(outgoing.pipe(ignoreElements()), ...logging);
@@ -101,7 +75,8 @@ export const spinUpSocketEpic = (
       (sock, code) => {
         closeSocket(sock.id, code);
       },
-      epic.send
+      epic.send,
+      logger
     )
   );
 

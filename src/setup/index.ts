@@ -1,6 +1,6 @@
 import * as http from 'http';
 import * as https from 'https';
-import { IServiceConfig, ICommandLineArgs, publishToEventBus } from '../shared';
+import { IServiceConfig, ICommandLineArgs } from '../shared';
 import { setupSockets } from './sockets';
 import { setupExpress } from './express';
 import { setupSpy } from './spy';
@@ -8,6 +8,7 @@ import { loadEnv } from '../shared/env';
 import { startup } from '../shared/startup';
 import { setupBackground } from './background';
 import { TeardownHandler } from '../shared/teardown';
+import { publishToEventBus } from '../shared/eventBus';
 
 export async function serviceSetup(
   server: http.Server | https.Server,

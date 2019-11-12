@@ -4,35 +4,37 @@ import { filter, mergeMap } from 'rxjs/operators';
 import { Channels } from '@aimee-blue/ab-contracts';
 import * as Joi from '@hapi/joi';
 import { isString, tryParse } from './helpers';
+import { Logger, defaultLogger } from '../logging';
 
 export const actionStreamFromSocket = <T extends { type: string }>(
   data: Observable<WebSocket.Data>,
-  actionSchemaByType = Channels.actionSchemaByType
+  actionSchemaByType = Channels.actionSchemaByType,
+  logger: Logger = defaultLogger
 ) => {
   return data.pipe(
     filter(isString),
     mergeMap(nonParsed => {
-      const value = tryParse<T>(nonParsed);
+      const value = tryParse<T>(nonParsed, logger);
       if (value === null) {
         return empty();
       }
 
       if (typeof value !== 'object' || !('type' in value)) {
-        console.error('💥  No type property in incoming message');
+        logger.error('💥  No type property in incoming message');
         return empty();
       }
 
       const schema = actionSchemaByType(value.type);
 
       if (!schema) {
-        console.error('💥  No schema found for type', value.type);
+        logger.error('💥  No schema found for type', value.type);
         return empty();
       }
 
       const result = Joi.validate(value, schema);
 
       if (result.error as Error | null) {
-        console.error('💥  Invalid message of type', value.type);
+        logger.error('💥  Invalid message of type', value.type);
         return empty();
       }
 

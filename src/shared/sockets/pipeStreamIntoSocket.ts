@@ -2,6 +2,7 @@ import { Observable } from 'rxjs';
 import { concatMap, ignoreElements } from 'rxjs/operators';
 import { SocketWithInfo } from './types';
 import { registerError } from '../registerError';
+import { defaultLogger, Logger } from '../logging';
 
 const SOCKET_CLOSED = 'Trying to send data while socket already closed';
 
@@ -21,9 +22,13 @@ const defaultSend = <T>(socket: SocketWithInfo, data: T): Promise<void> => {
   });
 };
 
-const defaultErrorHandler = <T>(_data: T, error: Error) => {
-  registerError(error);
-  console.error('💥  Error when sending data', error);
+const defaultErrorHandler = <T>(data: T, error: Error, logger: Logger) => {
+  if (error.message === SOCKET_CLOSED) {
+    logger.warn('🚨  Socket was closed before we could send data back', data);
+  } else {
+    registerError(error);
+    logger.error('💥  Error when sending data', data, error);
+  }
 };
 
 const defaultClose = (socket: SocketWithInfo, code?: number) => {
@@ -35,13 +40,14 @@ export const pipeStreamIntoSocket = <T>(
   socket: SocketWithInfo,
   close: typeof defaultClose = defaultClose,
   send: typeof defaultSend = defaultSend,
+  logger: Logger = defaultLogger,
   onSendError: typeof defaultErrorHandler = defaultErrorHandler
 ) => {
   const subscription = stream
     .pipe(
       concatMap(data =>
         send(socket, data).catch((err: Error) => {
-          onSendError(data, err);
+          onSendError(data, err, logger);
 
           return Promise.reject(err);
         })
@@ -51,7 +57,7 @@ export const pipeStreamIntoSocket = <T>(
     .subscribe({
       error: error => {
         if (!(error instanceof Error && error.message === SOCKET_CLOSED)) {
-          console.error('💥  Outgoing stream error', error);
+          logger.error('💥  Outgoing stream error', error);
         }
         close(socket, 1011);
       },

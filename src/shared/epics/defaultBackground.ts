@@ -1,4 +1,8 @@
 import { reportErrorsToCloud } from './reportErrorsToCloud';
-import { merge } from 'rxjs';
+import { BackgroundEpic } from '../kit';
+import { buildLoggingAuditor } from '../logging/loggingAuditor';
 
-export const defaultBackground = merge(reportErrorsToCloud());
+export const defaultBackground: BackgroundEpic[] = [
+  reportErrorsToCloud,
+  buildLoggingAuditor(5000),
+];

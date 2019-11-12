@@ -1,9 +1,10 @@
 import { marbles, Context } from 'rxjs-marbles/jest';
 import { epicWithAuth } from '../epicWithAuth';
 import { Auth, Apps } from '@aimee-blue/ab-contracts';
-import { empty, timer } from 'rxjs';
+import { timer } from 'rxjs';
 import { take, mapTo } from 'rxjs/operators';
 import { ISocketEpic } from '../../kit';
+import { createNoOpLogger } from '../../logging';
 
 const possibleInput = {
   a: Auth.auth({
@@ -30,10 +31,7 @@ const possibleOutput = {
 };
 
 function buildTestData(inputCmds: string, m: Context) {
-  const req = {};
-
-  const echoingEpicImpl: ISocketEpic<{}> = (commands, _req, _binary) =>
-    commands;
+  const echoingEpicImpl: ISocketEpic<{}> = commands => commands;
   const echoingEpic = jest.fn(echoingEpicImpl);
 
   // tslint:disable-next-line
@@ -54,13 +52,19 @@ function buildTestData(inputCmds: string, m: Context) {
 
   const input = m.hot(inputCmds, possibleInput);
 
+  const logger = createNoOpLogger();
+  const context = {
+    logger,
+  };
+
   // tslint:disable-next-line
-  const output = epic(input, req as any, empty(), {}).pipe(take(10));
+  const output = epic(input, context).pipe(take(10));
 
   return {
     input,
     output,
     originalEpic: echoingEpic,
+    context,
   };
 }
 
@@ -101,7 +105,10 @@ describe(epicWithAuth.name, () => {
     it(
       'should complete',
       marbles(m => {
-        const { input, output, originalEpic } = buildTestData(inputCmds, m);
+        const { input, output, originalEpic, context } = buildTestData(
+          inputCmds,
+          m
+        );
 
         m.expect(input).toHaveSubscriptions([inputSubs]);
         m.expect(output).toBeObservable(outputCmd, possibleOutput);
@@ -109,6 +116,7 @@ describe(epicWithAuth.name, () => {
 
         expect(originalEpic.mock.calls.length).toBe(1);
         expect(originalEpic.mock.calls[0][1]).toEqual({
+          ...context,
           auth: {
             decodedToken: 'decodedToken',
           },

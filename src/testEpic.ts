@@ -9,5 +9,6 @@ export function createTestEpic() {
       map((item, i) => ({ ...item, i: i * 2 }))
     );
   epic.actionSchemaByType = echoEpic.actionSchemaByType;
+  epic.debugStats = true;
   return epic;
 }
