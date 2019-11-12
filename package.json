@@ -80,7 +80,7 @@
     "chokidar": "3.3.0",
     "husky": "3.0.9",
     "rxjs-marbles": "5.0.3",
-    "ts-deps": "0.7.0",
+    "ts-deps": "0.8.0",
     "utility-types": "3.9.0"
   }
 }
