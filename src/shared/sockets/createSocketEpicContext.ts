@@ -13,8 +13,12 @@ export function createSocketEpicContext(
   binary: Observable<Buffer>,
   logger: Logger
 ): ISocketEpicContext {
-  const subscribe = () =>
-    fromEventBus().pipe(takeUntil(commands.pipe(whenCompleted())));
+  const closed = commands.pipe(whenCompleted());
+
+  const takeUntilClosed = () => <T>(stream: Observable<T>) =>
+    takeUntil<T>(closed)(stream);
+
+  const subscribe = () => fromEventBus().pipe(takeUntilClosed());
 
   const publish = () => (stream: Observable<IAction>) =>
     stream.pipe(pushToEventBus());
@@ -36,5 +40,6 @@ export function createSocketEpicContext(
     subscribe,
     logger,
     logStream: logStreamCustom,
+    takeUntilClosed,
   };
 }
