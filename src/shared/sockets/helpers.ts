@@ -1,4 +1,5 @@
 import WebSocket from 'ws';
+import { registerError } from '../registerError';
 
 export const isBuffer = (value: WebSocket.Data): value is Buffer => {
   return value instanceof Buffer;
@@ -12,6 +13,7 @@ export const tryParse = <T>(text: string): T | null => {
   try {
     return JSON.parse(text) as T;
   } catch (err) {
+    registerError(err);
     console.error('💥  Cannot parse incoming message', err);
     return null;
   }

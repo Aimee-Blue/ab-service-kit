@@ -13,6 +13,7 @@ import { binaryStreamFromSocket } from './binaryStreamFromSocket';
 import { logSocketStats } from './logSocketStats';
 import { logWarningIfOutgoingStreamNotComplete } from './logWarningIfOutgoingStreamNotComplete';
 import { RegistryStateApi } from './socketRegistryState';
+import { registerError } from '../registerError';
 
 const logConnected = (
   socket: SocketWithInfo,
@@ -27,6 +28,7 @@ const logConnected = (
     try {
       info = epic.logInfo(socket, message);
     } catch (e) {
+      registerError(e);
       console.error(
         '💥  Couldnt get information for logging (your custom SocketEpic.logInfo has thrown!)',
         e

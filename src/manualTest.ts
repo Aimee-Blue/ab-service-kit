@@ -1,4 +1,4 @@
-import { loadEnv } from './setup/env';
+import { loadEnv } from './shared/env';
 import { Config } from './shared';
 
 async function run() {

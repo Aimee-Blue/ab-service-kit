@@ -1,6 +1,7 @@
 import { Observable } from 'rxjs';
 import { concatMap, ignoreElements } from 'rxjs/operators';
 import { SocketWithInfo } from './types';
+import { registerError } from '../registerError';
 
 const SOCKET_CLOSED = 'Trying to send data while socket already closed';
 
@@ -21,6 +22,7 @@ const defaultSend = <T>(socket: SocketWithInfo, data: T): Promise<void> => {
 };
 
 const defaultErrorHandler = <T>(_data: T, error: Error) => {
+  registerError(error);
   console.error('💥  Error when sending data', error);
 };
 
