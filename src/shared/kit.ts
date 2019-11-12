@@ -66,6 +66,7 @@ export interface ISocketEpicContext {
   publish: () => (events: Observable<IAction>) => Observable<never>;
   logger: Logger;
   logStream: typeof logStream;
+  takeUntilClosed: () => <T>(stream: Observable<T>) => Observable<T>;
 }
 
 export interface ISocketEpic<I, O = unknown, D = {}>
