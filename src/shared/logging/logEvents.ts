@@ -131,7 +131,7 @@ const buildAuditLog = <T>(paramsRaw: LogStreamParams & { logger: Logger }) => (
   }
 };
 
-export function logStream<T>(
+export function logEvents<T>(
   paramsRaw: LogStreamParams | string
 ): OperatorFunction<T, T> {
   const params = {

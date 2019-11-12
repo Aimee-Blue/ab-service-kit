@@ -2,7 +2,7 @@ import { Observable, Subject } from 'rxjs';
 import { ignoreElements, tap, filter, scan, map } from 'rxjs/operators';
 import { EOL } from 'os';
 import { TagNotification, executeOnNotifications } from '../notifications';
-import { Logger, defaultLogger, logStream, LogStreamParams } from '../logging';
+import { Logger, defaultLogger, logEvents, LogStreamParams } from '../logging';
 
 type Timestamp = [number, number];
 
@@ -306,7 +306,7 @@ export function logSummaries(params: {
   const logger = params.logger ?? defaultLogger;
 
   return summaries.pipe(
-    logStream({
+    logEvents({
       prefix: `${EOL}🔃  Profiler results for [${params.name}]`,
       suffix: [EOL],
       logger,

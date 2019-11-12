@@ -2,7 +2,10 @@ import { SocketEpic, IAction } from './shared';
 import { takeUntil, filter, map } from 'rxjs/operators';
 import Joi from '@hapi/joi';
 
-export const echoEpic: SocketEpic<IAction, IAction> = (cmd, { logStream }) =>
+export const echoEpic: SocketEpic<IAction, IAction> = (
+  cmd,
+  { logEvents: logStream }
+) =>
   cmd.pipe(
     map(action => ({
       ...action,

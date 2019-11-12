@@ -10,3 +10,4 @@ export * from './logWarningIfOutgoingStreamNotComplete';
 export * from './prepareWaitForCompletionFn';
 export * from './socketRegistry';
 export * from './buildOnConnectionListener';
+export * from './createSocketEpicContext';

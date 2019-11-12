@@ -38,7 +38,13 @@ export const spinUpSocketEpic = (
 
   const binary = binaryStreamFromSocket(allData);
 
-  const ctx = createSocketEpicContext(request, commands, binary, logger);
+  const ctx = createSocketEpicContext(
+    request,
+    commands,
+    binary,
+    logger,
+    epic.defaultDeps
+  );
 
   logConnected(logger, socket, request, epic);
 

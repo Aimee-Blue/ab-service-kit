@@ -1,3 +1,3 @@
 export * from './logger';
 export * from './logEpic';
-export * from './logStream';
+export * from './logEvents';
