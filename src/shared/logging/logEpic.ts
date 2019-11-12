@@ -1,32 +1,53 @@
 import { Utils } from '@aimee-blue/ab-shared';
-import { AnySocketEpic } from '../kit';
-import { logStream } from './logStream';
+import { AnyEpic } from '../kit';
+import { logEvents } from './logEvents';
+import { conditionalOperator } from '../conditionalOperator';
 
 export interface ILogEpicParams {
   name?: string;
+  input?: boolean;
+  output?: boolean;
+  logEvents?: typeof logEvents;
 }
 
-export const logEpic = <E extends AnySocketEpic>(
+export const logEpic = <E extends AnyEpic>(
   epic: E,
-  log = logStream,
-  params: ILogEpicParams
+  paramsRaw: ILogEpicParams
 ) => {
+  const params = {
+    logEvents,
+    ...paramsRaw,
+  };
+
+  const maybeLogIncoming = conditionalOperator(
+    params.input ?? true,
+    params.logEvents
+  );
+
+  const maybeLogOutgoing = conditionalOperator(
+    params.output ?? true,
+    params.logEvents
+  );
+
   const fn = (...args: Parameters<E>) => {
-    const [commands, ctx] = args;
+    const [commands, ...rest] = args;
+
     const incomingName = `commands@${params.name || epic.name}`;
     const outgoingName = `results@${params.name || epic.name}`;
+
     return epic(
       commands.pipe(
-        log({
+        maybeLogIncoming({
           prefix: incomingName,
         })
       ),
-      ctx
+      ...rest
     ).pipe(
-      log({
+      maybeLogOutgoing({
         prefix: outgoingName,
       })
     );
   };
+
   return Utils.setFunctionName(`logEpic.${epic.name}`, fn);
 };

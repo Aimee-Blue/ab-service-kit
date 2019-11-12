@@ -5,14 +5,15 @@ import { fromEventBus, pushToEventBus } from '../eventBus';
 import { takeUntil } from 'rxjs/operators';
 import { whenCompleted } from '../whenCompleted';
 import { IAction } from '../action';
-import { logStream, Logger } from '../logging';
+import { logEvents, Logger } from '../logging';
 
-export function createSocketEpicContext(
+export function createSocketEpicContext<D extends Record<string, unknown> = {}>(
   request: IncomingMessage & { id: string },
   commands: Observable<IAction>,
   binary: Observable<Buffer>,
-  logger: Logger
-): ISocketEpicContext {
+  logger: Logger,
+  depsBuilder?: () => D
+): ISocketEpicContext & D {
   const closed = commands.pipe(whenCompleted());
 
   const takeUntilClosed = () => <T>(stream: Observable<T>) =>
@@ -23,8 +24,8 @@ export function createSocketEpicContext(
   const publish = () => (stream: Observable<IAction>) =>
     stream.pipe(pushToEventBus());
 
-  const logStreamCustom: typeof logStream = params =>
-    logStream({
+  const logEventsCustom: typeof logEvents = params =>
+    logEvents({
       logger,
       ...(typeof params === 'string'
         ? {
@@ -33,13 +34,16 @@ export function createSocketEpicContext(
         : params),
     });
 
+  const deps: D | {} = depsBuilder?.() ?? {};
+
   return {
+    ...deps,
     request,
     binary,
     publish,
     subscribe,
     logger,
-    logStream: logStreamCustom,
+    logEvents: logEventsCustom,
     takeUntilClosed,
-  };
+  } as D & ISocketEpicContext;
 }

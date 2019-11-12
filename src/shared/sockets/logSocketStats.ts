@@ -4,7 +4,7 @@ import { filter, ignoreElements, scan, map, startWith } from 'rxjs/operators';
 import { EOL } from 'os';
 import { localNow } from '../time';
 import { isString, isBuffer } from './helpers';
-import { Logger, logStream } from '../logging';
+import { Logger, logEvents } from '../logging';
 
 export function logSocketStats(
   logger: Logger,
@@ -28,7 +28,7 @@ export function logSocketStats(
       numberOfMessages: msgs,
       timestamp: localNow(),
     })),
-    logStream({
+    logEvents({
       prefix: `${EOL}🔃  Connection stats`,
       suffix: [EOL],
       on: ['audit', 'unsubscribe'],
