@@ -96,7 +96,7 @@ export function epicWithAuth<E extends ISocketEpicWithAuth<unknown>>(
 ) {
   const authForEpic = Utils.setFunctionName(
     `withAuth.${epic.name}`,
-    (cmd: Parameters<E>[0], ctx: Parameters<E>[1]) => {
+    (...[cmd, ctx]: Parameters<E>) => {
       return new Observable<Apps.IErrorAction | ObservedValueOf<ReturnType<E>>>(
         subscriber => {
           const commands = publishStream(cmd);

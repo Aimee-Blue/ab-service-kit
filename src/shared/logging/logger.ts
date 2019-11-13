@@ -106,8 +106,7 @@ function isTaggedLogger(logger: Logger): logger is LoggerWithSuffix {
 
 function taggedLoggerFactory(parent: Logger, suffixes: unknown[] = []) {
   return (additional: unknown): LoggerWithSuffix => {
-    suffixes.push(additional);
-    const locked = [...suffixes];
+    const locked = [...suffixes, additional];
     return Object.freeze({
       log: (...args) => {
         parent.log(...appendTags(args, locked));
@@ -119,7 +118,7 @@ function taggedLoggerFactory(parent: Logger, suffixes: unknown[] = []) {
         parent.error(...appendTags(args, locked));
       },
       withTag: arg => {
-        return taggedLoggerFactory(parent, suffixes)(arg);
+        return taggedLoggerFactory(parent, locked)(arg);
       },
       parent,
     });

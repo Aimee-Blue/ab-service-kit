@@ -29,9 +29,7 @@ export const logEpic = <E extends AnyEpic>(
     params.logEvents
   );
 
-  const fn = (...args: Parameters<E>) => {
-    const [commands, ...rest] = args;
-
+  const fn = (...[commands, ...rest]: Parameters<E>) => {
     const incomingName = `commands@${params.name || epic.name}`;
     const outgoingName = `results@${params.name || epic.name}`;
 
