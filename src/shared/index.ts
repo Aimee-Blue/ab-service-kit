@@ -12,6 +12,8 @@ export * from './ofType';
 export * from './retryWithBackoff';
 export * from './logEpic';
 export * from './registerError';
+export * from './publishAs';
+export * from './env';
 
 import * as Api from './api';
 import * as Auth from './auth';
