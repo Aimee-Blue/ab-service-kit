@@ -12,6 +12,8 @@ export * from './retryWithBackoff';
 export * from './logging';
 export * from './registerError';
 export * from './conditionalOperator';
+export * from './publishAs';
+export * from './env';
 export { createSocketEpicContext } from './sockets';
 
 import * as Api from './api';

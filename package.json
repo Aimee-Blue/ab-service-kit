@@ -25,7 +25,7 @@
     "combine-coverage": "node ./scripts/combineCoverage.js",
     "type-check": "tsc",
     "lint": "tslint -p . -t verbose",
-    "check": "concurrently \"node ./scripts/build.js\" \"tsc\" \"tslint -p . -t verbose\"",
+    "check": "concurrently --raw \"node ./scripts/build.js\" \"tsc\" \"tslint -p . -t verbose\"",
     "patch": "ts-deps patch",
     "release": "semantic-release",
     "prepublishOnly": "yarn run build && yarn run declarations",

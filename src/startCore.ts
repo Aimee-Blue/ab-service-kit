@@ -5,7 +5,7 @@ import fs from 'fs-extra';
 import yargs from 'yargs';
 import { resolve } from 'path';
 
-import { loadEnv } from './setup/env';
+import { loadEnv } from './shared/env';
 import { serviceSetup } from './setup';
 import { ICommandLineArgs, IServiceConfig } from './shared';
 
@@ -54,7 +54,9 @@ export async function startCore(
   const shouldLoadEnvFiles = config.shouldLoadEnvFiles ?? true;
 
   if (shouldLoadEnvFiles) {
-    await loadEnv(params.envFile);
+    await loadEnv({
+      envFile: params.envFile,
+    });
   }
 
   const certPath = params.cert || process.env.HTTPS_CERT_PATH!;

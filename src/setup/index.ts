@@ -4,7 +4,7 @@ import { IServiceConfig, ICommandLineArgs } from '../shared';
 import { setupSockets } from './sockets';
 import { setupExpress } from './express';
 import { setupSpy } from './spy';
-import { loadEnv } from './env';
+import { loadEnv } from '../shared/env';
 import { startup } from '../shared/startup';
 import { setupBackground } from './background';
 import { TeardownHandler } from '../shared/teardown';
@@ -35,7 +35,10 @@ export async function serviceSetup(
           : true;
 
       if (shouldLoadEnvFiles) {
-        await loadEnv(params.envFile);
+        await loadEnv({
+          envFile: params.envFile,
+          reset: true,
+        });
       }
     }
   };
