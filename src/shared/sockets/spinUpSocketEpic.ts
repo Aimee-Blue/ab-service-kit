@@ -62,7 +62,8 @@ export const spinUpSocketEpic = (
       allData,
       outgoing,
       warningTimeout,
-      socket.id
+      socket.id,
+      epic.name
     ),
     epic.debugStats && logSocketStats(logger, allData),
   ].filter(isTruthy);
