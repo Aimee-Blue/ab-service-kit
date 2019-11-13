@@ -41,26 +41,32 @@ export async function loadEnv(
   }
 
   files.forEach(filePath => {
-    if (fs.existsSync(filePath)) {
-      if (typeof params.verbosity === 'number' && params.verbosity >= 1) {
-        console.log(`- Loading ${filePath}`);
-      }
-
-      const result = dotenvExpand(
-        dotenv.config({
-          path: filePath,
-        })
-      );
-
-      if (result.parsed) {
-        const parsed = result.parsed;
-        Object.keys(result.parsed).forEach(key => {
-          loadedVars.set(key, parsed[key] as string);
-          if (typeof params.verbosity === 'number' && params.verbosity >= 2) {
-            console.log(`${key}=${parsed[key]}`);
-          }
-        });
-      }
+    if (!fs.existsSync(filePath)) {
+      return;
     }
+
+    if (typeof params.verbosity === 'number' && params.verbosity >= 1) {
+      console.log(`- Loading ${filePath}`);
+    }
+
+    const result = dotenvExpand(
+      dotenv.config({
+        path: filePath,
+      })
+    );
+
+    const parsed = result.parsed;
+
+    if (!parsed) {
+      return;
+    }
+
+    Object.entries(parsed).forEach(([key, value]) => {
+      loadedVars.set(key, value);
+
+      if (typeof params.verbosity === 'number' && params.verbosity >= 2) {
+        console.log(`${key}=${parsed[key]}`);
+      }
+    });
   });
 }
