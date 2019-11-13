@@ -26,7 +26,7 @@ export const spinUpSocketEpic = (
     rid: request.id.substr(0, 8),
   };
 
-  const logger = createTaggedLogger(requestIdTag);
+  const logger = createTaggedLogger([requestIdTag]);
 
   const allData = publishStream(dataStreamFromSocket(socket, logger));
 
@@ -38,13 +38,13 @@ export const spinUpSocketEpic = (
 
   const binary = binaryStreamFromSocket(allData);
 
-  const ctx = createSocketEpicContext(
+  const ctx = createSocketEpicContext({
     request,
     commands,
     binary,
     logger,
-    epic.defaultDeps
-  );
+    depsBuilder: epic.defaultDeps,
+  });
 
   logConnected(logger, socket, request, epic);
 

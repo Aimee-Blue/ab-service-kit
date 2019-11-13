@@ -5,15 +5,23 @@ import { fromEventBus, pushToEventBus } from '../eventBus';
 import { takeUntil } from 'rxjs/operators';
 import { whenCompleted } from '../whenCompleted';
 import { IAction } from '../action';
-import { logEvents, Logger } from '../logging';
+import { TaggedLogger } from '../logging';
+
+export interface ICreateContextParams<D extends Record<string, unknown> = {}> {
+  request: IncomingMessage & {
+    id: string;
+  };
+  commands: Observable<IAction>;
+  binary: Observable<Buffer>;
+  logger: TaggedLogger;
+  depsBuilder?: () => D;
+}
 
 export function createSocketEpicContext<D extends Record<string, unknown> = {}>(
-  request: IncomingMessage & { id: string },
-  commands: Observable<IAction>,
-  binary: Observable<Buffer>,
-  logger: Logger,
-  depsBuilder?: () => D
+  params: ICreateContextParams<D>
 ): ISocketEpicContext & D {
+  const { request, commands, binary, logger, depsBuilder } = params;
+
   const closed = commands.pipe(whenCompleted());
 
   const takeUntilClosed = () => <T>(stream: Observable<T>) =>
@@ -24,16 +32,6 @@ export function createSocketEpicContext<D extends Record<string, unknown> = {}>(
   const publish = () => (stream: Observable<IAction>) =>
     stream.pipe(pushToEventBus());
 
-  const logEventsCustom: typeof logEvents = params =>
-    logEvents({
-      logger,
-      ...(typeof params === 'string'
-        ? {
-            prefix: params,
-          }
-        : params),
-    });
-
   const deps: D | {} = depsBuilder?.() ?? {};
 
   return {
@@ -43,7 +41,6 @@ export function createSocketEpicContext<D extends Record<string, unknown> = {}>(
     publish,
     subscribe,
     logger,
-    logEvents: logEventsCustom,
     takeUntilClosed,
   } as D & ISocketEpicContext;
 }

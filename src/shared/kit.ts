@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { IncomingMessage } from 'http';
 import * as Joi from '@hapi/joi';
 import { IAction } from './action';
-import { Logger, logEvents } from './logging';
+import { TaggedLogger } from './logging';
 
 export interface ICommandLineArgs {
   http: boolean;
@@ -64,8 +64,7 @@ export interface ISocketEpicContext {
   binary: Observable<Buffer>;
   subscribe: () => Observable<IAction>;
   publish: () => (events: Observable<IAction>) => Observable<never>;
-  logger: Logger;
-  logEvents: typeof logEvents;
+  logger: TaggedLogger;
   takeUntilClosed: () => <T>(stream: Observable<T>) => Observable<T>;
 }
 
