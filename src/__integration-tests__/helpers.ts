@@ -1,9 +1,10 @@
 import * as Joi from '@hapi/joi';
 import { IServiceConfig, SocketEpic } from '../shared';
-import { start } from '../start';
+import { startCore } from '../startCore';
+import { create } from 'rxjs-spy';
 
 export const startTestService = async (config: IServiceConfig) => {
-  return await start(config, {
+  return await startCore(config, {
     port: 8080,
     host: 'localhost',
     http: true,
@@ -47,12 +48,19 @@ export async function initTestEpic(
     },
     shouldLoadEnvFiles: false,
   };
+
+  const spy = create({ defaultPlugins: true });
+  spy.log(/debug.*/);
+
   const teardown = await startTestService(config);
 
   return {
     handler,
     actionSchemaByType,
     config,
-    teardown,
+    teardown: () => {
+      spy.teardown();
+      return teardown();
+    },
   };
 }

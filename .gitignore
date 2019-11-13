@@ -8,3 +8,4 @@ lib
 node_modules
 package
 yarn-error.log
+.log

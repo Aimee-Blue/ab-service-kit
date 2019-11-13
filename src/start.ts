@@ -1,169 +1,46 @@
-import 'source-map-support/register';
-import * as http from 'http';
-import * as https from 'https';
-import fs from 'fs-extra';
-import yargs from 'yargs';
-import { resolve } from 'path';
+import { startCore } from './startCore';
+import { IServiceConfig } from './shared';
 
-import { loadEnv } from './shared/env';
-import { serviceSetup } from './setup';
-import { ICommandLineArgs, IServiceConfig } from './shared';
-
-const buildArgumentsParser = (config: IServiceConfig) =>
-  (yargs as yargs.Argv<ICommandLineArgs>)
-    .option('http', {
-      boolean: true,
-      description: 'Disable encryption',
-      default: false,
-    })
-    .option('watch', {
-      boolean: true,
-      description: 'Watch code for changes',
-      default: false,
-    })
-    .option('port', {
-      number: true,
-      description: 'port to listen on',
-      default: config.defaultPort,
-    })
-    .option('host', {
-      string: true,
-      description: 'address to listen on',
-    })
-    .option('cert', {
-      string: true,
-      description:
-        'Path to an HTTPS certificate (must be full chain certificate)',
-    })
-    .option('key', {
-      string: true,
-      description: 'Path to an HTTPS private-key',
-    });
-
-export async function start(config: IServiceConfig, args?: ICommandLineArgs) {
-  const parser = buildArgumentsParser(config);
-  const effectiveParser = config.argsBuilder
-    ? config.argsBuilder(parser)
-    : parser;
-
-  const params = args || effectiveParser.parse();
-
-  const shouldLoadEnvFiles =
-    typeof config.shouldLoadEnvFiles === 'boolean'
-      ? config.shouldLoadEnvFiles
-      : true;
-
-  if (shouldLoadEnvFiles) {
-    await loadEnv({
-      envFile: params.envFile,
-    });
+export function start(config: IServiceConfig) {
+  function finish() {
+    process.exitCode = 0;
   }
 
-  const certPath = params.cert || process.env.HTTPS_CERT_PATH!;
-  const keyPath = params.cert || process.env.HTTPS_KEY_PATH!;
-  const host = params.host || process.env.SERVER_HOSTNAME;
-  const port = process.env.PORT || params.port;
-
-  if (!params.http) {
-    if (!certPath) {
-      throw new Error(
-        'No certificate path provided. Please generate HTTPS certificate and key, or use --http option'
-      );
-    }
-    if (!keyPath) {
-      throw new Error(
-        'No private key path provided. Please generate HTTPS certificate and key, or use --http option'
-      );
-    }
-
-    const certExist = await fs.pathExists(certPath);
-    if (!certExist) {
-      throw new Error(`Cannot find file at path '${certPath}'`);
-    }
-
-    const keyExist = await fs.pathExists(keyPath);
-    if (!keyExist) {
-      throw new Error(`Cannot find file at path '${keyPath}'`);
-    }
+  function handleError(exc: unknown) {
+    console.error('💥  ', exc);
+    process.exit(1);
   }
 
-  const server = params.http
-    ? http.createServer()
-    : https.createServer({
-        cert: fs.readFileSync(certPath, 'utf8'),
-        key: fs.readFileSync(keyPath, 'utf8'),
-        passphrase: process.env.HTTPS_PASSPHRASE,
-      });
+  async function run() {
+    process.setUncaughtExceptionCaptureCallback(handleError);
 
-  const handleServerRequestsWithDevTools = async () => {
-    if (params.watch) {
-      // tslint:disable-next-line: no-unsafe-any
-      const serviceSetupInWatchMode = require('./setup/watchServerCode')
-        .serviceSetupInWatchMode as typeof import('./setup/watchServerCode')['serviceSetupInWatchMode'];
+    process.on('SIGINT', () => {
+      console.log('\nShutting down due to SIGINT...\n');
 
-      const configFile = config.serviceConfigModuleId || './lib/config.js';
-      const configFilePath = resolve(configFile);
-      const exists = await fs.pathExists(configFilePath);
+      shutdown()
+        .then(finish)
+        .catch(handleError);
+    });
 
-      if (!exists) {
-        throw new Error(
-          `Cannot resolve service configuration module (${configFilePath}), setup is required for watch mode to work`
-        );
-      }
+    process.on('SIGTERM', () => {
+      console.log('\nShutting down due to SIGTERM...\n');
 
-      return await serviceSetupInWatchMode(configFilePath, async newConfig => {
-        return await serviceSetup(server, newConfig, params);
-      });
-    } else {
-      return await serviceSetup(server, config, params);
-    }
-  };
+      shutdown()
+        .then(finish)
+        .catch(handleError);
+    });
 
-  const teardown = await handleServerRequestsWithDevTools();
+    const teardown = await startCore(config);
 
-  await new Promise((res, rej) => {
-    let handled = false;
-    server.on('error', err => {
-      if (handled) {
+    let isShuttingDown = false;
+    const shutdown = async () => {
+      if (isShuttingDown) {
         return;
       }
+      isShuttingDown = true;
+      await teardown();
+    };
+  }
 
-      handled = true;
-      rej(err);
-    });
-    server.listen(
-      {
-        port,
-        host,
-      },
-      () => {
-        if (handled) {
-          return;
-        }
-
-        handled = true;
-        const mode = params.http
-          ? ' (un-encrypted http/ws)'
-          : " (https/wss) - Pass '--http' argument to disable encryption";
-        console.log(
-          `👍  PID ${process.pid}; Currently listening on ${host ||
-            ''}${port}${mode}`
-        );
-        res();
-      }
-    );
-  });
-
-  return async () => {
-    await teardown('destroy');
-    await new Promise((res, rej) =>
-      server.close(err => {
-        if (err) {
-          rej(err);
-        } else {
-          res();
-        }
-      })
-    );
-  };
+  run().catch(handleError);
 }

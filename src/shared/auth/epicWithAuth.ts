@@ -18,11 +18,10 @@ import {
   concat,
   ObservedValueOf,
 } from 'rxjs';
-import { IncomingMessage } from 'http';
 import { Auth, Apps } from '@aimee-blue/ab-contracts';
 import { IJwt, decodeJwt } from '@aimee-blue/ab-auth';
 
-import { ISocketEpicAttributes } from '../kit';
+import { ISocketEpicAttributes, ISocketEpicContext } from '../kit';
 import { ofType } from '../ofType';
 import { verifyToken } from './verifyToken';
 import { IAction } from '../action';
@@ -38,9 +37,7 @@ export interface ISocketEpicWithAuth<I, O = unknown, D = unknown>
   extends ISocketEpicAttributes<O> {
   (
     commands: Observable<I>,
-    request: IncomingMessage & IInjectedAuthDetails,
-    binary: Observable<Buffer>,
-    deps?: D
+    ctx: ISocketEpicContext & IInjectedAuthDetails & D
   ): Observable<O>;
 }
 
@@ -99,9 +96,7 @@ export function epicWithAuth<E extends ISocketEpicWithAuth<unknown>>(
 ) {
   const authForEpic = Utils.setFunctionName(
     `withAuth.${epic.name}`,
-    (...args: Parameters<E>) => {
-      const [cmd, req, binary, ...rest] = args;
-
+    (...[cmd, ctx]: Parameters<E>) => {
       return new Observable<Apps.IErrorAction | ObservedValueOf<ReturnType<E>>>(
         subscriber => {
           const commands = publishStream(cmd);
@@ -117,10 +112,9 @@ export function epicWithAuth<E extends ISocketEpicWithAuth<unknown>>(
           const authFailed = authOp.pipe(
             ignoreElements(),
             catchError(err => {
-              console.log(
+              ctx.logger.log(
                 'Verify token failed:',
-                Errors.ensureError(err).message,
-                (req.id && `for ${req.id}`) || ''
+                Errors.ensureError(err).message
               );
 
               const appError: Apps.IErrorAction = {
@@ -147,12 +141,10 @@ export function epicWithAuth<E extends ISocketEpicWithAuth<unknown>>(
                 )
               ),
               switchMap(([auth, buffered]) => {
-                args[1].auth = auth;
+                ctx.auth = auth;
                 return epic(
                   concat(from(buffered), commands),
-                  req,
-                  binary,
-                  ...rest
+                  ctx
                 ) as ReturnType<E>;
               })
             )

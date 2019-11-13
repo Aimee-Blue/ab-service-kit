@@ -4,25 +4,28 @@ import { EOL } from 'os';
 import { localNow } from '../time';
 import { SocketWithInfo } from './types';
 import { wsCodeToReason } from './wsCodeToReason';
+import { Logger, defaultLogger } from '../logging';
 
-export const dataStreamFromSocket = (client: SocketWithInfo) => {
+export const dataStreamFromSocket = (
+  client: SocketWithInfo,
+  logger: Logger = defaultLogger
+) => {
   return new Observable<WebSocket.Data>(subscriber => {
     const messageHandler = (data: WebSocket.Data) => {
       subscriber.next(data);
     };
 
     const errorHandler = (error: unknown) => {
-      console.error('💥  Error on client socket', error);
+      logger.error('💥  Error on client socket', error);
       subscriber.error(error);
     };
 
     const closeHandler = (code: number, reason: string) => {
       const from = !client.closingByKit ? 'from client side' : 'from our side';
-      console.log(
+      logger.log(
         `${EOL}👋  Connection closed ${from}, with code ${code}; ${reason ||
           wsCodeToReason(code)}`,
         {
-          id: client.id,
           timestamp: localNow(),
         },
         EOL

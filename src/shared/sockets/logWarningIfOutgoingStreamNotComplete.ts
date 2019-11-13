@@ -8,12 +8,15 @@ import {
   takeUntil,
 } from 'rxjs/operators';
 import { whenCompleted } from '../whenCompleted';
+import { Logger } from '../logging';
 
 export function logWarningIfOutgoingStreamNotComplete(
+  logger: Logger,
   data: Observable<WebSocket.Data>,
   outgoing: Observable<unknown>,
   timeout: number,
-  id: string
+  id: string,
+  name: string
 ) {
   const incomingCompleted = data.pipe(whenCompleted());
   const outgoingCompleted = outgoing.pipe(whenCompleted());
@@ -23,8 +26,8 @@ export function logWarningIfOutgoingStreamNotComplete(
     concatMap(() =>
       timer(timeout).pipe(
         switchMap(() => {
-          console.warn(
-            `🚨  Epic stream for connection with id ${id} did not complete ${(
+          logger.warn(
+            `🚨  Epic (${name}) stream for connection with id ${id} did not complete ${(
               timeout / 1000
             ).toFixed(2)} seconds after the socket closure. Is something wrong?`
           );

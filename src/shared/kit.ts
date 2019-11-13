@@ -4,6 +4,8 @@ import WebSocket from 'ws';
 import { Observable } from 'rxjs';
 import { IncomingMessage } from 'http';
 import * as Joi from '@hapi/joi';
+import { IAction } from './action';
+import { Logger, logEvents } from './logging';
 
 export interface ICommandLineArgs {
   http: boolean;
@@ -22,7 +24,7 @@ export interface IServiceConfig {
 
   endpoints?: EndpointsHandler;
   sockets?: () => Promise<ISocketEpicsMap>;
-  background?: () => Promise<Observable<never>>;
+  background?: () => Promise<BackgroundEpic[]>;
   spy?: (spy: ReturnType<typeof import('rxjs-spy').create>) => Promise<void>;
 
   argsBuilder?: ArgsBuilder;
@@ -34,14 +36,18 @@ export interface IServiceConfig {
   shouldLoadEnvFiles?: boolean;
 }
 
+export type BackgroundEpic = (
+  events: Observable<IAction>
+) => Observable<IAction>;
+
 export interface ISocketEpicsMap {
   [path: string]: AnySocketEpic;
 }
 
-export interface ISocketEpicAttributes<O = unknown> {
+export interface ISocketEpicAttributes<O = unknown, D = {}> {
   send?: (socket: WebSocket, data: O) => Promise<void>;
   actionSchemaByType?: (type: string) => Joi.ObjectSchema | null;
-  logInfo?: (
+  logOnConnection?: (
     socket: WebSocket,
     request: IncomingMessage & { id: string }
   ) => { [key: string]: string | undefined };
@@ -50,21 +56,32 @@ export interface ISocketEpicAttributes<O = unknown> {
   completedSocketWaitTimeout?: number;
   watchModeDetachBehaviour?: 'disconnect' | 'unsubscribe';
   debugStats?: boolean;
+  defaultDeps?: () => D;
 }
 
-export interface ISocketEpic<I, O = unknown, D = unknown>
-  extends ISocketEpicAttributes<O> {
-  (
-    commands: Observable<I>,
-    request: IncomingMessage & { id: string },
-    binary: Observable<Buffer>,
-    deps?: D
-  ): Observable<O>;
+export interface ISocketEpicContext {
+  request: IncomingMessage & { id: string };
+  binary: Observable<Buffer>;
+  subscribe: () => Observable<IAction>;
+  publish: () => (events: Observable<IAction>) => Observable<never>;
+  logger: Logger;
+  logEvents: typeof logEvents;
+  takeUntilClosed: () => <T>(stream: Observable<T>) => Observable<T>;
+}
+
+export interface ISocketEpic<I, O = unknown, D = {}>
+  extends ISocketEpicAttributes<O, D> {
+  (commands: Observable<I>, ctx: ISocketEpicContext & D): Observable<O>;
 }
 
 export type AnySocketEpic = ISocketEpic<unknown>;
 
-export type SocketEpic<I, O = unknown, D = unknown> = ISocketEpic<I, O, D>;
+export type AnyEpic = <T, R, A extends unknown[]>(
+  commands: Observable<T>,
+  ...args: A
+) => Observable<R>;
+
+export type SocketEpic<I, O = unknown, D = {}> = ISocketEpic<I, O, D>;
 
 type ArgsBuilder = (
   args: yargs.Argv<ICommandLineArgs>
