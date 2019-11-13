@@ -173,30 +173,28 @@ export type LogEventsOperator = typeof logEvents;
 
 function taggedLogEventsFactory(
   startWith: unknown[] = [],
+  logger: BasicLogger = defaultBasicLogger,
   fn: LogEventsOperator = logEvents
 ) {
   const tags = [...startWith];
-  const taggedlogEvents = <T>(paramsRaw: LogStreamParams | string) => {
-    return fn<T>(
-      typeof paramsRaw === 'string'
-        ? {
-            prefix: paramsRaw,
-            tags,
-          }
-        : {
-            ...paramsRaw,
-            tags: [...(paramsRaw.tags ?? []), ...tags],
-          }
-    );
+  const taggedlogEvents = <T>(paramsRaw: LogEventsArg) => {
+    const params = logEventsParams(paramsRaw, logger);
+    return fn<T>({
+      ...params,
+      tags: [...(params.tags ?? []), ...tags],
+    });
   };
   taggedlogEvents.withTags = (...extraTags: unknown[]) => {
-    return taggedLogEventsFactory([...tags, ...extraTags], fn);
+    return taggedLogEventsFactory([...tags, ...extraTags], logger, fn);
   };
   return taggedlogEvents;
 }
 
-export function createTaggedLogEvents(tags: unknown[]) {
-  return taggedLogEventsFactory(tags);
+export function createTaggedLogEvents(
+  tags: unknown[],
+  logger = defaultBasicLogger
+) {
+  return taggedLogEventsFactory(tags, logger);
 }
 
 export type TaggedLogEventsOperator = ReturnType<typeof createTaggedLogEvents>;

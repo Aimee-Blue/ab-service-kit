@@ -117,7 +117,7 @@ function taggedLoggerFactory(
     withTags: (...args) => {
       return taggedLoggerFactory(parent, [...locked, ...args]);
     },
-    logEvents: createTaggedLogEvents(startWith),
+    logEvents: createTaggedLogEvents(startWith, parent),
     parent,
   });
 }
