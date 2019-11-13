@@ -15,7 +15,8 @@ export function logWarningIfOutgoingStreamNotComplete(
   data: Observable<WebSocket.Data>,
   outgoing: Observable<unknown>,
   timeout: number,
-  id: string
+  id: string,
+  name: string
 ) {
   const incomingCompleted = data.pipe(whenCompleted());
   const outgoingCompleted = outgoing.pipe(whenCompleted());
@@ -26,7 +27,7 @@ export function logWarningIfOutgoingStreamNotComplete(
       timer(timeout).pipe(
         switchMap(() => {
           logger.warn(
-            `🚨  Epic stream for connection with id ${id} did not complete ${(
+            `🚨  Epic (${name}) stream for connection with id ${id} did not complete ${(
               timeout / 1000
             ).toFixed(2)} seconds after the socket closure. Is something wrong?`
           );

@@ -27,7 +27,9 @@ export function mergeEpics(
     (commands, ctx) => {
       return merge(
         ...epics.map(val =>
-          defer(() => val(commands, ctx)).pipe(
+          defer(() =>
+            val(commands, { ...(val.defaultDeps?.() ?? {}), ...ctx })
+          ).pipe(
             retryWithBackoff({
               sourceDescription: `${val.name} epic`,
             })
