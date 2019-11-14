@@ -66,7 +66,11 @@ export const load = async (
   }
 
   try {
-    return await configurationLoad(params);
+    const config = await configurationLoad(params);
+    // even though server already returns to us a merged configuration
+    // it might have be configuration from different version of contracts
+    // so here we ensure that we use defaults from our version of contracts:
+    return Config.mergeConfigsWithDefault(config as Config.IPartialConfig);
   } catch (err) {
     registerError(err);
     console.error(
