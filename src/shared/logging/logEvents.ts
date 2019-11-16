@@ -83,7 +83,7 @@ const buildSimpleLog = <T>(
       }
     } catch (err) {
       registerError(err);
-      console.error('💥  Something bad happened when logging', err);
+      params.logger.error('💥  Something bad happened when logging', err);
     }
   };
 };
@@ -91,12 +91,12 @@ const buildSimpleLog = <T>(
 const buildAuditLog = <T>(
   paramsRaw: LogStreamParams & { logger: BasicLogger }
 ) => (info: NotificationInfo<T, 'audit'>) => {
-  try {
-    const params = {
-      ...paramsRaw,
-      ...paramsRaw[info.notification],
-    };
+  const params = {
+    ...paramsRaw,
+    ...paramsRaw[info.notification],
+  };
 
+  try {
     const description = [params.prefix, ...(params.tags || [])];
 
     switch (info.notification) {
@@ -129,7 +129,7 @@ const buildAuditLog = <T>(
     }
   } catch (err) {
     registerError(err);
-    console.error('💥  Something bad happened when logging', err);
+    params.logger.error('💥  Something bad happened when logging', err);
   }
 };
 
@@ -137,7 +137,7 @@ export type LogEventsArg = LogStreamParams | string;
 
 export function logEventsParams(
   arg: LogEventsArg,
-  defaultLogger = defaultBasicLogger
+  defaultLogger = defaultBasicLogger()
 ): LogStreamParams & { logger: BasicLogger } {
   return {
     logger: defaultLogger,
@@ -169,12 +169,14 @@ export function logEvents<T>(paramsRaw: LogEventsArg): OperatorFunction<T, T> {
   }
 }
 
-export type LogEventsOperator = typeof logEvents;
+export type LogEventsOperator<T> = (
+  paramsRaw: LogEventsArg
+) => OperatorFunction<T, T>;
 
 function taggedLogEventsFactory(
   startWith: unknown[] = [],
-  logger: BasicLogger = defaultBasicLogger,
-  fn: LogEventsOperator = logEvents
+  logger: BasicLogger = defaultBasicLogger(),
+  fn = logEvents
 ) {
   const tags = [...startWith];
   const taggedlogEvents = <T>(paramsRaw: LogEventsArg) => {
@@ -192,7 +194,7 @@ function taggedLogEventsFactory(
 
 export function createTaggedLogEvents(
   tags: unknown[],
-  logger = defaultBasicLogger
+  logger = defaultBasicLogger()
 ) {
   return taggedLogEventsFactory(tags, logger);
 }

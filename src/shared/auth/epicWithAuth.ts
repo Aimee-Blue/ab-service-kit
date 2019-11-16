@@ -33,11 +33,16 @@ export interface IInjectedAuthDetails {
   auth?: IJwt;
 }
 
-export interface ISocketEpicWithAuth<I, O = unknown, D = unknown>
-  extends ISocketEpicAttributes<O> {
+export interface ISocketEpicWithAuth<
+  I extends IAction = IAction,
+  O extends IAction | Buffer = IAction | Buffer,
+  D = {},
+  R extends unknown[] = unknown[]
+> extends ISocketEpicAttributes<O, D> {
   (
     commands: Observable<I>,
-    ctx: ISocketEpicContext & IInjectedAuthDetails & D
+    ctx: ISocketEpicContext & IInjectedAuthDetails & D,
+    ...rest: R
   ): Observable<O>;
 }
 
@@ -89,14 +94,14 @@ function verifyTokensUsingAuthMessage(
     );
 }
 
-export function epicWithAuth<E extends ISocketEpicWithAuth<unknown>>(
+export function epicWithAuth<E extends ISocketEpicWithAuth>(
   allow: Auth.Role[],
   epic: E,
   deps = defaultDeps
 ) {
   const authForEpic = Utils.setFunctionName(
     `withAuth.${epic.name}`,
-    (...[cmd, ctx]: Parameters<E>) => {
+    (...[cmd, ctx, ...rest]: Parameters<E>) => {
       return new Observable<Apps.IErrorAction | ObservedValueOf<ReturnType<E>>>(
         subscriber => {
           const commands = publishStream(cmd);
@@ -144,7 +149,8 @@ export function epicWithAuth<E extends ISocketEpicWithAuth<unknown>>(
                 ctx.auth = auth;
                 return epic(
                   concat(from(buffered), commands),
-                  ctx
+                  ctx,
+                  ...rest
                 ) as ReturnType<E>;
               })
             )

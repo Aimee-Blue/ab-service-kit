@@ -6,13 +6,13 @@ import {
   TaggedLogEventsOperator,
 } from './logEvents';
 import {
-  createBasicLogger,
   createNoOpBasicLogger,
   BasicLogger,
+  defaultBasicLogger,
 } from './basicLogger';
 import { Observable } from 'rxjs';
 
-export function createLogger(basicLogger = createBasicLogger()) {
+export function createLogger(basicLogger = defaultBasicLogger()) {
   return Object.freeze({
     ...basicLogger,
     logEvents: <T>(arg: LogEventsArg) =>
@@ -134,7 +134,7 @@ export function createTaggedLogger(
     return parent.withTags(...tags);
   }
 
-  return taggedLoggerFactory(parent || createBasicLogger(), tags);
+  return taggedLoggerFactory(parent || defaultBasicLogger(), tags);
 }
 
 export function createNoOpTaggedLogger() {

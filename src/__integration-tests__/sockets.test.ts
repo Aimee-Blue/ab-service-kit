@@ -8,7 +8,7 @@ import { initTestEpic } from './helpers';
 import { EOL } from 'os';
 
 describe('given service with echo pipeline', () => {
-  const echoingEpic: SocketEpic<unknown> = (commands, { logger }) =>
+  const echoingEpic: SocketEpic = (commands, { logger }) =>
     commands.pipe(
       tap(item => {
         logger.log(`${EOL}A new message was received`, item);

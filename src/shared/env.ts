@@ -1,6 +1,7 @@
 import dotenvExpand from 'dotenv-expand';
 import dotenv from 'dotenv';
 import fs, { pathExists } from 'fs-extra';
+import { BasicLogger, defaultBasicLogger } from './logging';
 
 const loadedVars = new Map<string, string>();
 
@@ -12,6 +13,7 @@ interface ILoadEnvParams {
   envFile?: string;
   verbosity?: 0 | 1 | 2;
   reset?: boolean;
+  logger?: BasicLogger;
 }
 
 export async function loadEnv(
@@ -22,6 +24,7 @@ export async function loadEnv(
 ) {
   const envFile = params.envFile;
   const files = envFile ? [envFile, ...defaults] : defaults;
+  const logger = params.logger || defaultBasicLogger();
 
   const packageJsonExists = await pathExists(packageJson);
   if (!packageJsonExists) {
@@ -33,7 +36,7 @@ export async function loadEnv(
   if (params.reset) {
     for (const key of loadedVars.keys()) {
       if (typeof params.verbosity === 'number' && params.verbosity >= 2) {
-        console.log(`${key}=...`);
+        logger.log(`${key}=...`);
       }
       delete process.env[key];
     }
@@ -46,7 +49,7 @@ export async function loadEnv(
     }
 
     if (typeof params.verbosity === 'number' && params.verbosity >= 1) {
-      console.log(`- Loading ${filePath}`);
+      logger.log(`- Loading ${filePath}`);
     }
 
     const result = dotenvExpand(
@@ -65,7 +68,7 @@ export async function loadEnv(
       loadedVars.set(key, value);
 
       if (typeof params.verbosity === 'number' && params.verbosity >= 2) {
-        console.log(`${key}=${parsed[key]}`);
+        logger.log(`${key}=${parsed[key]}`);
       }
     });
   });

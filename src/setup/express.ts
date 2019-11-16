@@ -3,13 +3,14 @@ import * as http from 'http';
 import * as https from 'https';
 import cors from 'cors';
 
-import { IServiceConfig } from '../shared';
+import { IServiceConfig, ServiceDeps } from '../shared';
 import { defaultEndpoints } from '../endpoints';
 import { TeardownHandler } from '../shared/teardown';
 
-export async function setupExpress(
+export async function setupExpress<D>(
   server: http.Server | https.Server,
-  config: IServiceConfig
+  config: IServiceConfig<D>,
+  deps: ServiceDeps<D>
 ): Promise<TeardownHandler> {
   const app = express();
 
@@ -25,9 +26,9 @@ export async function setupExpress(
       typeof config.shouldUseDefaultEndpoints !== 'boolean' ||
       config.shouldUseDefaultEndpoints
     ) {
-      defaultEndpoints(app);
+      defaultEndpoints(app, deps);
     }
-    await config.endpoints(app);
+    await config.endpoints(app, deps);
   }
 
   server.addListener('request', app);

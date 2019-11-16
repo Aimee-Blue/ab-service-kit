@@ -1,35 +1,33 @@
 import { Utils } from '@aimee-blue/ab-shared';
 import { AnyEpic } from '../kit';
-import { logEvents } from './logEvents';
 import { conditionalOperator } from '../conditionalOperator';
 
 export interface ILogEpicParams {
   name?: string;
   input?: boolean;
   output?: boolean;
-  logEvents?: typeof logEvents;
 }
 
 export const logEpic = <E extends AnyEpic>(
   epic: E,
   paramsRaw: ILogEpicParams
-) => {
-  const params = {
-    logEvents,
-    ...paramsRaw,
-  };
+): E => {
+  const fn = (...[commands, ctx, ...rest]: Parameters<E>): ReturnType<E> => {
+    const params = {
+      logEvents: ctx.logger.logEvents,
+      ...paramsRaw,
+    };
 
-  const maybeLogIncoming = conditionalOperator(
-    params.input ?? true,
-    params.logEvents
-  );
+    const maybeLogIncoming = conditionalOperator(
+      params.input ?? true,
+      params.logEvents
+    );
 
-  const maybeLogOutgoing = conditionalOperator(
-    params.output ?? true,
-    params.logEvents
-  );
+    const maybeLogOutgoing = conditionalOperator(
+      params.output ?? true,
+      params.logEvents
+    );
 
-  const fn = (...[commands, ...rest]: Parameters<E>) => {
     const incomingName = `commands@${params.name || epic.name}`;
     const outgoingName = `results@${params.name || epic.name}`;
 
@@ -37,15 +35,18 @@ export const logEpic = <E extends AnyEpic>(
       commands.pipe(
         maybeLogIncoming({
           prefix: incomingName,
+          logger: ctx.logger,
         })
       ),
+      ctx,
       ...rest
     ).pipe(
       maybeLogOutgoing({
         prefix: outgoingName,
+        logger: ctx.logger,
       })
-    );
+    ) as ReturnType<E>;
   };
 
-  return Utils.setFunctionName(`logEpic.${epic.name}`, fn);
+  return (Utils.setFunctionName(`logEpic.${epic.name}`, fn) as unknown) as E;
 };

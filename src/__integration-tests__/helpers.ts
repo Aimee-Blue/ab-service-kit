@@ -13,7 +13,7 @@ export const startTestService = async (config: IServiceConfig) => {
 };
 
 export async function initTestEpic(
-  epic: SocketEpic<unknown>,
+  epic: SocketEpic,
   params?: Pick<
     IServiceConfig,
     Exclude<keyof IServiceConfig, 'sockets' | 'defaultPort'>
@@ -40,7 +40,7 @@ export async function initTestEpic(
     ...params,
     defaultPort: 8080,
     sockets: async () => {
-      const events: SocketEpic<unknown> = handler;
+      const events: SocketEpic = handler;
       events.actionSchemaByType = actionSchemaByType;
       return {
         '/events': events,

@@ -1,5 +1,6 @@
 import { setupSockets } from '../setup/sockets';
 import { EventEmitter } from 'events';
+import { createNoOpBasicLogger } from '../shared';
 
 function mockServer() {
   const server = new EventEmitter();
@@ -17,6 +18,9 @@ function prepareTestArgsAndMocks() {
     config: {
       shouldUseDefaultEndpoints: false,
     },
+    sharedDeps: {
+      logger: createNoOpBasicLogger(),
+    },
     deps: {
       getRegistry: jest.fn(() => registry),
     },
@@ -26,7 +30,7 @@ function prepareTestArgsAndMocks() {
 describe('setupSockets', () => {
   it('should initialize registry', async () => {
     const data = prepareTestArgsAndMocks();
-    await setupSockets(data.server, data.config, data.deps);
+    await setupSockets(data.server, data.config, data.sharedDeps, data.deps);
 
     expect(data.deps.getRegistry).toBeCalledTimes(1);
     expect(data.deps.getRegistry.mock.calls[0][0]).toBe(data.server);
@@ -36,7 +40,12 @@ describe('setupSockets', () => {
 
   it('should dispose correctly', async () => {
     const data = prepareTestArgsAndMocks();
-    const result = await setupSockets(data.server, data.config, data.deps);
+    const result = await setupSockets(
+      data.server,
+      data.config,
+      data.sharedDeps,
+      data.deps
+    );
 
     await result('destroy');
 

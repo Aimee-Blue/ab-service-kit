@@ -13,6 +13,7 @@ import {
 } from 'rxjs/operators';
 import { IAction } from '../action';
 import { timesRegistered } from './streams';
+import { BasicLogger, defaultBasicLogger } from '../logging';
 
 interface ISendParams {
   event: string;
@@ -59,6 +60,7 @@ export interface ISendActionsParams<A extends IAction, AOut extends A = A> {
   traceKey?: string;
   filter?: (action: A) => action is AOut;
   transform?: (action: A, params?: ISendActionsParams<A, AOut>) => ISendParams;
+  logger?: BasicLogger;
 }
 
 function defaultTransform(
@@ -95,7 +97,10 @@ export const sendActions = <A extends IAction, AOut extends A = A>(
               )
             ).pipe(
               catchError(err => {
-                console.error('💥  An error when profiling actions', err);
+                (params?.logger ?? defaultBasicLogger()).error(
+                  '💥  An error when profiling actions',
+                  err
+                );
                 return empty();
               })
             )
