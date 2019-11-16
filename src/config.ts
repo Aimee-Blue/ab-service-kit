@@ -1,4 +1,4 @@
-import { IServiceConfig } from './shared';
+import { IServiceConfig, defaultBasicLogger } from './shared';
 import { verifyToken, currentSelfSignedToken } from './shared/auth';
 import { expressWithAuth } from './shared/auth/expressWithAuth';
 import { createTestEpic } from './testEpic';
@@ -11,10 +11,12 @@ const config: IServiceConfig = {
   },
 
   endpoints: async app => {
+    const logger = defaultBasicLogger();
+
     app.get('/verify', (_req, res, next) => {
       const fn = async () => {
         const token = await currentSelfSignedToken();
-        console.log('token', { token });
+        logger.log('token', { token });
         const verified = await verifyToken({
           token,
           allow: ['cluster'],
@@ -24,11 +26,11 @@ const config: IServiceConfig = {
 
       fn()
         .then(result => {
-          console.log('result', result);
+          logger.log('result', result);
           res.json(result).status(200);
         })
         .catch(err => {
-          console.error('Error', err);
+          logger.error('Error', err);
           next(err);
         });
     });

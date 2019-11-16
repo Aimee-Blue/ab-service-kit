@@ -17,17 +17,28 @@ export interface ICommandLineArgs {
   envFile?: string;
 }
 
-export type EndpointsHandler = (app: express.Express) => Promise<void>;
+export type ServiceDeps<D> = {
+  logger: BasicLogger;
+} & D;
 
-export interface IServiceConfig {
+export type EndpointsHandler<D> = (
+  app: express.Express,
+  deps: ServiceDeps<D>
+) => Promise<void>;
+
+export interface IServiceConfig<D = {}> {
   defaultPort: number;
 
-  endpoints?: EndpointsHandler;
-  sockets?: () => Promise<ISocketEpicsMap>;
-  background?: () => Promise<BackgroundEpic[]>;
-  spy?: (spy: ReturnType<typeof import('rxjs-spy').create>) => Promise<void>;
-
   logger?: () => Promise<BasicLogger>;
+  buildDeps?: () => Promise<D>;
+
+  endpoints?: EndpointsHandler<D>;
+  sockets?: (deps: ServiceDeps<D>) => Promise<ISocketEpicsMap>;
+  background?: (deps: ServiceDeps<D>) => Promise<BackgroundEpic[]>;
+  spy?: (
+    spy: ReturnType<typeof import('rxjs-spy').create>,
+    deps: ServiceDeps<D>
+  ) => Promise<void>;
 
   argsBuilder?: ArgsBuilder;
   serviceConfigModuleId?: string;
@@ -38,9 +49,18 @@ export interface IServiceConfig {
   shouldLoadEnvFiles?: boolean;
 }
 
-export type BackgroundEpic = (
-  events: Observable<IAction>
-) => Observable<IAction>;
+export interface IBackgroundEpicContext {
+  logger: TaggedLogger;
+}
+
+export interface IBackgroundEpic<D> {
+  (events: Observable<IAction>, ctx: IBackgroundEpicContext & D): Observable<
+    IAction
+  >;
+  buildDeps?: () => D;
+}
+
+export type BackgroundEpic<D = {}> = IBackgroundEpic<D>;
 
 export interface ISocketEpicsMap {
   [path: string]: AnySocketEpic;

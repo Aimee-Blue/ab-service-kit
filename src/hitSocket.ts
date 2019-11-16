@@ -14,10 +14,13 @@ import {
   endWith,
   tap,
 } from 'rxjs/operators';
+import { defaultBasicLogger } from './shared';
 
 const url = 'http://localhost:4010/events';
 
 async function start() {
+  const logger = defaultBasicLogger();
+
   const ws = new WebSocket(url);
   const socket = Object.assign(ws, { id: 'test-socket', closingByKit: false });
 
@@ -32,7 +35,7 @@ async function start() {
   const jobs = merge(
     actions.pipe(
       concatMap(action => {
-        console.log('  -> Received', action);
+        logger.log('  -> Received', action);
         return empty();
       })
     )
@@ -48,7 +51,7 @@ async function start() {
           text: text.replace('\n', ''),
         })),
         tap(action => {
-          console.log('  <- Sending', action);
+          logger.log('  <- Sending', action);
         })
       ),
       socket
@@ -67,5 +70,5 @@ async function start() {
 }
 
 start().catch(err => {
-  console.error('', err);
+  defaultBasicLogger().error('', err);
 });

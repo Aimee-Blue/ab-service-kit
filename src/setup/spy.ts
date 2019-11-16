@@ -1,8 +1,9 @@
-import { IServiceConfig, isDevBuild } from '../shared';
+import { IServiceConfig, isDevBuild, ServiceDeps } from '../shared';
 import { TeardownHandler, noop } from '../shared/teardown';
 
-export async function setupSpy(
-  config: IServiceConfig
+export async function setupSpy<D>(
+  config: IServiceConfig<D>,
+  deps: ServiceDeps<D>
 ): Promise<TeardownHandler> {
   if (config.spy) {
     const { create } = require('rxjs-spy') as typeof import('rxjs-spy');
@@ -13,9 +14,9 @@ export async function setupSpy(
 
     ((global as unknown) as { [key: string]: unknown }).rxSpy = spy;
 
-    await config.spy(spy);
+    await config.spy(spy, deps);
 
-    console.log(
+    deps.logger.log(
       '👀  RxJs Spy initialized',
       isDevBuild() ? '[all plugins]' : '[only logging]'
     );

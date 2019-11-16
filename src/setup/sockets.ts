@@ -1,13 +1,19 @@
 import * as http from 'http';
 import * as https from 'https';
-import { IServiceConfig, AnySocketEpic, createBasicLogger } from '../shared';
+import {
+  IServiceConfig,
+  AnySocketEpic,
+  defaultBasicLogger,
+  ServiceDeps,
+} from '../shared';
 import { TeardownHandler } from '../shared/teardown';
 import { defaultSocketsMap } from '../shared/epics';
 import { getRegistry } from '../shared/sockets';
 
-export async function setupSockets(
+export async function setupSockets<D>(
   server: http.Server | https.Server,
-  config: IServiceConfig,
+  config: IServiceConfig<D>,
+  sharedDeps: ServiceDeps<D>,
   deps = {
     getRegistry,
   }
@@ -19,11 +25,11 @@ export async function setupSockets(
       : {};
 
   const configPipelines = await (config.sockets
-    ? config.sockets()
+    ? config.sockets(sharedDeps)
     : Promise.resolve({}));
 
   const logger = await (config.logger?.() ??
-    Promise.resolve(createBasicLogger()));
+    Promise.resolve(defaultBasicLogger()));
 
   const pipelines = {
     ...defaultPipelines,

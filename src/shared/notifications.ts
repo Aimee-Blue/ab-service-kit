@@ -1,6 +1,7 @@
 import { Observable, isObservable, merge, ObservedValueOf } from 'rxjs';
 import { publishStream } from './publishStream';
 import { registerError } from './registerError';
+import { defaultBasicLogger } from './logging';
 
 export type TagNotification =
   | 'next'
@@ -82,7 +83,10 @@ export function executeOnNotifications<T, O extends Observable<unknown>>(
             },
             error: err => {
               registerError(err);
-              console.log('💥  Logging notifications generated an error', err);
+              defaultBasicLogger().log(
+                '💥  Logging notifications generated an error',
+                err
+              );
             },
           })
         );

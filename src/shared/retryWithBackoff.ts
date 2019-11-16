@@ -1,6 +1,7 @@
 import { Observable, timer, from } from 'rxjs';
 import { catchError, switchMapTo, tap } from 'rxjs/operators';
 import { registerError } from './registerError';
+import { BasicLogger, defaultBasicLogger } from './logging';
 
 interface IErrorInfo {
   error: Error;
@@ -18,6 +19,7 @@ interface IRetryOptsAll {
   waitTimeOnFirstError: number;
   minWaitTime: number;
   maxWaitTime: number;
+  logger?: BasicLogger;
 }
 
 function timeBeforeNextRetry(opts: IRetryOptsAll, numberOfErrors: number) {
@@ -31,16 +33,7 @@ function timeBeforeNextRetry(opts: IRetryOptsAll, numberOfErrors: number) {
 
 export function retryWithBackoff<T>(optsRaw?: RetryOpts) {
   const opts: IRetryOptsAll = {
-    shouldRetry: info => {
-      console.error(
-        `💥  The ${opts.sourceDescription || 'process'} has failed ${
-          info.numberOfErrors
-        } time(s). Will retry in ${(info.timeBeforeNextRetry / 1000).toFixed(
-          2
-        )}s. `,
-        info.error
-      );
-
+    shouldRetry: _info => {
       return true;
     },
     resetErrorsOnNext: true,
@@ -50,6 +43,19 @@ export function retryWithBackoff<T>(optsRaw?: RetryOpts) {
     maxWaitTime: 1 * 60 * 60 * 1000,
     sourceDescription: 'process',
     ...optsRaw,
+  };
+
+  const logger = opts.logger ?? defaultBasicLogger();
+
+  const log = (info: IErrorInfo) => {
+    logger.error(
+      `💥  The ${opts.sourceDescription || 'process'} has failed ${
+        info.numberOfErrors
+      } time(s). Will retry in ${(info.timeBeforeNextRetry / 1000).toFixed(
+        2
+      )}s. `,
+      info.error
+    );
   };
 
   const recursiveObserve = (
@@ -71,11 +77,13 @@ export function retryWithBackoff<T>(optsRaw?: RetryOpts) {
         registerError(error);
         const numberOfErrors = reset ? 0 : errors;
         const time = timeBeforeNextRetry(opts, numberOfErrors + 1);
-        return opts.shouldRetry({
+        const info = {
           error,
           numberOfErrors: numberOfErrors + 1,
           timeBeforeNextRetry: time,
-        })
+        };
+        log(info);
+        return opts.shouldRetry(info)
           ? timer(time).pipe(
               switchMapTo(recursiveObserve(numberOfErrors + 1, source))
             )

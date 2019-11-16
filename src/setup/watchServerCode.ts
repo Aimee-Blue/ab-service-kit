@@ -18,6 +18,7 @@ import {
   isTruthy,
   isUnitTest,
   isIntegrationTest,
+  defaultBasicLogger,
 } from '../shared';
 import { pathExists } from 'fs-extra';
 import { TeardownHandler } from '../shared/teardown';
@@ -31,13 +32,16 @@ const watchMultiple = (patterns: string[]) => {
   if (isUnitTest() || isIntegrationTest()) {
     return never();
   }
+
+  const logger = defaultBasicLogger();
+
   return new Observable<string>(subscriber => {
     const watcher = chokidar.watch(patterns, {
       ignorePermissionErrors: true,
     });
 
     const onChange = (file: string) => {
-      console.log('Change detected for', file);
+      logger.log('Change detected for', file);
       subscriber.next(file);
     };
 
@@ -56,14 +60,16 @@ const watchMultiple = (patterns: string[]) => {
 
     return () => {
       watcher.close().catch(err => {
-        console.log('Couldnt close file watcher', err);
+        logger.log('Couldnt close file watcher', err);
       });
     };
   });
 };
 
 let teardownOldServer: TeardownHandler = async () => {
-  console.log('Dummy teardown was called ... odd');
+  const logger = defaultBasicLogger();
+
+  logger.log('Dummy teardown was called ... odd');
   return;
 };
 
@@ -153,6 +159,8 @@ export async function serviceSetupInWatchMode(
 ): Promise<TeardownHandler> {
   const initialConfig = requireSetupModule(setupFilePath);
 
+  const logger = defaultBasicLogger();
+
   teardownOldServer = await setup(initialConfig);
 
   // please note that changes to this pattern will probably need changes to `watchServerCode` function
@@ -164,9 +172,7 @@ export async function serviceSetupInWatchMode(
   ];
 
   const subscription = defer(() => {
-    console.log(
-      `🔍  Watching for file changes in ${WATCH_PATTERNS.join(', ')}`
-    );
+    logger.log(`🔍  Watching for file changes in ${WATCH_PATTERNS.join(', ')}`);
     return watchMultiple(WATCH_PATTERNS);
   })
     .pipe(
@@ -183,7 +189,7 @@ export async function serviceSetupInWatchMode(
       ),
       filter(pair => {
         if (!pair.exists) {
-          console.log(
+          logger.log(
             `Cannot resolve changes to ${pair.filePath} (tried ${pair.resolved}), ignoring`
           );
         }
@@ -233,7 +239,7 @@ export async function serviceSetupInWatchMode(
       }),
 
       catchError((err, self) => {
-        console.log(
+        logger.log(
           '💥  Watching error, will wait for 2sec before restart ... ',
           err
         );
@@ -244,8 +250,8 @@ export async function serviceSetupInWatchMode(
       () => {
         return;
       },
-      err => console.log('💥  Watching error', err),
-      () => console.log('Watching stopped')
+      err => logger.log('💥  Watching error', err),
+      () => logger.log('Watching stopped')
     );
 
   return async mode => {
