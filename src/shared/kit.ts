@@ -27,7 +27,7 @@ export interface IServiceConfig {
   background?: () => Promise<BackgroundEpic[]>;
   spy?: (spy: ReturnType<typeof import('rxjs-spy').create>) => Promise<void>;
 
-  logger?: () => BasicLogger;
+  logger?: () => Promise<BasicLogger>;
 
   argsBuilder?: ArgsBuilder;
   serviceConfigModuleId?: string;
