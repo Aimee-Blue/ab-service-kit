@@ -1,6 +1,6 @@
 import * as http from 'http';
 import * as https from 'https';
-import { IServiceConfig, AnySocketEpic } from '../shared';
+import { IServiceConfig, AnySocketEpic, createBasicLogger } from '../shared';
 import { TeardownHandler } from '../shared/teardown';
 import { defaultSocketsMap } from '../shared/epics';
 import { getRegistry } from '../shared/sockets';
@@ -29,7 +29,11 @@ export async function setupSockets(
 
   const epicsByPath = new Map<string, AnySocketEpic>(Object.entries(pipelines));
 
-  const registry = deps.getRegistry(server, epicsByPath);
+  const registry = deps.getRegistry(
+    server,
+    epicsByPath,
+    config.logger?.() ?? createBasicLogger()
+  );
 
   registry.initialize(epicsByPath);
 

@@ -3,11 +3,13 @@ import { SocketHandler } from './types';
 import { AnySocketEpic } from '../kit';
 import { RegistryStateApi } from './socketRegistryState';
 import { spinUpSocketEpic } from './spinUpSocketEpic';
+import { BasicLogger } from '../logging';
 
 export const buildOnConnectionListener = (
   epicsByPath: () => Map<string, AnySocketEpic>,
   closeSocket: RegistryStateApi['closeSocket'],
-  attachToSocket: RegistryStateApi['attachToSocket']
+  attachToSocket: RegistryStateApi['attachToSocket'],
+  logger: BasicLogger
 ): SocketHandler => (socket, message) => {
   if (!message.url) {
     return;
@@ -28,7 +30,8 @@ export const buildOnConnectionListener = (
     socket,
     message,
     epic,
-    closeSocket
+    closeSocket,
+    logger
   );
 
   attachToSocket(
