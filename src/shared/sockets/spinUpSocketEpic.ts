@@ -44,7 +44,7 @@ export const spinUpSocketEpic = (
     commands,
     binary,
     logger,
-    depsBuilder: epic.defaultDeps,
+    buildDeps: epic.buildDeps,
   });
 
   logConnected(logger, socket, request, epic);

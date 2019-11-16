@@ -83,7 +83,7 @@ export interface ISocketEpicAttributes<
   completedSocketWaitTimeout?: number;
   watchModeDetachBehaviour?: 'disconnect' | 'unsubscribe';
   debugStats?: boolean;
-  defaultDeps?: () => D;
+  buildDeps?: () => D;
 }
 
 export interface ISocketEpicContext {

@@ -30,7 +30,7 @@ export function mergeEpics(
       return merge(
         ...epics.map(epic =>
           defer(() =>
-            epic(commands, { ...(epic.defaultDeps?.() ?? {}), ...ctx }, ...rest)
+            epic(commands, { ...(epic.buildDeps?.() ?? {}), ...ctx }, ...rest)
           ).pipe(
             retryWithBackoff({
               sourceDescription: `${epic.name} epic`,
