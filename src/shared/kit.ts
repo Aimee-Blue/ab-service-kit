@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { IncomingMessage } from 'http';
 import * as Joi from '@hapi/joi';
 import { IAction } from './action';
-import { TaggedLogger } from './logging';
+import { TaggedLogger, BasicLogger } from './logging';
 
 export interface ICommandLineArgs {
   http: boolean;
@@ -26,6 +26,8 @@ export interface IServiceConfig {
   sockets?: () => Promise<ISocketEpicsMap>;
   background?: () => Promise<BackgroundEpic[]>;
   spy?: (spy: ReturnType<typeof import('rxjs-spy').create>) => Promise<void>;
+
+  logger?: () => Promise<BasicLogger>;
 
   argsBuilder?: ArgsBuilder;
   serviceConfigModuleId?: string;
