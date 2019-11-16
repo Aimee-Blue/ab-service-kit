@@ -1,11 +1,6 @@
 import * as http from 'http';
 import * as https from 'https';
-import {
-  IServiceConfig,
-  AnySocketEpic,
-  defaultBasicLogger,
-  ServiceDeps,
-} from '../shared';
+import { IServiceConfig, AnySocketEpic, ServiceDeps } from '../shared';
 import { TeardownHandler } from '../shared/teardown';
 import { defaultSocketsMap } from '../shared/epics';
 import { getRegistry } from '../shared/sockets';
@@ -28,9 +23,6 @@ export async function setupSockets<D>(
     ? config.sockets(sharedDeps)
     : Promise.resolve({}));
 
-  const logger = await (config.logger?.() ??
-    Promise.resolve(defaultBasicLogger()));
-
   const pipelines = {
     ...defaultPipelines,
     ...configPipelines,
@@ -38,7 +30,7 @@ export async function setupSockets<D>(
 
   const epicsByPath = new Map<string, AnySocketEpic>(Object.entries(pipelines));
 
-  const registry = deps.getRegistry(server, epicsByPath, logger);
+  const registry = deps.getRegistry(server, epicsByPath, sharedDeps.logger);
 
   registry.initialize(epicsByPath);
 

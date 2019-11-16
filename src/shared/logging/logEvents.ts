@@ -160,12 +160,15 @@ export function logEvents<T>(paramsRaw: LogEventsArg): OperatorFunction<T, T> {
       stream.pipe(
         executeOnNotifications(
           [...tags, onLoggingAudit().pipe(mapTo('audit' as const))],
-          buildAuditLog<T>(params)
+          buildAuditLog<T>(params),
+          params.logger
         )
       );
   } else {
     return stream =>
-      stream.pipe(executeOnNotifications(tags, buildSimpleLog<T>(params)));
+      stream.pipe(
+        executeOnNotifications(tags, buildSimpleLog<T>(params), params.logger)
+      );
   }
 }
 

@@ -1,4 +1,4 @@
-import { IServiceConfig, defaultBasicLogger } from './shared';
+import { IServiceConfig } from './shared';
 import { verifyToken, currentSelfSignedToken } from './shared/auth';
 import { expressWithAuth } from './shared/auth/expressWithAuth';
 import { createTestEpic } from './testEpic';
@@ -10,13 +10,11 @@ const config: IServiceConfig = {
     spy.log(/debug-.*/);
   },
 
-  endpoints: async app => {
-    const logger = defaultBasicLogger();
-
+  endpoints: async (app, deps) => {
     app.get('/verify', (_req, res, next) => {
       const fn = async () => {
         const token = await currentSelfSignedToken();
-        logger.log('token', { token });
+        deps.logger.log('token', { token });
         const verified = await verifyToken({
           token,
           allow: ['cluster'],
@@ -26,11 +24,11 @@ const config: IServiceConfig = {
 
       fn()
         .then(result => {
-          logger.log('result', result);
+          deps.logger.log('result', result);
           res.json(result).status(200);
         })
         .catch(err => {
-          logger.error('Error', err);
+          deps.logger.error('Error', err);
           next(err);
         });
     });
@@ -46,6 +44,7 @@ const config: IServiceConfig = {
   sockets: async () => {
     return {
       '/events': createTestEpic(),
+      '/binary-performance-test': createTestEpic(),
     };
   },
 };
