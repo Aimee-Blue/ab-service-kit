@@ -53,10 +53,12 @@ export interface IBackgroundEpicContext {
   logger: TaggedLogger;
 }
 
-export interface IBackgroundEpic<D> {
-  (events: Observable<IAction>, ctx: IBackgroundEpicContext & D): Observable<
-    IAction
-  >;
+export interface IBackgroundEpic<D = {}, R extends unknown[] = unknown[]> {
+  (
+    events: Observable<IAction>,
+    ctx: IBackgroundEpicContext & D,
+    ...args: R
+  ): Observable<IAction>;
   buildDeps?: () => D;
 }
 
@@ -66,7 +68,10 @@ export interface ISocketEpicsMap {
   [path: string]: AnySocketEpic;
 }
 
-export interface ISocketEpicAttributes<O = unknown, D = {}> {
+export interface ISocketEpicAttributes<
+  O extends IAction | Buffer = IAction | Buffer,
+  D = {}
+> {
   send?: (socket: WebSocket, data: O) => Promise<void>;
   actionSchemaByType?: (type: string) => Joi.ObjectSchema | null;
   logOnConnection?: (
@@ -90,19 +95,37 @@ export interface ISocketEpicContext {
   takeUntilClosed: () => <T>(stream: Observable<T>) => Observable<T>;
 }
 
-export interface ISocketEpic<I, O = unknown, D = {}>
-  extends ISocketEpicAttributes<O, D> {
-  (commands: Observable<I>, ctx: ISocketEpicContext & D): Observable<O>;
+export interface ISocketEpic<
+  I extends IAction = IAction,
+  O extends IAction | Buffer = IAction | Buffer,
+  D = {},
+  R extends unknown[] = unknown[]
+> extends ISocketEpicAttributes<O, D> {
+  (
+    commands: Observable<I>,
+    ctx: ISocketEpicContext & D,
+    ...args: R
+  ): Observable<O>;
 }
 
-export type AnySocketEpic = ISocketEpic<unknown>;
+export type AnySocketEpic = SocketEpic;
 
-export type AnyEpic = <T, R, A extends unknown[]>(
+export type AnyEpic = <
+  T extends IAction,
+  O extends IAction,
+  R extends unknown[]
+>(
   commands: Observable<T>,
-  ...args: A
-) => Observable<R>;
+  ctx: IBackgroundEpicContext | ISocketEpicContext,
+  ...args: R
+) => Observable<O>;
 
-export type SocketEpic<I, O = unknown, D = {}> = ISocketEpic<I, O, D>;
+export type SocketEpic<
+  I extends IAction = IAction,
+  O extends IAction | Buffer = IAction | Buffer,
+  D = {},
+  R extends unknown[] = unknown[]
+> = ISocketEpic<I, O, D, R>;
 
 type ArgsBuilder = (
   args: yargs.Argv<ICommandLineArgs>

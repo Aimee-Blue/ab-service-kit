@@ -169,12 +169,14 @@ export function logEvents<T>(paramsRaw: LogEventsArg): OperatorFunction<T, T> {
   }
 }
 
-export type LogEventsOperator = typeof logEvents;
+export type LogEventsOperator<T> = (
+  paramsRaw: LogEventsArg
+) => OperatorFunction<T, T>;
 
 function taggedLogEventsFactory(
   startWith: unknown[] = [],
   logger: BasicLogger = defaultBasicLogger(),
-  fn: LogEventsOperator = logEvents
+  fn = logEvents
 ) {
   const tags = [...startWith];
   const taggedlogEvents = <T>(paramsRaw: LogEventsArg) => {
