@@ -1,7 +1,7 @@
 import { Observable, isObservable, merge, ObservedValueOf } from 'rxjs';
 import { publishStream } from './publishStream';
 import { registerError } from './registerError';
-import { defaultBasicLogger } from './logging';
+import { defaultBasicLogger, BasicLogger } from './logging';
 
 export type TagNotification =
   | 'next'
@@ -37,7 +37,8 @@ export type NotificationInfo<T, K = void> =
 
 export function executeOnNotifications<T, O extends Observable<unknown>>(
   notifications: Array<TagNotification | O>,
-  cb: (info: NotificationInfo<T, ObservedValueOf<O>>) => void
+  cb: (info: NotificationInfo<T, ObservedValueOf<O>>) => void,
+  logger: BasicLogger = defaultBasicLogger()
 ) {
   return (stream: Observable<T>) => {
     if (notifications.length === 0) {
@@ -83,10 +84,7 @@ export function executeOnNotifications<T, O extends Observable<unknown>>(
             },
             error: err => {
               registerError(err);
-              defaultBasicLogger().log(
-                '💥  Logging notifications generated an error',
-                err
-              );
+              logger.log('💥  Logging notifications generated an error', err);
             },
           })
         );
