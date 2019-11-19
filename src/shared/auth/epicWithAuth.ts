@@ -40,7 +40,7 @@ export interface ISocketEpicWithAuth<
   R extends unknown[] = unknown[]
 > extends ISocketEpicAttributes<O, D> {
   (
-    commands: Observable<I>,
+    commands: Observable<IAction | I>,
     ctx: ISocketEpicContext & IInjectedAuthDetails & D,
     ...rest: R
   ): Observable<O>;

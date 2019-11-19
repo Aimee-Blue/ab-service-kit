@@ -1,10 +1,24 @@
 import { merge, defer } from 'rxjs';
-import { AnySocketEpic, BackgroundEpic } from './kit';
+import {
+  AnySocketEpic,
+  BackgroundEpic,
+  SocketEpic,
+  InputOfEpic,
+  OutputOfEpic,
+  DependenciesOfBackgroundEpic,
+  DependenciesOfSocketEpic,
+} from './kit';
 import { retryWithBackoff } from './retryWithBackoff';
 import { Utils } from '@aimee-blue/ab-shared';
 
-export function mergeBackgroundEpics(...epics: BackgroundEpic[]) {
-  return (...[events, ctx, ...rest]: Parameters<BackgroundEpic>) => {
+export function mergeBackgroundEpics<E extends BackgroundEpic>(
+  ...epics: E[]
+): BackgroundEpic<
+  InputOfEpic<E>,
+  OutputOfEpic<E>,
+  DependenciesOfBackgroundEpic<E>
+> {
+  return ((...[events, ctx, ...rest]: Parameters<BackgroundEpic>) => {
     return merge(
       ...epics.map(epic =>
         defer(() =>
@@ -17,14 +31,18 @@ export function mergeBackgroundEpics(...epics: BackgroundEpic[]) {
         )
       )
     );
-  };
+  }) as BackgroundEpic<
+    InputOfEpic<E>,
+    OutputOfEpic<E>,
+    DependenciesOfBackgroundEpic<E>
+  >;
 }
 
-export function mergeEpics(
+export function mergeEpics<E extends AnySocketEpic>(
   name: string,
-  ...epics: AnySocketEpic[]
-): AnySocketEpic {
-  const mergedEpic: AnySocketEpic = Utils.setFunctionName(
+  ...epics: E[]
+): SocketEpic<InputOfEpic<E>, OutputOfEpic<E>, DependenciesOfSocketEpic<E>> {
+  const mergedEpic = Utils.setFunctionName(
     name,
     (...[commands, ctx, ...rest]) => {
       return merge(
@@ -40,7 +58,7 @@ export function mergeEpics(
         )
       );
     }
-  );
+  ) as SocketEpic<InputOfEpic<E>, OutputOfEpic<E>, DependenciesOfSocketEpic<E>>;
   return mergedEpic;
 }
 
