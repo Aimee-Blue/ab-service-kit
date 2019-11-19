@@ -1,6 +1,7 @@
 import path from 'path';
 import resolveFrom from 'resolve-from';
 import parentModule from 'parent-module';
+import { defaultBasicLogger } from './logging';
 
 const resolve = (moduleId: string) => {
   try {
@@ -25,7 +26,9 @@ export const clearModule = (moduleId: string) => {
     return;
   }
 
-  console.log('  Clearing', filePath);
+  const logger = defaultBasicLogger();
+
+  logger.log('  Clearing', filePath);
 
   const cache = require.cache as { [key: string]: NodeModule | undefined };
 

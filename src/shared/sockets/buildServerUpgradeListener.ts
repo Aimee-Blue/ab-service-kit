@@ -5,11 +5,13 @@ import url from 'url';
 import { SocketWithInfo, MessageWithInfo } from './types';
 import { AnySocketEpic } from '../kit';
 import { RegistryStateApi } from './socketRegistryState';
+import { BasicLogger } from '../logging';
 
 export const buildServerUpgradeListener = (
   wss: WebSocket.Server,
   epicsByPath: () => Map<string, AnySocketEpic>,
-  add: RegistryStateApi['addSocket']
+  add: RegistryStateApi['addSocket'],
+  logger: BasicLogger
 ) =>
   function upgrade(request: MessageWithInfo, socket: Socket, head: Buffer) {
     if (!request.url) {
@@ -20,7 +22,7 @@ export const buildServerUpgradeListener = (
     const pathname = url.parse(request.url).pathname;
 
     if (typeof pathname !== 'string' || !epicsByPath().has(pathname)) {
-      console.log("🤷‍  Path doesn't have a handler", pathname);
+      logger.log("🤷‍  Path doesn't have a handler", pathname);
       socket.destroy();
       return;
     }

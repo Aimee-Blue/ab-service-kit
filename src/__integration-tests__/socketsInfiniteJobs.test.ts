@@ -9,7 +9,7 @@ import { initTestEpic } from './helpers';
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
 
 describe('given service with a faulty epic that never finishes tasks', () => {
-  const epicThatNeverFinishes: SocketEpic<unknown> = commands =>
+  const epicThatNeverFinishes: SocketEpic = commands =>
     merge(commands, never());
 
   let data: PromiseType<ReturnType<typeof initTestEpic>>;
@@ -31,11 +31,7 @@ describe('given service with a faulty epic that never finishes tasks', () => {
     );
 
     const connected = await merge(onOpen, onError)
-      .pipe(
-        mapTo('connected'),
-        timeoutWith(1000, of('timed-out')),
-        take(1)
-      )
+      .pipe(mapTo('connected'), timeoutWith(1000, of('timed-out')), take(1))
       .toPromise();
 
     expect(connected).toBe('connected');
@@ -52,10 +48,7 @@ describe('given service with a faulty epic that never finishes tasks', () => {
     socket.terminate();
 
     const teardownResult = await from(data.teardown())
-      .pipe(
-        mapTo('done'),
-        timeoutWith(6000, of('timeout'))
-      )
+      .pipe(mapTo('done'), timeoutWith(6000, of('timeout')))
       .toPromise();
 
     // we should teardown within 6s because the wait timeout is 5s

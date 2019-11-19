@@ -24,9 +24,7 @@ describe('given service with long running tasks', () => {
     unsubscribed: false,
   };
 
-  const echoingEpicWithLongRunningInnerObservable: SocketEpic<
-    unknown
-  > = commands =>
+  const echoingEpicWithLongRunningInnerObservable: SocketEpic = commands =>
     commands.pipe(
       publish(cmd =>
         merge(
@@ -72,11 +70,7 @@ describe('given service with long running tasks', () => {
     );
 
     const connected = await merge(onOpen, onError)
-      .pipe(
-        mapTo('connected'),
-        timeoutWith(1000, of('timed-out')),
-        take(1)
-      )
+      .pipe(mapTo('connected'), timeoutWith(1000, of('timed-out')), take(1))
       .toPromise();
 
     expect(connected).toBe('connected');

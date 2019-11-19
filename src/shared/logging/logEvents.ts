@@ -1,5 +1,5 @@
 import { OperatorFunction } from 'rxjs';
-import { Logger, defaultLogger } from './logger';
+import { BasicLogger, defaultBasicLogger } from './basicLogger';
 import {
   TagNotification,
   executeOnNotifications,
@@ -13,13 +13,13 @@ export type LogNotification = TagNotification | 'audit';
 
 export interface ILogTextParams {
   prefix: string;
-  extra?: unknown[];
+  tags?: unknown[];
   suffix?: unknown[];
 }
 
 export interface ILogStreamParamsCore extends ILogTextParams {
   on?: LogNotification[];
-  logger?: Logger;
+  logger?: BasicLogger;
 }
 
 export type LogTextParamsMap = Partial<Record<LogNotification, ILogTextParams>>;
@@ -46,7 +46,9 @@ function logOnFromParam(on: ILogStreamParamsCore['on']): LogNotification[] {
   }
 }
 
-const buildSimpleLog = <T>(paramsRaw: LogStreamParams & { logger: Logger }) => {
+const buildSimpleLog = <T>(
+  paramsRaw: LogStreamParams & { logger: BasicLogger }
+) => {
   return (info: NotificationInfo<T, 'audit'>) => {
     const params = {
       ...paramsRaw,
@@ -57,7 +59,7 @@ const buildSimpleLog = <T>(paramsRaw: LogStreamParams & { logger: Logger }) => {
       const description = [
         params.prefix,
         `(${info.notification})`,
-        ...(params.extra || []),
+        ...(params.tags || []),
       ];
 
       switch (info.notification) {
@@ -81,21 +83,21 @@ const buildSimpleLog = <T>(paramsRaw: LogStreamParams & { logger: Logger }) => {
       }
     } catch (err) {
       registerError(err);
-      console.error('💥  Something bad happened when logging', err);
+      params.logger.error('💥  Something bad happened when logging', err);
     }
   };
 };
 
-const buildAuditLog = <T>(paramsRaw: LogStreamParams & { logger: Logger }) => (
-  info: NotificationInfo<T, 'audit'>
-) => {
-  try {
-    const params = {
-      ...paramsRaw,
-      ...paramsRaw[info.notification],
-    };
+const buildAuditLog = <T>(
+  paramsRaw: LogStreamParams & { logger: BasicLogger }
+) => (info: NotificationInfo<T, 'audit'>) => {
+  const params = {
+    ...paramsRaw,
+    ...paramsRaw[info.notification],
+  };
 
-    const description = [params.prefix, ...(params.extra || [])];
+  try {
+    const description = [params.prefix, ...(params.tags || [])];
 
     switch (info.notification) {
       case 'audit':
@@ -127,21 +129,28 @@ const buildAuditLog = <T>(paramsRaw: LogStreamParams & { logger: Logger }) => (
     }
   } catch (err) {
     registerError(err);
-    console.error('💥  Something bad happened when logging', err);
+    params.logger.error('💥  Something bad happened when logging', err);
   }
 };
 
-export function logEvents<T>(
-  paramsRaw: LogStreamParams | string
-): OperatorFunction<T, T> {
-  const params = {
+export type LogEventsArg = LogStreamParams | string;
+
+export function logEventsParams(
+  arg: LogEventsArg,
+  defaultLogger = defaultBasicLogger()
+): LogStreamParams & { logger: BasicLogger } {
+  return {
     logger: defaultLogger,
-    ...(typeof paramsRaw === 'string'
+    ...(typeof arg === 'string'
       ? {
-          prefix: paramsRaw,
+          prefix: arg,
         }
-      : paramsRaw),
+      : arg),
   };
+}
+
+export function logEvents<T>(paramsRaw: LogEventsArg): OperatorFunction<T, T> {
+  const params = logEventsParams(paramsRaw);
 
   const logOn = logOnFromParam(params.on);
   const tags = tagsFromLogOn(logOn);
@@ -151,11 +160,46 @@ export function logEvents<T>(
       stream.pipe(
         executeOnNotifications(
           [...tags, onLoggingAudit().pipe(mapTo('audit' as const))],
-          buildAuditLog<T>(params)
+          buildAuditLog<T>(params),
+          params.logger
         )
       );
   } else {
     return stream =>
-      stream.pipe(executeOnNotifications(tags, buildSimpleLog<T>(params)));
+      stream.pipe(
+        executeOnNotifications(tags, buildSimpleLog<T>(params), params.logger)
+      );
   }
 }
+
+export type LogEventsOperator<T> = (
+  paramsRaw: LogEventsArg
+) => OperatorFunction<T, T>;
+
+function taggedLogEventsFactory(
+  startWith: unknown[] = [],
+  logger: BasicLogger = defaultBasicLogger(),
+  fn = logEvents
+) {
+  const tags = [...startWith];
+  const taggedlogEvents = <T>(paramsRaw: LogEventsArg) => {
+    const params = logEventsParams(paramsRaw, logger);
+    return fn<T>({
+      ...params,
+      tags: [...(params.tags ?? []), ...tags],
+    });
+  };
+  taggedlogEvents.withTags = (...extraTags: unknown[]) => {
+    return taggedLogEventsFactory([...tags, ...extraTags], logger, fn);
+  };
+  return taggedlogEvents;
+}
+
+export function createTaggedLogEvents(
+  tags: unknown[],
+  logger = defaultBasicLogger()
+) {
+  return taggedLogEventsFactory(tags, logger);
+}
+
+export type TaggedLogEventsOperator = ReturnType<typeof createTaggedLogEvents>;

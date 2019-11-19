@@ -1,32 +1,30 @@
-import { tag } from 'rxjs-spy/operators';
+import {
+  logEvents,
+  LogEventsArg,
+  logEventsParams,
+  createTaggedLogEvents,
+  TaggedLogEventsOperator,
+} from './logEvents';
+import {
+  createNoOpBasicLogger,
+  BasicLogger,
+  defaultBasicLogger,
+} from './basicLogger';
 import { Observable } from 'rxjs';
-import util from 'util';
 
-export function createNoOpLogger() {
+export function createLogger(basicLogger = defaultBasicLogger()) {
   return Object.freeze({
-    log: (..._parameters: unknown[]) => {
-      return;
-    },
-    warn: (..._parameters: unknown[]) => {
-      return;
-    },
-    error: (..._parameters: unknown[]) => {
-      return;
-    },
+    ...basicLogger,
+    logEvents: <T>(arg: LogEventsArg) =>
+      logEvents<T>(logEventsParams(arg, basicLogger)),
   });
 }
 
-export function createLogger() {
+export function createNoOpLogger(): Logger {
+  const basicLogger = createNoOpBasicLogger();
   return Object.freeze({
-    log: (message?: unknown, ...parameters: unknown[]) => {
-      console.log(message, ...parameters);
-    },
-    warn: (message?: unknown, ...parameters: unknown[]) => {
-      console.warn(message, ...parameters);
-    },
-    error: (message?: unknown, ...parameters: unknown[]) => {
-      console.error(message, ...parameters);
-    },
+    ...basicLogger,
+    logEvents: <T>(_arg: LogEventsArg) => (stream: Observable<T>) => stream,
   });
 }
 
@@ -36,10 +34,11 @@ export type Logger = ReturnType<typeof createLogger>;
 
 export type LogArgs = Parameters<Logger['log']>;
 
-export type LoggerWithSuffix = Logger &
+export type TaggedLogger = Logger &
   Readonly<{
-    withTag: (suffix: unknown) => LoggerWithSuffix;
-    parent: Logger;
+    logEvents: TaggedLogEventsOperator;
+    withTags: (...tags: unknown[]) => TaggedLogger;
+    parent: BasicLogger;
   }>;
 
 function splitFirstLineAndBody(text: string) {
@@ -95,54 +94,49 @@ function appendTags(args: LogArgs, tags: unknown[]) {
   return [...before, ...tags, ...after];
 }
 
-function isTaggedLogger(logger: Logger): logger is LoggerWithSuffix {
+function isTaggedLogger(logger: BasicLogger): logger is TaggedLogger {
   return (
     logger !== null &&
     typeof logger === 'object' &&
-    'withSuffix' in logger &&
+    'withTags' in logger &&
     'parent' in logger
   );
 }
 
-function taggedLoggerFactory(parent: Logger, suffixes: unknown[] = []) {
-  return (additional: unknown): LoggerWithSuffix => {
-    suffixes.push(additional);
-    const locked = [...suffixes];
-    return Object.freeze({
-      log: (...args) => {
-        parent.log(...appendTags(args, locked));
-      },
-      warn: (...args) => {
-        parent.warn(...appendTags(args, locked));
-      },
-      error: (...args) => {
-        parent.error(...appendTags(args, locked));
-      },
-      withTag: arg => {
-        return taggedLoggerFactory(parent, suffixes)(arg);
-      },
-      parent,
-    });
-  };
+function taggedLoggerFactory(
+  parent: BasicLogger,
+  startWith: unknown[] = []
+): TaggedLogger {
+  const locked = [...startWith];
+  return Object.freeze({
+    log: (...args) => {
+      parent.log(...appendTags(args, locked));
+    },
+    warn: (...args) => {
+      parent.warn(...appendTags(args, locked));
+    },
+    error: (...args) => {
+      parent.error(...appendTags(args, locked));
+    },
+    withTags: (...args) => {
+      return taggedLoggerFactory(parent, [...locked, ...args]);
+    },
+    logEvents: createTaggedLogEvents(startWith, parent),
+    parent,
+  });
 }
 
 export function createTaggedLogger(
-  suffix: unknown,
-  parent?: Logger
-): LoggerWithSuffix {
+  tags: unknown[],
+  parent?: BasicLogger
+): TaggedLogger {
   if (parent && isTaggedLogger(parent)) {
-    return parent.withTag(suffix);
+    return parent.withTags(...tags);
   }
 
-  const factory = taggedLoggerFactory(parent || createLogger());
-
-  return factory(suffix);
+  return taggedLoggerFactory(parent || defaultBasicLogger(), tags);
 }
 
-export function createTaggedRxJsSpyTagOperator(
-  suffix: unknown,
-  parent: typeof tag = tag
-) {
-  return (text: string) => <T>(stream: Observable<T>) =>
-    stream.pipe(parent(util.format(text, suffix)));
+export function createNoOpTaggedLogger() {
+  return createTaggedLogger([], createNoOpLogger());
 }

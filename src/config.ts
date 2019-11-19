@@ -10,11 +10,11 @@ const config: IServiceConfig = {
     spy.log(/debug-.*/);
   },
 
-  endpoints: async app => {
+  endpoints: async (app, deps) => {
     app.get('/verify', (_req, res, next) => {
       const fn = async () => {
         const token = await currentSelfSignedToken();
-        console.log('token', { token });
+        deps.logger.log('token', { token });
         const verified = await verifyToken({
           token,
           allow: ['cluster'],
@@ -24,11 +24,11 @@ const config: IServiceConfig = {
 
       fn()
         .then(result => {
-          console.log('result', result);
+          deps.logger.log('result', result);
           res.json(result).status(200);
         })
         .catch(err => {
-          console.error('Error', err);
+          deps.logger.error('Error', err);
           next(err);
         });
     });
@@ -44,6 +44,7 @@ const config: IServiceConfig = {
   sockets: async () => {
     return {
       '/events': createTestEpic(),
+      '/binary-performance-test': createTestEpic(),
     };
   },
 };

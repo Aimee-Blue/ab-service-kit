@@ -1,11 +1,12 @@
 import { loadEnv } from './shared/env';
-import { Config } from './shared';
+import { Config, defaultBasicLogger } from './shared';
 
 async function run() {
   await loadEnv();
-  console.log(await Config.load());
+
+  defaultBasicLogger().log(await Config.load());
 }
 
 run().catch(err => {
-  console.error('', err);
+  defaultBasicLogger().error('', err);
 });

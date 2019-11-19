@@ -5,7 +5,6 @@ export * from './kit';
 export * from './publishStream';
 export * from './time';
 export * from './isTest';
-export * from './startup';
 export * from './mergeEpics';
 export * from './ofType';
 export * from './retryWithBackoff';

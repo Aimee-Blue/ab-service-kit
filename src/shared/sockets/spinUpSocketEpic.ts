@@ -14,19 +14,20 @@ import { logWarningIfOutgoingStreamNotComplete } from './logWarningIfOutgoingStr
 import { RegistryStateApi } from './socketRegistryState';
 import { createSocketEpicContext } from './createSocketEpicContext';
 import { logConnected } from './logConnected';
-import { createTaggedLogger } from '../logging';
+import { createTaggedLogger, BasicLogger } from '../logging';
 
 export const spinUpSocketEpic = (
   socket: SocketWithInfo,
   request: MessageWithInfo,
   epic: AnySocketEpic,
-  closeSocket: RegistryStateApi['closeSocket']
+  closeSocket: RegistryStateApi['closeSocket'],
+  parentLogger: BasicLogger
 ) => {
   const requestIdTag = {
     rid: request.id.substr(0, 8),
   };
 
-  const logger = createTaggedLogger(requestIdTag);
+  const logger = createTaggedLogger([requestIdTag], parentLogger);
 
   const allData = publishStream(dataStreamFromSocket(socket, logger));
 
@@ -38,13 +39,13 @@ export const spinUpSocketEpic = (
 
   const binary = binaryStreamFromSocket(allData);
 
-  const ctx = createSocketEpicContext(
+  const ctx = createSocketEpicContext({
     request,
     commands,
     binary,
     logger,
-    epic.defaultDeps
-  );
+    buildDeps: epic.buildDeps,
+  });
 
   logConnected(logger, socket, request, epic);
 

@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { IncomingMessage } from 'http';
 import * as Joi from '@hapi/joi';
 import { IAction } from './action';
-import { Logger, logEvents } from './logging';
+import { TaggedLogger, BasicLogger } from './logging';
 
 export interface ICommandLineArgs {
   http: boolean;
@@ -17,15 +17,28 @@ export interface ICommandLineArgs {
   envFile?: string;
 }
 
-export type EndpointsHandler = (app: express.Express) => Promise<void>;
+export type ServiceDeps<D> = {
+  logger: BasicLogger;
+} & D;
 
-export interface IServiceConfig {
+export type EndpointsHandler<D> = (
+  app: express.Express,
+  deps: ServiceDeps<D>
+) => Promise<void>;
+
+export interface IServiceConfig<D = {}> {
   defaultPort: number;
 
-  endpoints?: EndpointsHandler;
-  sockets?: () => Promise<ISocketEpicsMap>;
-  background?: () => Promise<BackgroundEpic[]>;
-  spy?: (spy: ReturnType<typeof import('rxjs-spy').create>) => Promise<void>;
+  logger?: () => Promise<BasicLogger>;
+  buildDeps?: () => Promise<D>;
+
+  endpoints?: EndpointsHandler<D>;
+  sockets?: (deps: ServiceDeps<D>) => Promise<ISocketEpicsMap>;
+  background?: (deps: ServiceDeps<D>) => Promise<BackgroundEpic[]>;
+  spy?: (
+    spy: ReturnType<typeof import('rxjs-spy').create>,
+    deps: ServiceDeps<D>
+  ) => Promise<void>;
 
   argsBuilder?: ArgsBuilder;
   serviceConfigModuleId?: string;
@@ -36,15 +49,29 @@ export interface IServiceConfig {
   shouldLoadEnvFiles?: boolean;
 }
 
-export type BackgroundEpic = (
-  events: Observable<IAction>
-) => Observable<IAction>;
+export interface IBackgroundEpicContext {
+  logger: TaggedLogger;
+}
+
+export interface IBackgroundEpic<D = {}, R extends unknown[] = unknown[]> {
+  (
+    events: Observable<IAction>,
+    ctx: IBackgroundEpicContext & D,
+    ...args: R
+  ): Observable<IAction>;
+  buildDeps?: () => D;
+}
+
+export type BackgroundEpic<D = {}> = IBackgroundEpic<D>;
 
 export interface ISocketEpicsMap {
   [path: string]: AnySocketEpic;
 }
 
-export interface ISocketEpicAttributes<O = unknown, D = {}> {
+export interface ISocketEpicAttributes<
+  O extends IAction | Buffer = IAction | Buffer,
+  D = {}
+> {
   send?: (socket: WebSocket, data: O) => Promise<void>;
   actionSchemaByType?: (type: string) => Joi.ObjectSchema | null;
   logOnConnection?: (
@@ -56,7 +83,7 @@ export interface ISocketEpicAttributes<O = unknown, D = {}> {
   completedSocketWaitTimeout?: number;
   watchModeDetachBehaviour?: 'disconnect' | 'unsubscribe';
   debugStats?: boolean;
-  defaultDeps?: () => D;
+  buildDeps?: () => D;
 }
 
 export interface ISocketEpicContext {
@@ -64,24 +91,41 @@ export interface ISocketEpicContext {
   binary: Observable<Buffer>;
   subscribe: () => Observable<IAction>;
   publish: () => (events: Observable<IAction>) => Observable<never>;
-  logger: Logger;
-  logEvents: typeof logEvents;
+  logger: TaggedLogger;
   takeUntilClosed: () => <T>(stream: Observable<T>) => Observable<T>;
 }
 
-export interface ISocketEpic<I, O = unknown, D = {}>
-  extends ISocketEpicAttributes<O, D> {
-  (commands: Observable<I>, ctx: ISocketEpicContext & D): Observable<O>;
+export interface ISocketEpic<
+  I extends IAction = IAction,
+  O extends IAction | Buffer = IAction | Buffer,
+  D = {},
+  R extends unknown[] = unknown[]
+> extends ISocketEpicAttributes<O, D> {
+  (
+    commands: Observable<I>,
+    ctx: ISocketEpicContext & D,
+    ...args: R
+  ): Observable<O>;
 }
 
-export type AnySocketEpic = ISocketEpic<unknown>;
+export type AnySocketEpic = SocketEpic;
 
-export type AnyEpic = <T, R, A extends unknown[]>(
+export type AnyEpic = <
+  T extends IAction,
+  O extends IAction,
+  R extends unknown[]
+>(
   commands: Observable<T>,
-  ...args: A
-) => Observable<R>;
+  ctx: IBackgroundEpicContext | ISocketEpicContext,
+  ...args: R
+) => Observable<O>;
 
-export type SocketEpic<I, O = unknown, D = {}> = ISocketEpic<I, O, D>;
+export type SocketEpic<
+  I extends IAction = IAction,
+  O extends IAction | Buffer = IAction | Buffer,
+  D = {},
+  R extends unknown[] = unknown[]
+> = ISocketEpic<I, O, D, R>;
 
 type ArgsBuilder = (
   args: yargs.Argv<ICommandLineArgs>

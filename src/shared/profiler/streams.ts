@@ -2,7 +2,14 @@ import { Observable, Subject } from 'rxjs';
 import { ignoreElements, tap, filter, scan, map } from 'rxjs/operators';
 import { EOL } from 'os';
 import { TagNotification, executeOnNotifications } from '../notifications';
-import { Logger, defaultLogger, logEvents, LogStreamParams } from '../logging';
+import {
+  Logger,
+  defaultLogger,
+  logEvents,
+  LogStreamParams,
+  BasicLogger,
+  defaultBasicLogger,
+} from '../logging';
 
 type Timestamp = [number, number];
 
@@ -221,6 +228,7 @@ export function start(
   paramsRaw: {
     name: string;
     on?: TagNotification;
+    logger?: BasicLogger;
   },
   state = globalState()
 ) {
@@ -233,7 +241,13 @@ export function start(
       state.hit(params.name);
     };
 
-    return stream.pipe(executeOnNotifications([params.on], hit));
+    return stream.pipe(
+      executeOnNotifications(
+        [params.on],
+        hit,
+        params.logger ?? defaultBasicLogger()
+      )
+    );
   };
 }
 
@@ -258,6 +272,7 @@ export function stop(
     till: TagNotification;
     details?: IDetails;
     transformTookTime?: (time: number) => number;
+    logger?: BasicLogger;
   },
   state = globalState()
 ) {
@@ -269,7 +284,13 @@ export function stop(
     const setMemo = () => {
       state.memo(params.name, params.details, params.transformTookTime);
     };
-    return stream.pipe(executeOnNotifications([params.till], setMemo));
+    return stream.pipe(
+      executeOnNotifications(
+        [params.till],
+        setMemo,
+        params.logger ?? defaultBasicLogger()
+      )
+    );
   };
 }
 

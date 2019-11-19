@@ -3,7 +3,7 @@ import { epicWithAuth } from '../epicWithAuth';
 import { Auth, Apps } from '@aimee-blue/ab-contracts';
 import { timer } from 'rxjs';
 import { take, mapTo } from 'rxjs/operators';
-import { ISocketEpic } from '../../kit';
+import { SocketEpic } from '../../kit';
 import { createNoOpLogger } from '../../logging';
 
 const possibleInput = {
@@ -31,7 +31,7 @@ const possibleOutput = {
 };
 
 function buildTestData(inputCmds: string, m: Context) {
-  const echoingEpicImpl: ISocketEpic<{}> = commands => commands;
+  const echoingEpicImpl: SocketEpic = commands => commands;
   const echoingEpic = jest.fn(echoingEpicImpl);
 
   // tslint:disable-next-line

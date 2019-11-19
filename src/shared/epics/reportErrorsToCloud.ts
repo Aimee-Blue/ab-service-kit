@@ -16,7 +16,7 @@ const reportError = async (errorAction: Apps.IErrorAction) => {
   });
 };
 
-export const reportErrorsToCloud: BackgroundEpic = events => {
+export const reportErrorsToCloud: BackgroundEpic = (events, ctx) => {
   if (isDevBuild()) {
     return empty();
   }
@@ -26,7 +26,7 @@ export const reportErrorsToCloud: BackgroundEpic = events => {
     mergeMap(errorAction =>
       from(reportError(errorAction)).pipe(
         catchError(err => {
-          console.error('💥  Couldnt send error to Cloud', err);
+          ctx.logger.error('💥  Couldnt send error to Cloud', err);
           return empty();
         })
       )
