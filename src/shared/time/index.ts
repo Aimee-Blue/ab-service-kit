@@ -1,5 +1,6 @@
 import { serverTime } from './serverTime';
 import { registerError } from '../registerError';
+import { defaultBasicLogger } from '../logging';
 
 // in the docs is mentioned that `hrtime` is more stable
 // that the Date.now and doesn't drift, so we use it to
@@ -24,7 +25,9 @@ export function reInitializeTime() {
   initialHr = process.hrtime();
   initialDiff = Date.now() - quickNowWithMicroseconds();
 
-  console.log('💡  Re-initializing time', {
+  const logger = defaultBasicLogger();
+
+  logger.log('💡  Re-initializing time', {
     oldDiff,
     newDiff: initialDiff,
   });
@@ -63,6 +66,8 @@ export const time = (deps = defaultDeps) => {
     return Promise.resolve(localNow() - serverTimeInfo.offset);
   }
 
+  const logger = defaultBasicLogger();
+
   return (
     promise ||
     (promise = deps
@@ -80,7 +85,7 @@ export const time = (deps = defaultDeps) => {
           };
           promise = null;
 
-          console.log(
+          logger.log(
             '⏰  Time synchronized, it took',
             took,
             'offset is',
@@ -94,7 +99,7 @@ export const time = (deps = defaultDeps) => {
         registerError(err);
         promise = null;
 
-        console.error('💥  Error when synchronizing time', err);
+        logger.error('💥  Error when synchronizing time', err);
         return localNow();
       }))
   );

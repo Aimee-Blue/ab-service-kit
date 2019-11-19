@@ -3,10 +3,14 @@ import { concatMap, ignoreElements } from 'rxjs/operators';
 import { SocketWithInfo } from './types';
 import { registerError } from '../registerError';
 import { defaultLogger, Logger } from '../logging';
+import { IAction } from '../action';
 
 const SOCKET_CLOSED = 'Trying to send data while socket already closed';
 
-const defaultSend = <T>(socket: SocketWithInfo, data: T): Promise<void> => {
+const defaultSend = <T extends Buffer | IAction>(
+  socket: SocketWithInfo,
+  data: T
+): Promise<void> => {
   return new Promise<void>((res, rej) => {
     if (socket.readyState === socket.OPEN) {
       socket.send(data instanceof Buffer ? data : JSON.stringify(data), err => {
@@ -35,7 +39,7 @@ const defaultClose = (socket: SocketWithInfo, code?: number) => {
   socket.close(code);
 };
 
-export const pipeStreamIntoSocket = <T>(
+export const pipeStreamIntoSocket = <T extends Buffer | IAction>(
   stream: Observable<T>,
   socket: SocketWithInfo,
   close: typeof defaultClose = defaultClose,

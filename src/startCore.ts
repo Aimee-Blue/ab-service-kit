@@ -7,7 +7,8 @@ import { resolve } from 'path';
 
 import { loadEnv } from './shared/env';
 import { serviceSetup } from './setup';
-import { ICommandLineArgs, IServiceConfig } from './shared';
+import { ICommandLineArgs, IServiceConfig, BasicLogger } from './shared';
+import { initializeLoggerOrFallback } from './setup/initializeLogger';
 
 const buildArgumentsParser = (config: IServiceConfig) =>
   (yargs as yargs.Argv<ICommandLineArgs>)
@@ -42,7 +43,8 @@ const buildArgumentsParser = (config: IServiceConfig) =>
 
 export async function startCore(
   config: IServiceConfig,
-  args?: ICommandLineArgs
+  args?: ICommandLineArgs,
+  optLogger?: BasicLogger
 ) {
   const parser = buildArgumentsParser(config);
   const effectiveParser = config.argsBuilder
@@ -51,11 +53,14 @@ export async function startCore(
 
   const params = args || effectiveParser.parse();
 
+  const logger = optLogger ?? (await initializeLoggerOrFallback(config));
+
   const shouldLoadEnvFiles = config.shouldLoadEnvFiles ?? true;
 
   if (shouldLoadEnvFiles) {
     await loadEnv({
       envFile: params.envFile,
+      logger,
     });
   }
 
@@ -112,10 +117,10 @@ export async function startCore(
       }
 
       return await serviceSetupInWatchMode(configFilePath, async newConfig => {
-        return await serviceSetup(server, newConfig, params);
+        return await serviceSetup(server, newConfig, params, logger);
       });
     } else {
-      return await serviceSetup(server, config, params);
+      return await serviceSetup(server, config, params, logger);
     }
   };
 
@@ -143,11 +148,12 @@ export async function startCore(
 
         handled = true;
         const mode = params.http
-          ? ' (un-encrypted http/ws)'
-          : " (https/wss) - Pass '--http' argument to disable encryption";
-        console.log(
-          `👍  PID ${process.pid}; Currently listening on ${host ||
-            ''}${port}${mode}`
+          ? '(un-encrypted http/ws)'
+          : "(https/wss) - Pass '--http' argument to disable encryption";
+        logger.log(
+          `👍  PID ${process.pid}; Currently listening on ${[host, port]
+            .filter(Boolean)
+            .join(':')} ${mode}`
         );
         res();
       }

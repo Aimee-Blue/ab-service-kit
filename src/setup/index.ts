@@ -1,26 +1,44 @@
 import * as http from 'http';
 import * as https from 'https';
-import { IServiceConfig, ICommandLineArgs } from '../shared';
+import {
+  IServiceConfig,
+  ICommandLineArgs,
+  BasicLogger,
+  ServiceDeps,
+} from '../shared';
 import { setupSockets } from './sockets';
 import { setupExpress } from './express';
 import { setupSpy } from './spy';
 import { loadEnv } from '../shared/env';
-import { startup } from '../shared/startup';
 import { setupBackground } from './background';
 import { TeardownHandler } from '../shared/teardown';
-import { publishToEventBus } from '../shared/eventBus';
 
-export async function serviceSetup(
+async function buildDeps<D extends Record<string, unknown>>(
+  config: IServiceConfig<D>,
+  logger: BasicLogger
+): Promise<ServiceDeps<D>> {
+  const d: D | {} = await (config.buildDeps?.() ?? Promise.resolve({}));
+  const deps = Object.assign(
+    {
+      logger,
+    },
+    d
+  );
+  return deps as ServiceDeps<D>;
+}
+
+export async function serviceSetup<D extends Record<string, unknown> = {}>(
   server: http.Server | https.Server,
-  config: IServiceConfig,
-  params: ICommandLineArgs
+  config: IServiceConfig<D>,
+  params: ICommandLineArgs,
+  logger: BasicLogger
 ): Promise<TeardownHandler> {
-  const spy = await setupSpy(config);
-  const background = await setupBackground(config);
-  const app = await setupExpress(server, config);
-  const ws = await setupSockets(server, config);
+  const deps = await buildDeps(config, logger);
 
-  publishToEventBus(startup(server, config, params));
+  const spy = await setupSpy(config, deps);
+  const background = await setupBackground(config, deps);
+  const app = await setupExpress(server, config, deps);
+  const ws = await setupSockets(server, config, deps);
 
   return async mode => {
     await ws(mode);
@@ -38,6 +56,7 @@ export async function serviceSetup(
         await loadEnv({
           envFile: params.envFile,
           reset: true,
+          logger,
         });
       }
     }

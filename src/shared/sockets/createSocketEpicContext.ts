@@ -14,13 +14,13 @@ export interface ICreateContextParams<D extends Record<string, unknown> = {}> {
   commands: Observable<IAction>;
   binary: Observable<Buffer>;
   logger: TaggedLogger;
-  depsBuilder?: () => D;
+  buildDeps?: () => D;
 }
 
 export function createSocketEpicContext<D extends Record<string, unknown> = {}>(
   params: ICreateContextParams<D>
 ): ISocketEpicContext & D {
-  const { request, commands, binary, logger, depsBuilder } = params;
+  const { request, commands, binary, logger, buildDeps } = params;
 
   const closed = commands.pipe(whenCompleted());
 
@@ -32,7 +32,7 @@ export function createSocketEpicContext<D extends Record<string, unknown> = {}>(
   const publish = () => (stream: Observable<IAction>) =>
     stream.pipe(pushToEventBus());
 
-  const deps: D | {} = depsBuilder?.() ?? {};
+  const deps: D | {} = buildDeps?.() ?? {};
 
   return {
     ...deps,

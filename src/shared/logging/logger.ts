@@ -5,10 +5,14 @@ import {
   createTaggedLogEvents,
   TaggedLogEventsOperator,
 } from './logEvents';
-import { createBasicLogger, createNoOpBasicLogger } from './basicLogger';
+import {
+  createNoOpBasicLogger,
+  BasicLogger,
+  defaultBasicLogger,
+} from './basicLogger';
 import { Observable } from 'rxjs';
 
-export function createLogger(basicLogger = createBasicLogger()) {
+export function createLogger(basicLogger = defaultBasicLogger()) {
   return Object.freeze({
     ...basicLogger,
     logEvents: <T>(arg: LogEventsArg) =>
@@ -34,7 +38,7 @@ export type TaggedLogger = Logger &
   Readonly<{
     logEvents: TaggedLogEventsOperator;
     withTags: (...tags: unknown[]) => TaggedLogger;
-    parent: Logger;
+    parent: BasicLogger;
   }>;
 
 function splitFirstLineAndBody(text: string) {
@@ -90,7 +94,7 @@ function appendTags(args: LogArgs, tags: unknown[]) {
   return [...before, ...tags, ...after];
 }
 
-function isTaggedLogger(logger: Logger): logger is TaggedLogger {
+function isTaggedLogger(logger: BasicLogger): logger is TaggedLogger {
   return (
     logger !== null &&
     typeof logger === 'object' &&
@@ -100,7 +104,7 @@ function isTaggedLogger(logger: Logger): logger is TaggedLogger {
 }
 
 function taggedLoggerFactory(
-  parent: Logger,
+  parent: BasicLogger,
   startWith: unknown[] = []
 ): TaggedLogger {
   const locked = [...startWith];
@@ -124,13 +128,13 @@ function taggedLoggerFactory(
 
 export function createTaggedLogger(
   tags: unknown[],
-  parent?: Logger
+  parent?: BasicLogger
 ): TaggedLogger {
   if (parent && isTaggedLogger(parent)) {
     return parent.withTags(...tags);
   }
 
-  return taggedLoggerFactory(parent || createLogger(), tags);
+  return taggedLoggerFactory(parent || defaultBasicLogger(), tags);
 }
 
 export function createNoOpTaggedLogger() {

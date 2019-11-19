@@ -6,6 +6,7 @@ import uuid from 'uuid';
 import { EOL } from 'os';
 import { isDevBuild } from '../isTest';
 import { registerError } from '../registerError';
+import { BasicLogger, defaultBasicLogger } from '../logging';
 
 let initializedClient: PubSub.PubSub | null = null;
 
@@ -75,7 +76,11 @@ export async function prepareTopics(topics: string[]) {
 
 const TIMEOUT_ERROR = 'Retry total timeout exceeded before any response';
 
-export async function publish<T>(topic: string, data: T) {
+export async function publish<T>(
+  topic: string,
+  data: T,
+  logger: BasicLogger = defaultBasicLogger()
+) {
   const topicPublisher = getTopic(topic);
 
   topicPublisher.publish(
@@ -86,7 +91,7 @@ export async function publish<T>(topic: string, data: T) {
         if (err.message.includes(TIMEOUT_ERROR)) {
           topicMap.delete(topic);
         }
-        console.error(
+        logger.error(
           `💥  Error when publishing to topic ${topic} ${
             mesId ? `with message ${mesId}` : ''
           }`,
@@ -162,7 +167,11 @@ async function createTopicAndSubscription(
   return subscription;
 }
 
-export function subscribe(topic: string, options?: SubscribeOptions) {
+export function subscribe(
+  topic: string,
+  options?: SubscribeOptions,
+  optLogger?: BasicLogger
+) {
   return defer(() => from(appName())).pipe(
     switchMap(name => createTopicAndSubscription(topic, name, options)),
     switchMap(
@@ -170,7 +179,9 @@ export function subscribe(topic: string, options?: SubscribeOptions) {
         new Observable<Message>(subscriber => {
           const name = subscription.name;
 
-          console.log(
+          const logger = optLogger || defaultBasicLogger();
+
+          logger.log(
             `${EOL}🎬  Subscribing to topic "${topic}" with subscription "${name}"`,
             EOL
           );
@@ -190,14 +201,14 @@ export function subscribe(topic: string, options?: SubscribeOptions) {
             subscription
               .close()
               .then(() => {
-                console.log(
+                logger.log(
                   `${EOL}🏁  Unsubscribed from "${subscription.name}"`,
                   EOL
                 );
               })
               .catch((err: Error) => {
                 registerError(err);
-                console.error(
+                logger.error(
                   `${EOL}💥  Error when unsubscribing from "${subscription.name}"`,
                   err,
                   EOL

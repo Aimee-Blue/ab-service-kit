@@ -1,11 +1,12 @@
 import { marbles } from 'rxjs-marbles/jest';
-import { retryWithBackoff, RetryOpts } from '../shared';
+import { retryWithBackoff, RetryOpts, createNoOpBasicLogger } from '../shared';
 import { take, tap } from 'rxjs/operators';
 
 describe(retryWithBackoff.name, () => {
   describe('given default options', () => {
     const opts: RetryOpts = {
       shouldRetry: () => true,
+      logger: createNoOpBasicLogger(),
     };
 
     describe('given source with no errors', () => {

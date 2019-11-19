@@ -1,3 +1,7 @@
+/**
+ * Creates new logger instance, use `defaultBasicLogger` instead if you want
+ * to share same instance as everyone else are sharing
+ */
 export function createBasicLogger() {
   return Object.freeze({
     log: (message?: unknown, ...parameters: unknown[]) => {
@@ -28,4 +32,19 @@ export function createNoOpBasicLogger(): BasicLogger {
 
 export type BasicLogger = ReturnType<typeof createBasicLogger>;
 
-export const defaultBasicLogger = createBasicLogger();
+let logger: BasicLogger | undefined;
+
+export const defaultBasicLogger = () => {
+  if (logger) {
+    return logger;
+  }
+  return (logger = createBasicLogger());
+};
+
+export const setDefaultBasicLogger = (newLogger: BasicLogger) => {
+  // tslint:disable-next-line: strict-boolean-expressions
+  if (!newLogger) {
+    throw new Error('Logger should be defined');
+  }
+  logger = logger;
+};

@@ -5,6 +5,7 @@ import { map, flatMap } from 'rxjs/operators';
 import { currentSelfSignedToken } from '../auth';
 import { isNumber } from 'util';
 import { registerError } from '../registerError';
+import { BasicLogger, defaultBasicLogger } from '../logging';
 
 function last<T>(elements: T[]) {
   if (elements.length === 0) {
@@ -54,6 +55,7 @@ export interface IGetConfigParams {
   revision?: Config.Revision;
   authToken?: string;
   uid?: string;
+  logger?: BasicLogger;
 }
 
 export const load = async (
@@ -65,6 +67,8 @@ export const load = async (
     );
   }
 
+  const logger = params.logger ?? defaultBasicLogger();
+
   try {
     const config = await configurationLoad(params);
     // even though server already returns to us a merged configuration
@@ -73,7 +77,7 @@ export const load = async (
     return Config.mergeConfigsWithDefault(config as Config.IPartialConfig);
   } catch (err) {
     registerError(err);
-    console.error(
+    logger.error(
       '💥  Failed when fetching config',
       ...[err, params.revision].filter(Boolean)
     );

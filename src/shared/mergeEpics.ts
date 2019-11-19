@@ -1,16 +1,18 @@
-import { merge, defer, Observable } from 'rxjs';
+import { merge, defer } from 'rxjs';
 import { AnySocketEpic, BackgroundEpic } from './kit';
 import { retryWithBackoff } from './retryWithBackoff';
 import { Utils } from '@aimee-blue/ab-shared';
-import { IAction } from './action';
 
 export function mergeBackgroundEpics(...epics: BackgroundEpic[]) {
-  return (events: Observable<IAction>) => {
+  return (...[events, ctx, ...rest]: Parameters<BackgroundEpic>) => {
     return merge(
       ...epics.map(epic =>
-        defer(() => epic(events)).pipe(
+        defer(() =>
+          epic(events, { ...(epic.buildDeps?.() ?? {}), ...ctx }, ...rest)
+        ).pipe(
           retryWithBackoff({
             sourceDescription: `${epic.name} epic`,
+            logger: ctx.logger,
           })
         )
       )
@@ -24,14 +26,15 @@ export function mergeEpics(
 ): AnySocketEpic {
   const mergedEpic: AnySocketEpic = Utils.setFunctionName(
     name,
-    (commands, ctx) => {
+    (...[commands, ctx, ...rest]) => {
       return merge(
-        ...epics.map(val =>
+        ...epics.map(epic =>
           defer(() =>
-            val(commands, { ...(val.defaultDeps?.() ?? {}), ...ctx })
+            epic(commands, { ...(epic.buildDeps?.() ?? {}), ...ctx }, ...rest)
           ).pipe(
             retryWithBackoff({
-              sourceDescription: `${val.name} epic`,
+              sourceDescription: `${epic.name} epic`,
+              logger: ctx.logger,
             })
           )
         )

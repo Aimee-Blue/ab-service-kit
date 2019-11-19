@@ -4,16 +4,19 @@ import { AnySocketEpic } from '../kit';
 import { buildOnConnectionListener } from './buildOnConnectionListener';
 import { IConnectedSocket, buildRegistryStateApi } from './socketRegistryState';
 import { buildServerUpgradeListener } from './buildServerUpgradeListener';
+import { BasicLogger } from '../logging';
 
 export type SocketRegistry = ReturnType<typeof createSocketRegistry>;
 
 export function createSocketRegistry(
   server: Server,
-  epicsByPath: Map<string, AnySocketEpic>
+  epicsByPath: Map<string, AnySocketEpic>,
+  logger: BasicLogger
 ) {
   const state = {
     epicsByPath,
     sockets: new Map<string, IConnectedSocket>(),
+    logger,
   };
 
   const api = buildRegistryStateApi(state);
@@ -21,13 +24,14 @@ export function createSocketRegistry(
   const wss = new WebSocket.Server({ noServer: true });
 
   wss.on('error', error => {
-    console.log('💥  ', error);
+    logger.log('💥  ', error);
   });
 
   const onConnection: SocketHandler = buildOnConnectionListener(
     () => state.epicsByPath,
     api.closeSocket,
-    api.attachToSocket
+    api.attachToSocket,
+    logger
   );
 
   wss.on('connection', onConnection);
@@ -35,7 +39,8 @@ export function createSocketRegistry(
   const upgradeListener = buildServerUpgradeListener(
     wss,
     () => state.epicsByPath,
-    api.addSocket
+    api.addSocket,
+    logger
   );
 
   server.addListener('upgrade', upgradeListener);
@@ -63,10 +68,11 @@ export function createSocketRegistry(
 
 export function getRegistry(
   server: Server & { registry?: SocketRegistry },
-  epicsByPath: Map<string, AnySocketEpic>
+  epicsByPath: Map<string, AnySocketEpic>,
+  logger: BasicLogger
 ) {
   if (server.registry) {
     return server.registry;
   }
-  return (server.registry = createSocketRegistry(server, epicsByPath));
+  return (server.registry = createSocketRegistry(server, epicsByPath, logger));
 }
