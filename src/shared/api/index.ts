@@ -5,12 +5,20 @@ import { PromiseType } from 'utility-types';
 const constructEndpointUri = (rootEndpoint: string, functionName: string) =>
   rootEndpoint + functionName;
 
+export const defaultApiParams = () => ({
+  rootEndpoint: process.env.CLOUD_FUNCTION_ROOT_ENDPOINT!,
+});
+
+export interface IApiParams {
+  rootEndpoint: string;
+}
+
 export const fetchFn = (
   functionName: string,
   init?: RequestInit | undefined,
-  rootEndpoint: string = process.env.CLOUD_FUNCTION_ROOT_ENDPOINT!
+  params: IApiParams = defaultApiParams()
 ) => {
-  return fetch(constructEndpointUri(rootEndpoint, functionName), init);
+  return fetch(constructEndpointUri(params.rootEndpoint, functionName), init);
 };
 
 /**
@@ -21,7 +29,7 @@ export const fetchFn = (
  */
 export const callFn = <T, P = unknown>(
   functionName: string,
-  rootEndpoint: string = process.env.CLOUD_FUNCTION_ROOT_ENDPOINT!
+  params: IApiParams = defaultApiParams()
 ) => (data: P, opts: ICallOpts = {}) =>
   fetchFn(
     functionName,
@@ -35,7 +43,7 @@ export const callFn = <T, P = unknown>(
       },
       redirect: 'error',
     },
-    rootEndpoint
+    params
   )
     .then(async res => {
       if (res.ok) {
@@ -55,29 +63,27 @@ interface ICallOpts {
   authToken?: string;
 }
 
-type ParametersIf<T> = T extends ((...args: unknown[]) => unknown)
+type ParametersIf<T> = T extends (...args: unknown[]) => unknown
   ? Parameters<T>
   : [never];
 
-type ReturnTypeIf<T> = T extends ((...args: unknown[]) => unknown)
+type ReturnTypeIf<T> = T extends (...args: unknown[]) => unknown
   ? ReturnType<T>
   : never;
 
 type PromiseTypeIf<T> = T extends Promise<unknown> ? PromiseType<T> : never;
 
-export function apiOf<T>(
-  rootEndpoint: string = process.env.CLOUD_FUNCTION_ROOT_ENDPOINT!
-) {
+export function apiOf<T>(params: IApiParams = defaultApiParams()) {
   return {
     callFn: <K extends keyof T>(
       name: K,
       param: ParametersIf<T[K]>[0],
       opts: ICallOpts = {}
     ) => {
-      return callFn<PromiseTypeIf<ReturnTypeIf<T[K]>>>(
-        name as string,
-        rootEndpoint
-      )(param, opts);
+      return callFn<PromiseTypeIf<ReturnTypeIf<T[K]>>>(name as string, params)(
+        param,
+        opts
+      );
     },
   };
 }
