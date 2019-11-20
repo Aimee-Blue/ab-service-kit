@@ -13,6 +13,7 @@ export * from './registerError';
 export * from './conditionalOperator';
 export * from './publishAs';
 export * from './env';
+export * from './pushToSubject';
 export { createSocketEpicContext } from './sockets';
 
 import * as Api from './api';
