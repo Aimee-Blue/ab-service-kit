@@ -1,8 +1,15 @@
-import { IServiceConfig, defaultBasicLogger } from '../shared';
+import {
+  IServiceConfig,
+  defaultBasicLogger,
+  setDefaultBasicLogger,
+} from '../shared';
 
 export async function initializeLoggerOrFallback(config: IServiceConfig) {
   try {
-    return await (config.logger?.() || Promise.resolve(defaultBasicLogger()));
+    const logger = await (config.logger?.() ||
+      Promise.resolve(defaultBasicLogger()));
+    setDefaultBasicLogger(logger);
+    return logger;
   } catch (err) {
     const fallback = defaultBasicLogger();
     fallback.error('💥  Exception when initializing logger', err);
