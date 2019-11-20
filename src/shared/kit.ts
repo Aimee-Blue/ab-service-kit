@@ -1,7 +1,7 @@
 import yargs from 'yargs';
 import express from 'express';
 import WebSocket from 'ws';
-import { Observable } from 'rxjs';
+import { Observable, ObservedValueOf } from 'rxjs';
 import { IncomingMessage } from 'http';
 import * as Joi from '@hapi/joi';
 import { IAction } from './action';
@@ -53,16 +53,25 @@ export interface IBackgroundEpicContext {
   logger: TaggedLogger;
 }
 
-export interface IBackgroundEpic<D = {}, R extends unknown[] = unknown[]> {
+export interface IBackgroundEpic<
+  I extends IAction = IAction,
+  O extends IAction = IAction,
+  D = {},
+  R extends unknown[] = unknown[]
+> {
   (
-    events: Observable<IAction>,
+    events: Observable<IAction | I>,
     ctx: IBackgroundEpicContext & D,
     ...args: R
-  ): Observable<IAction>;
+  ): Observable<O>;
   buildDeps?: () => D;
 }
 
-export type BackgroundEpic<D = {}> = IBackgroundEpic<D>;
+export type BackgroundEpic<
+  I extends IAction = IAction,
+  O extends IAction = IAction,
+  D = {}
+> = IBackgroundEpic<I, O, D>;
 
 export interface ISocketEpicsMap {
   [path: string]: AnySocketEpic;
@@ -102,20 +111,22 @@ export interface ISocketEpic<
   R extends unknown[] = unknown[]
 > extends ISocketEpicAttributes<O, D> {
   (
-    commands: Observable<I>,
+    commands: Observable<IAction | I>,
     ctx: ISocketEpicContext & D,
     ...args: R
   ): Observable<O>;
 }
 
+export const makeSocketEpic = <E extends ISocketEpic>(epic: E): E => epic;
+
 export type AnySocketEpic = SocketEpic;
 
-export type AnyEpic = <
-  T extends IAction,
-  O extends IAction,
-  R extends unknown[]
->(
-  commands: Observable<T>,
+export type AnyEpic<
+  T extends IAction = IAction,
+  O extends IAction | Buffer = IAction | Buffer,
+  R extends unknown[] = unknown[]
+> = (
+  commands: Observable<IAction | T>,
   ctx: IBackgroundEpicContext | ISocketEpicContext,
   ...args: R
 ) => Observable<O>;
@@ -130,3 +141,18 @@ export type SocketEpic<
 type ArgsBuilder = (
   args: yargs.Argv<ICommandLineArgs>
 ) => yargs.Argv<ICommandLineArgs>;
+
+export type InputOfEpic<E extends AnyEpic> = ObservedValueOf<Parameters<E>[0]>;
+export type OutputOfEpic<E extends AnyEpic> = ObservedValueOf<ReturnType<E>>;
+export type DependenciesOfBackgroundEpic<E extends BackgroundEpic> = Exclude<
+  Parameters<E>[1],
+  IBackgroundEpicContext
+> extends never
+  ? {}
+  : Exclude<Parameters<E>[1], IBackgroundEpicContext>;
+export type DependenciesOfSocketEpic<E extends SocketEpic> = Exclude<
+  Parameters<E>[1],
+  ISocketEpicContext
+> extends never
+  ? {}
+  : Exclude<Parameters<E>[1], ISocketEpicContext>;
