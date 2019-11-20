@@ -5,6 +5,8 @@ import { currentSelfSignedToken } from './selfSignedTokens';
 export async function verifyToken(
   param: Auth.IVerifyParams
 ): Promise<Auth.IVerifyResult> {
-  const token = await currentSelfSignedToken();
-  return await callFn<Auth.IVerifyResult>('authVerify', token)(param);
+  const authToken = await currentSelfSignedToken();
+  return await callFn<Auth.IVerifyResult>('authVerify')(param, {
+    authToken,
+  });
 }

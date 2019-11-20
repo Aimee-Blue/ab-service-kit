@@ -66,6 +66,9 @@ function firstMessageShouldBeAuth() {
     );
 }
 
+export const VERIFY_TOKEN_REQUEST_SUCCESS_PREFIX =
+  'verifyAuth succeeded with non-ok status';
+
 function verifyTokensUsingAuthMessage(
   allow: Auth.Role[],
   deps: typeof defaultDeps
@@ -85,7 +88,7 @@ function verifyTokensUsingAuthMessage(
                 return of(decoded.payload);
               } else {
                 throw new Error(
-                  `verifyAuth succeeded with non-ok status ${result.status} - ${result.message}`
+                  `${VERIFY_TOKEN_REQUEST_SUCCESS_PREFIX} ${result.status} - ${result.message}`
                 );
               }
             })
@@ -117,10 +120,15 @@ export function epicWithAuth<E extends ISocketEpicWithAuth>(
           const authFailed = authOp.pipe(
             ignoreElements(),
             catchError(err => {
-              ctx.logger.log(
-                'Verify token failed:',
-                Errors.ensureError(err).message
-              );
+              const error = Errors.ensureError(err);
+              if (error.message.includes(VERIFY_TOKEN_REQUEST_SUCCESS_PREFIX)) {
+                ctx.logger.log(error.message);
+              } else {
+                ctx.logger.error(
+                  'Verify token request failed: ',
+                  error.message
+                );
+              }
 
               const appError: Apps.IErrorAction = {
                 type: Apps.ERROR,
