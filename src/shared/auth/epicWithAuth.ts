@@ -27,6 +27,8 @@ import { verifyToken } from './verifyToken';
 import { IAction } from '../action';
 import { publishStream } from '../publishStream';
 import { Utils, Errors } from '@aimee-blue/ab-shared';
+import { VerifyError } from './verifyError';
+import { registerError } from '../registerError';
 
 export interface IInjectedAuthDetails {
   id: string;
@@ -83,12 +85,17 @@ function verifyTokensUsingAuthMessage(
           })
           .pipe(
             switchMap(result => {
-              if (typeof result === 'object' && result.status === 200) {
-                const decoded = deps.decodeJwt(auth.payload.token);
+              const decoded = deps.decodeJwt(auth.payload.token);
+              if (
+                typeof result === 'object' &&
+                result !== null &&
+                result.status === 200
+              ) {
                 return of(decoded.payload);
               } else {
-                throw new Error(
-                  `${VERIFY_TOKEN_REQUEST_SUCCESS_PREFIX} ${result.status} - ${result.message}`
+                throw new VerifyError(
+                  `${VERIFY_TOKEN_REQUEST_SUCCESS_PREFIX} ${result.status} - ${result.message}`,
+                  decoded
                 );
               }
             })
@@ -121,13 +128,25 @@ export function epicWithAuth<E extends ISocketEpicWithAuth>(
             ignoreElements(),
             catchError(err => {
               const error = Errors.ensureError(err);
-              if (error.message.includes(VERIFY_TOKEN_REQUEST_SUCCESS_PREFIX)) {
-                ctx.logger.log(error.message);
+              if (error instanceof VerifyError) {
+                const payload = error.token?.payload as
+                  | {
+                      isConsole?: boolean;
+                      isHil?: boolean;
+                    }
+                  | undefined;
+                if (payload && payload.isConsole && !payload.isHil) {
+                  registerError(error);
+                  ctx.logger.error(
+                    '💥  Console user authentication failed: ',
+                    error
+                  );
+                } else {
+                  // probably just a sleeping HIL tab:
+                  ctx.logger.log(error.message);
+                }
               } else {
-                ctx.logger.error(
-                  'Verify token request failed: ',
-                  error.message
-                );
+                ctx.logger.error('💥  Verify token request failed: ', error);
               }
 
               const appError: Apps.IErrorAction = {

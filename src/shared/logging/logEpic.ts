@@ -35,7 +35,6 @@ export const logEpic = <E extends AnyEpic>(
       commands.pipe(
         maybeLogIncoming({
           prefix: incomingName,
-          logger: ctx.logger,
         })
       ),
       ctx,
@@ -43,7 +42,6 @@ export const logEpic = <E extends AnyEpic>(
     ).pipe(
       maybeLogOutgoing({
         prefix: outgoingName,
-        logger: ctx.logger,
       })
     ) as ReturnType<E>;
   };
