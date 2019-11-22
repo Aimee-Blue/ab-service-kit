@@ -96,6 +96,7 @@ export interface ISocketEpicAttributes<
 }
 
 export interface ISocketEpicContext {
+  id: string;
   request: IncomingMessage & { id: string };
   binary: Observable<Buffer>;
   subscribe: () => Observable<IAction>;
