@@ -6,9 +6,9 @@ import {
   Logger,
   defaultLogger,
   logEvents,
-  LogStreamParams,
   BasicLogger,
   defaultBasicLogger,
+  LogOn,
 } from '../logging';
 
 type Timestamp = [number, number];
@@ -320,7 +320,7 @@ interface ISummary {
 
 export function logSummaries(params: {
   name: string;
-  on?: LogStreamParams['on'];
+  on?: LogOn;
   logger?: Logger;
 }) {
   const summaries = createSummary(params.name);

@@ -44,7 +44,7 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@aimee-blue/ab-contracts": ">=1.117.0"
+    "@aimee-blue/ab-contracts": ">=1.138.1"
   },
   "dependencies": {
     "@aimee-blue/ab-auth": "1.1.0",
@@ -68,7 +68,7 @@
     "yargs": "15.0.1"
   },
   "devDependencies": {
-    "@aimee-blue/ab-contracts": "1.129.0",
+    "@aimee-blue/ab-contracts": "1.138.1",
     "@types/cors": "2.8.6",
     "@types/dotenv": "8.2.0",
     "@types/express": "4.17.2",
@@ -81,7 +81,7 @@
     "husky": "3.1.0",
     "prettier": "1.19.1",
     "rxjs-marbles": "5.0.3",
-    "ts-deps": "0.8.1",
+    "ts-deps": "0.9.0",
     "utility-types": "3.10.0"
   }
 }
