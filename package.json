@@ -47,7 +47,7 @@
     "@aimee-blue/ab-contracts": ">=1.138.1"
   },
   "dependencies": {
-    "@aimee-blue/ab-auth": "1.1.0",
+    "@aimee-blue/ab-auth": "1.3.0",
     "@aimee-blue/ab-shared": "1.115.0",
     "@google-cloud/pubsub": "1.1.5",
     "@hapi/joi": "15.1.1",
