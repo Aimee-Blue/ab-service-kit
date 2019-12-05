@@ -48,7 +48,7 @@
   },
   "dependencies": {
     "@aimee-blue/ab-auth": "1.1.0",
-    "@aimee-blue/ab-shared": "1.115.0",
+    "@aimee-blue/ab-shared": "1.117.0",
     "@google-cloud/pubsub": "1.1.5",
     "@hapi/joi": "15.1.1",
     "cors": "2.8.5",
