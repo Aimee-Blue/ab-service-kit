@@ -68,7 +68,7 @@ function firstMessageShouldBeAuth() {
     );
 }
 
-export const VERIFY_TOKEN_REQUEST_SUCCESS_PREFIX =
+const VERIFY_TOKEN_REQUEST_SUCCESS_PREFIX =
   'verifyAuth succeeded with non-ok status';
 
 function verifyTokensUsingAuthMessage(
