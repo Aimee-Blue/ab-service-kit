@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@aimee-blue/ab-auth@1.3.0":
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/@aimee-blue/ab-auth/-/ab-auth-1.3.0.tgz#16c73bca0137d58feab567b30a913f32faefa976"
-  integrity sha512-GFbOHgaE+DIornbSlFzCAuvGtWA8Jkf8EXhtBLVhftXa5cj8tdV6sumjaclAlDM2lvxNzMZfiNbhdL3pr6mGpA==
+"@aimee-blue/ab-auth@1.3.1":
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/@aimee-blue/ab-auth/-/ab-auth-1.3.1.tgz#6db1cd8e1f5b9e0c0ea67d1f615e21f078a48098"
+  integrity sha512-wZHsjqDTyNsvy1dgjFFLHArZTY2sHHpUMQ1tYqzkvihDiD4g1y9qUPW1KRLf+SN1tb1dp7HQZTkitvqNwcBwlA==
   dependencies:
     "@aimee-blue/ab-shared" "1.116.0"
     "@hapi/joi" "15.1.1"
