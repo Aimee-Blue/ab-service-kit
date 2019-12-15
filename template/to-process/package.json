@@ -4,7 +4,7 @@
   "author": "@aimee-blue",
   "main": "lib/server.js",
   "scripts": {
-    "upgrade-shared": "yarn upgrade @aimee-blue/ab-shared --latest",
+    "upgrade-contracts": "yarn upgrade @aimee-blue/ab-contracts --latest",
     "upgrade-scripts": "yarn upgrade @aimee-blue/ab-scripts --latest",
     "upgrade-kit": "yarn upgrade @aimee-blue/ab-service-kit --latest",
     "build:watch": "yarn build --watch",
@@ -17,11 +17,11 @@
     "shell-docker": "docker exec -it $(docker ps -aqf name=$npm_package_name) bash"
   },
   "dependencies": {
-    "@aimee-blue/ab-contracts": "1.129.0",
-    "@aimee-blue/ab-service-kit": "1.14.0"
+    "@aimee-blue/ab-contracts": "1.149.0",
+    "@aimee-blue/ab-service-kit": "1.21.1"
   },
   "devDependencies": {
     "@aimee-blue/ab-scripts": "1.3.1",
-    "ts-deps": "0.7.0"
+    "ts-deps": "0.10.0"
   }
 }

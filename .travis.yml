@@ -20,7 +20,7 @@ jobs:
       deploy:
         provider: script
         script:
-          - yarn release
+          - yarn release --dry-run
         skip_cleanup: true
         on:
           all_branches: true
