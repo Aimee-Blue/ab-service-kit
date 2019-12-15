@@ -4,8 +4,6 @@ on: [pull_request]
 
 jobs:
   build-and-run-checks:
-    if: github.event.pull_request.merge_commit_sha != null
-
     runs-on: [ubuntu-latest]
 
     strategy:
@@ -16,7 +14,6 @@ jobs:
       - uses: actions/checkout@v1
         with:
           fetch-depth: 1
-          ref: ${{ github.event.pull_request.merge_commit_sha }}
 
       - name: Setup Node
         uses: actions/setup-node@v1.1.0
