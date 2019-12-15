@@ -51,7 +51,7 @@ function tagsFromLogOn(notifications: LogOn): TagNotification[] {
 function logOnFromParam(on?: LogOn): LogOn {
   if (Array.isArray(on)) {
     const set = new Set<LogNotification>(on.filter(isLogNotification));
-    return [...set, on.filter(entry => !isLogNotification(entry))] as LogOn;
+    return [...set, ...on.filter(entry => !isLogNotification(entry))];
   } else {
     // default:
     return ['next', 'error', 'complete', 'subscribe', 'unsubscribe'];
