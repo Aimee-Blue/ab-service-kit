@@ -15,8 +15,8 @@ import { Observable } from 'rxjs';
 export function createLogger(basicLogger = defaultBasicLogger()) {
   return Object.freeze({
     ...basicLogger,
-    logEvents: <T>(arg: LogEventsArg<T>) =>
-      logEvents<T>(logEventsParams(arg, basicLogger)),
+    logEvents: <T, Y>(arg: LogEventsArg<T, Y>) =>
+      logEvents<T, Y>(logEventsParams(arg, basicLogger)),
   });
 }
 
@@ -24,7 +24,8 @@ export function createNoOpLogger(): Logger {
   const basicLogger = createNoOpBasicLogger();
   return Object.freeze({
     ...basicLogger,
-    logEvents: <T>(_arg: LogEventsArg<T>) => (stream: Observable<T>) => stream,
+    logEvents: <T, Y>(_arg: LogEventsArg<T, Y>) => (stream: Observable<T>) =>
+      stream,
   });
 }
 

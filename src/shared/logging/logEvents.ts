@@ -21,15 +21,16 @@ export type LogOn<K extends string = string> = Array<
   LogNotification | Observable<K>
 >;
 
-export interface ILogStreamParamsCore<T> extends ILogTextParams {
+export interface ILogStreamParamsCore<T, Y> extends ILogTextParams {
   on?: LogOn;
-  project?: <Y>(stream: Observable<T>) => Observable<Y>;
+  project?: (stream: Observable<T>) => Observable<Y>;
   logger?: BasicLogger;
 }
 
 export type LogTextParamsMap = Partial<Record<LogNotification, ILogTextParams>>;
 
-export type LogStreamParams<T> = ILogStreamParamsCore<T> & LogTextParamsMap;
+export type LogStreamParams<T, Y> = ILogStreamParamsCore<T, Y> &
+  LogTextParamsMap;
 
 function isTagNotification(
   notification: LogNotification
@@ -57,10 +58,10 @@ function logOnFromParam(on?: LogOn): LogOn {
   }
 }
 
-const buildSimpleLog = <T>(
-  paramsRaw: LogStreamParams<T> & { logger: BasicLogger }
+const buildSimpleLog = <T, Y>(
+  paramsRaw: LogStreamParams<T, Y> & { logger: BasicLogger }
 ) => {
-  return (info: NotificationInfo<T, 'audit'>) => {
+  return (info: NotificationInfo<T | Y, 'audit'>) => {
     const params = {
       ...paramsRaw,
       ...paramsRaw[info.notification],
@@ -99,9 +100,9 @@ const buildSimpleLog = <T>(
   };
 };
 
-const buildAuditLog = <T>(
-  paramsRaw: LogStreamParams<T> & { logger: BasicLogger }
-) => (info: NotificationInfo<T, 'audit'>) => {
+const buildAuditLog = <T, Y>(
+  paramsRaw: LogStreamParams<T, Y> & { logger: BasicLogger }
+) => (info: NotificationInfo<T | Y, 'audit'>) => {
   const params = {
     ...paramsRaw,
     ...paramsRaw[info.notification],
@@ -146,12 +147,12 @@ const buildAuditLog = <T>(
   }
 };
 
-export type LogEventsArg<T> = LogStreamParams<T> | string;
+export type LogEventsArg<T, Y> = LogStreamParams<T, Y> | string;
 
-export function logEventsParams<T>(
-  arg: LogEventsArg<T>,
+export function logEventsParams<T, Y>(
+  arg: LogEventsArg<T, Y>,
   defaultLogger = defaultBasicLogger()
-): LogStreamParams<T> & { logger: BasicLogger } {
+): LogStreamParams<T, Y> & { logger: BasicLogger } {
   return {
     logger: defaultLogger,
     ...(typeof arg === 'string'
@@ -162,10 +163,10 @@ export function logEventsParams<T>(
   };
 }
 
-export function logEvents<T>(
-  paramsRaw: LogEventsArg<T>
+export function logEvents<T, Y>(
+  paramsRaw: LogEventsArg<T, Y>
 ): OperatorFunction<T, T> {
-  const params = logEventsParams<T>(paramsRaw);
+  const params = logEventsParams<T, Y>(paramsRaw);
 
   const project = params.project;
   const logOn = logOnFromParam(params.on);
@@ -182,10 +183,10 @@ export function logEvents<T>(
             ...observables,
             onLoggingAudit().pipe(mapTo('audit' as const)),
           ],
-          buildAuditLog<T>(params),
+          buildAuditLog(params),
           params.logger
         )
-      : executeOnNotifications(tags, buildSimpleLog<T>(params), params.logger);
+      : executeOnNotifications(tags, buildSimpleLog(params), params.logger);
 
   if (!project) {
     return stream => stream.pipe(operator);
@@ -199,8 +200,8 @@ export function logEvents<T>(
   }
 }
 
-export type LogEventsOperator<T> = (
-  paramsRaw: LogEventsArg<T>
+export type LogEventsOperator<T, Y> = (
+  paramsRaw: LogEventsArg<T, Y>
 ) => OperatorFunction<T, T>;
 
 function taggedLogEventsFactory(
@@ -209,9 +210,9 @@ function taggedLogEventsFactory(
   fn = logEvents
 ) {
   const tags = [...startWith];
-  const taggedlogEvents = <T>(paramsRaw: LogEventsArg<T>) => {
+  const taggedlogEvents = <T, Y>(paramsRaw: LogEventsArg<T, Y>) => {
     const params = logEventsParams(paramsRaw, logger);
-    return fn<T>({
+    return fn<T, Y>({
       ...params,
       tags: [...(params.tags ?? []), ...tags],
     });
