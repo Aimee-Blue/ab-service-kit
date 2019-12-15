@@ -61,6 +61,13 @@ export function executeOnNotifications<T, O extends Observable<unknown>>(
           next: value => {
             lastValue = value;
           },
+          error: _err => {
+            // we can simply ignore the error because it
+            // goes to the subscriber below anyway, however,
+            // we cannot remove this handler otherwise the
+            // error bubbles up to the process.onUnhandled
+            return;
+          },
           ...(notifications.includes('next') && {
             next: value => {
               lastValue = value;
