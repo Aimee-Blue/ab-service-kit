@@ -27,7 +27,7 @@
     "lint": "tslint -p . -t verbose",
     "check": "concurrently --raw \"node ./scripts/build.js\" \"tsc\" \"tslint -p . -t verbose\"",
     "patch": "ts-deps patch",
-    "release": "semantic-release",
+    "release": "node ./scripts/release.js",
     "prepublishOnly": "yarn run build && yarn run declarations",
     "start": "node lib/test",
     "start:watch": "node lib/test --watch",
@@ -44,12 +44,12 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@aimee-blue/ab-contracts": ">=1.117.0"
+    "@aimee-blue/ab-contracts": ">=1.148.1"
   },
   "dependencies": {
-    "@aimee-blue/ab-auth": "1.1.0",
-    "@aimee-blue/ab-shared": "1.115.0",
-    "@google-cloud/pubsub": "1.1.5",
+    "@aimee-blue/ab-auth": "1.3.1",
+    "@aimee-blue/ab-shared": "1.117.0",
+    "@google-cloud/pubsub": "1.1.6",
     "@hapi/joi": "15.1.1",
     "cors": "2.8.5",
     "dotenv": "8.2.0",
@@ -64,24 +64,24 @@
     "rxjs-stream": "3.1.0",
     "source-map-support": "0.5.16",
     "uuid": "3.3.3",
-    "ws": "7.2.0",
-    "yargs": "14.2.0"
+    "ws": "7.2.1",
+    "yargs": "15.0.2"
   },
   "devDependencies": {
-    "@aimee-blue/ab-contracts": "1.129.0",
+    "@aimee-blue/ab-contracts": "1.148.1",
     "@types/cors": "2.8.6",
     "@types/dotenv": "8.2.0",
     "@types/express": "4.17.2",
     "@types/hapi__joi": "15.0.4",
     "@types/node": "10",
-    "@types/node-fetch": "2.5.3",
+    "@types/node-fetch": "2.5.4",
     "@types/uuid": "3.4.6",
-    "@types/ws": "6.0.3",
+    "@types/ws": "6.0.4",
     "chokidar": "3.3.0",
-    "husky": "3.0.9",
+    "husky": "3.1.0",
     "prettier": "1.19.1",
-    "rxjs-marbles": "5.0.3",
-    "ts-deps": "0.8.1",
+    "rxjs-marbles": "5.0.4",
+    "ts-deps": "0.10.0-alpha.2",
     "utility-types": "3.10.0"
   }
 }

@@ -46,5 +46,5 @@ export const setDefaultBasicLogger = (newLogger: BasicLogger) => {
   if (!newLogger) {
     throw new Error('Logger should be defined');
   }
-  logger = logger;
+  logger = newLogger;
 };

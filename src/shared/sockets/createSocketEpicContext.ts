@@ -36,6 +36,7 @@ export function createSocketEpicContext<D extends Record<string, unknown> = {}>(
 
   return {
     ...deps,
+    id: request.id,
     request,
     binary,
     publish,

@@ -1,4 +1,4 @@
-import { OperatorFunction } from 'rxjs';
+import { OperatorFunction, Observable, merge, isObservable } from 'rxjs';
 import { BasicLogger, defaultBasicLogger } from './basicLogger';
 import {
   TagNotification,
@@ -7,7 +7,7 @@ import {
 } from '../notifications';
 import { registerError } from '../registerError';
 import { onLoggingAudit } from './loggingAuditAction';
-import { mapTo } from 'rxjs/operators';
+import { mapTo, ignoreElements, publish } from 'rxjs/operators';
 
 export type LogNotification = TagNotification | 'audit';
 
@@ -17,14 +17,20 @@ export interface ILogTextParams {
   suffix?: unknown[];
 }
 
-export interface ILogStreamParamsCore extends ILogTextParams {
-  on?: LogNotification[];
+export type LogOn<K extends string = string> = Array<
+  LogNotification | Observable<K>
+>;
+
+export interface ILogStreamParamsCore<T, Y> extends ILogTextParams {
+  on?: LogOn;
+  project?: (stream: Observable<T>) => Observable<Y>;
   logger?: BasicLogger;
 }
 
 export type LogTextParamsMap = Partial<Record<LogNotification, ILogTextParams>>;
 
-export type LogStreamParams = ILogStreamParamsCore & LogTextParamsMap;
+export type LogStreamParams<T, Y> = ILogStreamParamsCore<T, Y> &
+  LogTextParamsMap;
 
 function isTagNotification(
   notification: LogNotification
@@ -32,24 +38,30 @@ function isTagNotification(
   return notification !== 'audit';
 }
 
-function tagsFromLogOn(notifications: LogNotification[]): TagNotification[] {
+function isLogNotification(
+  notification: LogNotification | Observable<string>
+): notification is TagNotification {
+  return typeof notification === 'string';
+}
+
+function tagsFromLogOn(notifications: LogOn): TagNotification[] {
   return notifications.filter(isTagNotification);
 }
 
-function logOnFromParam(on: ILogStreamParamsCore['on']): LogNotification[] {
+function logOnFromParam(on?: LogOn): LogOn {
   if (Array.isArray(on)) {
-    const set = new Set<LogNotification>(on);
-    return [...set];
+    const set = new Set<LogNotification>(on.filter(isLogNotification));
+    return [...set, on.filter(entry => !isLogNotification(entry))] as LogOn;
   } else {
     // default:
     return ['next', 'error', 'complete', 'subscribe', 'unsubscribe'];
   }
 }
 
-const buildSimpleLog = <T>(
-  paramsRaw: LogStreamParams & { logger: BasicLogger }
+const buildSimpleLog = <T, Y>(
+  paramsRaw: LogStreamParams<T, Y> & { logger: BasicLogger }
 ) => {
-  return (info: NotificationInfo<T, 'audit'>) => {
+  return (info: NotificationInfo<T | Y, 'audit'>) => {
     const params = {
       ...paramsRaw,
       ...paramsRaw[info.notification],
@@ -88,9 +100,9 @@ const buildSimpleLog = <T>(
   };
 };
 
-const buildAuditLog = <T>(
-  paramsRaw: LogStreamParams & { logger: BasicLogger }
-) => (info: NotificationInfo<T, 'audit'>) => {
+const buildAuditLog = <T, Y>(
+  paramsRaw: LogStreamParams<T, Y> & { logger: BasicLogger }
+) => (info: NotificationInfo<T | Y, 'audit'>) => {
   const params = {
     ...paramsRaw,
     ...paramsRaw[info.notification],
@@ -106,6 +118,7 @@ const buildAuditLog = <T>(
         }
         params.logger.log(
           ...description,
+          'last-observed:',
           info.lastValue,
           ...(params.suffix ?? [])
         );
@@ -113,6 +126,7 @@ const buildAuditLog = <T>(
       case 'unsubscribe':
         params.logger.log(
           ...description,
+          'last-observed:',
           info.lastValue,
           ...(params.suffix ?? [])
         );
@@ -133,12 +147,12 @@ const buildAuditLog = <T>(
   }
 };
 
-export type LogEventsArg = LogStreamParams | string;
+export type LogEventsArg<T, Y> = LogStreamParams<T, Y> | string;
 
-export function logEventsParams(
-  arg: LogEventsArg,
+export function logEventsParams<T, Y>(
+  arg: LogEventsArg<T, Y>,
   defaultLogger = defaultBasicLogger()
-): LogStreamParams & { logger: BasicLogger } {
+): LogStreamParams<T, Y> & { logger: BasicLogger } {
   return {
     logger: defaultLogger,
     ...(typeof arg === 'string'
@@ -149,31 +163,45 @@ export function logEventsParams(
   };
 }
 
-export function logEvents<T>(paramsRaw: LogEventsArg): OperatorFunction<T, T> {
-  const params = logEventsParams(paramsRaw);
+export function logEvents<T, Y>(
+  paramsRaw: LogEventsArg<T, Y>
+): OperatorFunction<T, T> {
+  const params = logEventsParams<T, Y>(paramsRaw);
 
+  const project = params.project;
   const logOn = logOnFromParam(params.on);
   const tags = tagsFromLogOn(logOn);
+  const observables = logOn.filter(isObservable) as Array<Observable<string>>;
 
-  if (logOn.includes('audit')) {
-    return stream =>
-      stream.pipe(
-        executeOnNotifications(
-          [...tags, onLoggingAudit().pipe(mapTo('audit' as const))],
-          buildAuditLog<T>(params),
+  // When the triggering event is another observable we want to
+  // log the latest value from source stream
+  const operator =
+    logOn.includes('audit') || observables.length > 0
+      ? executeOnNotifications(
+          [
+            ...tags,
+            ...observables,
+            onLoggingAudit().pipe(mapTo('audit' as const)),
+          ],
+          buildAuditLog(params),
           params.logger
         )
-      );
+      : executeOnNotifications(tags, buildSimpleLog(params), params.logger);
+
+  if (!project) {
+    return stream => stream.pipe(operator);
   } else {
     return stream =>
       stream.pipe(
-        executeOnNotifications(tags, buildSimpleLog<T>(params), params.logger)
+        publish(shared =>
+          merge(shared, shared.pipe(project, operator, ignoreElements()))
+        )
       );
   }
 }
 
-export type LogEventsOperator<T> = (
-  paramsRaw: LogEventsArg
+export type LogEventsOperator<T, Y> = (
+  paramsRaw: LogEventsArg<T, Y>
 ) => OperatorFunction<T, T>;
 
 function taggedLogEventsFactory(
@@ -182,9 +210,9 @@ function taggedLogEventsFactory(
   fn = logEvents
 ) {
   const tags = [...startWith];
-  const taggedlogEvents = <T>(paramsRaw: LogEventsArg) => {
+  const taggedlogEvents = <T, Y>(paramsRaw: LogEventsArg<T, Y>) => {
     const params = logEventsParams(paramsRaw, logger);
-    return fn<T>({
+    return fn<T, Y>({
       ...params,
       tags: [...(params.tags ?? []), ...tags],
     });

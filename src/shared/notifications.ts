@@ -40,12 +40,12 @@ export function executeOnNotifications<T, O extends Observable<unknown>>(
   cb: (info: NotificationInfo<T, ObservedValueOf<O>>) => void,
   logger: BasicLogger = defaultBasicLogger()
 ) {
-  return (stream: Observable<T>) => {
+  return <X extends T>(stream: Observable<X>) => {
     if (notifications.length === 0) {
       return stream;
     }
 
-    return new Observable<T>(subscriber => {
+    return new Observable<X>(subscriber => {
       const observables = notifications.filter(isObservable) as O[];
 
       if (notifications.includes('subscribe')) {
@@ -54,12 +54,19 @@ export function executeOnNotifications<T, O extends Observable<unknown>>(
 
       const shared = publishStream(stream);
 
-      let lastValue: T | undefined;
+      let lastValue: X | undefined;
 
       subscriber.add(
         shared.subscribe({
           next: value => {
             lastValue = value;
+          },
+          error: _err => {
+            // we can simply ignore the error because it
+            // goes to the subscriber below anyway, however,
+            // we cannot remove this handler otherwise the
+            // error bubbles up to the process.onUnhandled
+            return;
           },
           ...(notifications.includes('next') && {
             next: value => {

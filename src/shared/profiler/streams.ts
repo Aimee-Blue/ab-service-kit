@@ -6,9 +6,9 @@ import {
   Logger,
   defaultLogger,
   logEvents,
-  LogStreamParams,
   BasicLogger,
   defaultBasicLogger,
+  LogOn,
 } from '../logging';
 
 type Timestamp = [number, number];
@@ -158,7 +158,7 @@ interface IState {
     name: string,
     details?: IDetails,
     transformTookTime?: (metric: number) => number
-  ): void;
+  ): number | null;
 }
 
 let cachedState: IState | null = null;
@@ -179,6 +179,7 @@ export function attach(params: {
   name: string;
   from: TagNotification;
   till: TagNotification;
+  cb?: (value: number) => void;
   details?: IDetails;
   transformTimeTook?: (value: number) => number;
   state?: IState;
@@ -194,6 +195,7 @@ export function attach(params: {
         {
           name: params.name,
           till: params.till,
+          cb: params.cb,
           transformTookTime: params.transformTimeTook,
           details: params.details,
         },
@@ -256,12 +258,20 @@ export function registerStops(
     name: string;
     on: Observable<unknown>;
     details?: IDetails;
+    cb?: (time: number) => void;
     transformTookTime?: (time: number) => number;
   },
   state = globalState()
 ) {
   const setMemo = () => {
-    state.memo(params.name, params.details, params.transformTookTime);
+    const timeTook = state.memo(
+      params.name,
+      params.details,
+      params.transformTookTime
+    );
+    if (typeof timeTook === 'number' && params.cb) {
+      params.cb(timeTook);
+    }
   };
   return params.on.pipe(tap(setMemo), ignoreElements());
 }
@@ -271,6 +281,7 @@ export function stop(
     name: string;
     till: TagNotification;
     details?: IDetails;
+    cb?: (time: number) => void;
     transformTookTime?: (time: number) => number;
     logger?: BasicLogger;
   },
@@ -282,7 +293,14 @@ export function stop(
   };
   return <T>(stream: Observable<T>) => {
     const setMemo = () => {
-      state.memo(params.name, params.details, params.transformTookTime);
+      const timeTook = state.memo(
+        params.name,
+        params.details,
+        params.transformTookTime
+      );
+      if (typeof timeTook === 'number' && params.cb) {
+        params.cb(timeTook);
+      }
     };
     return stream.pipe(
       executeOnNotifications(
@@ -320,7 +338,7 @@ interface ISummary {
 
 export function logSummaries(params: {
   name: string;
-  on?: LogStreamParams['on'];
+  on?: LogOn;
   logger?: Logger;
 }) {
   const summaries = createSummary(params.name);
