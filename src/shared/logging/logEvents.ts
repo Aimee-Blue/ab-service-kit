@@ -1,4 +1,4 @@
-import { OperatorFunction, Observable, merge, isObservable } from 'rxjs';
+import { OperatorFunction, Observable, merge, isObservable, empty } from 'rxjs';
 import { BasicLogger, defaultBasicLogger } from './basicLogger';
 import {
   TagNotification,
@@ -181,7 +181,9 @@ export function logEvents<T, Y>(
           [
             ...tags,
             ...observables,
-            onLoggingAudit().pipe(mapTo('audit' as const)),
+            (logOn.includes('audit') &&
+              onLoggingAudit().pipe(mapTo('audit' as const))) ||
+              empty(),
           ],
           buildAuditLog(params),
           params.logger
