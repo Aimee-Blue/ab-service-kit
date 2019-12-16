@@ -180,7 +180,6 @@ export function logEvents<T, Y>(
       ? executeOnNotifications(
           [
             ...tags,
-            ...observables,
             (logOn.includes('audit') &&
               onLoggingAudit().pipe(mapTo('audit' as const))) ||
               empty(),
