@@ -68,7 +68,7 @@
     "yargs": "15.0.1"
   },
   "devDependencies": {
-    "@aimee-blue/ab-contracts": "1.148.1",
+    "@aimee-blue/ab-contracts": "1.151.1",
     "@types/cors": "2.8.6",
     "@types/dotenv": "8.2.0",
     "@types/express": "4.17.2",
