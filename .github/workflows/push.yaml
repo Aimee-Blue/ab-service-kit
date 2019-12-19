@@ -1,4 +1,4 @@
-name: Verify Pull Request
+name: Release Service Kit to NPM
 
 on:
   push:
