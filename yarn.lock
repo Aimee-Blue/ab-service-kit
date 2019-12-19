@@ -6640,10 +6640,10 @@ trim-off-newlines@^1.0.0:
   resolved "https://registry.yarnpkg.com/trim-off-newlines/-/trim-off-newlines-1.0.1.tgz#9f9ba9d9efa8764c387698bcbfeb2c848f11adb3"
   integrity sha1-n5up2e+odkw4dpi8v+sshI8RrbM=
 
-ts-deps@0.10.0-alpha.3:
-  version "0.10.0-alpha.3"
-  resolved "https://registry.yarnpkg.com/ts-deps/-/ts-deps-0.10.0-alpha.3.tgz#993bf04deb1273e463a8d7cf37e65a664b21fa0c"
-  integrity sha512-NYNNx6gpu1VhlOFx4o49ZVTC8e+aWzKr39yJ8UNhBoz/aBUeAGehlV3i4PAr/a+MGaXS4s5ppHgp3b/F6UeyiA==
+ts-deps@0.10.0-alpha.6:
+  version "0.10.0-alpha.6"
+  resolved "https://registry.yarnpkg.com/ts-deps/-/ts-deps-0.10.0-alpha.6.tgz#877f7f59073315c6cea527a365009893c9f945cc"
+  integrity sha512-5tstz5yliVvmZr0Doxcvmnf/tML5mgdwJzebGRa1Es5++9+XA5Ju6vWG3+Zubi+b8hRKrXeFIeu0leEm771ZZA==
   dependencies:
     "@babel/cli" "7.7.5"
     "@babel/core" "7.7.5"
