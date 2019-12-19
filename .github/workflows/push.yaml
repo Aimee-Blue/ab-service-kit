@@ -1,4 +1,4 @@
-name: CI
+name: Verify Pull Request
 
 on:
   push:
