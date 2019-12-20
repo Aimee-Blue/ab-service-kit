@@ -60,4 +60,4 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: yarn build && yarn declarations && yarn release
+        run: yarn prepublishOnly && yarn release
