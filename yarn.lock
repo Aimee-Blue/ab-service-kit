@@ -5914,10 +5914,10 @@ rxjs-spy@7.5.1:
     error-stack-parser "^2.0.1"
     stacktrace-gps "^3.0.2"
 
-rxjs-stream@3.1.0:
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/rxjs-stream/-/rxjs-stream-3.1.0.tgz#abc75c1c39d20e6be7952ccad0e05b18644075de"
-  integrity sha512-PghDyONlLdl6shJ2HPwojxMFeSwjsJ3R2XEYtl7qJLgIK2Q1QGE6G5xyDJGJu8sjQTfLkOE3b5QCdOQRi7IK+w==
+rxjs-stream@3.1.1:
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/rxjs-stream/-/rxjs-stream-3.1.1.tgz#a102f3d07588e461e2b6acd059e4b55289c44837"
+  integrity sha512-GZG+EyvNqxpR3jypvALqacBrfxk4DsCnqLSQ5mxTlL1kliYEHSSZi5JV7HELwYIYDOn/AxaYxx5hHfsDl1QwEg==
 
 rxjs@6.5.3, rxjs@^6.4.0, rxjs@^6.5.2, rxjs@^6.5.3:
   version "6.5.3"
