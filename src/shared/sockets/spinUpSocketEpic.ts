@@ -31,10 +31,8 @@ export const spinUpSocketEpic = (
 
   const allData = publishStream(dataStreamFromSocket(socket, logger));
 
-  const commands = actionStreamFromSocket(
-    allData,
-    epic.actionSchemaByType,
-    logger
+  const commands = publishStream(
+    actionStreamFromSocket(allData, epic.actionSchemaByType, logger)
   );
 
   const binary = binaryStreamFromSocket(allData);
@@ -89,6 +87,7 @@ export const spinUpSocketEpic = (
   );
 
   subscription.add(connect());
+  subscription.add(commands.connect());
   subscription.add(outgoing.connect());
   subscription.add(allData.connect());
 
