@@ -1,54 +1,57 @@
 {
   "name": "@aimee-blue/ab-service-kit",
   "version": "0.0.0-development",
-  "description": "Aimee Blue Service Template",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
-  "repository": "git@github.com:Aimee-Blue/ab-service-kit.git",
-  "author": "@Aimee-Blue",
-  "license": "MIT",
   "private": false,
+  "description": "Aimee Blue Service Template",
+  "repository": "git@github.com:Aimee-Blue/ab-service-kit.git",
+  "license": "MIT",
+  "author": "@Aimee-Blue",
   "files": [
     "lib",
     "src",
     "template"
   ],
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "scripts": {
+    "prebuild": "node ./scripts/clean.js",
     "build": "node ./scripts/build.js -s",
     "build:watch": "node ./scripts/build.js -s --watch",
-    "declarations": "tsc -p ./tsconfig.declarations.json",
-    "prebuild": "node ./scripts/clean.js",
+    "check": "concurrently --raw \"node ./scripts/build.js\" \"tsc\" \"tslint -p . -t verbose\"",
     "clean": "node ./scripts/clean.js",
-    "test": "jest --color",
+    "combine-coverage": "node ./scripts/combineCoverage.js",
+    "declarations": "tsc -p ./tsconfig.declarations.json",
     "integration": "jest --config ./jest.config.integration.js --color -i",
     "integration:inspect": "node --inspect-brk ./node_modules/.bin/jest --config ./jest.config.integration.js --color -i",
-    "combine-coverage": "node ./scripts/combineCoverage.js",
-    "type-check": "tsc",
     "lint": "tslint -p . -t verbose",
-    "check": "concurrently --raw \"node ./scripts/build.js\" \"tsc\" \"tslint -p . -t verbose\"",
     "patch": "ts-deps patch",
-    "release": "node ./scripts/release.js",
     "prepublishOnly": "yarn run build && yarn run declarations",
+    "release": "node ./scripts/release.js",
     "start": "node lib/test",
+    "start:inspect": "node --inspect lib/test",
     "start:watch": "node lib/test --watch",
-    "start:inspect": "node --inspect lib/test"
+    "test": "jest --color",
+    "type-check": "tsc"
   },
   "husky": {
     "hooks": {
+      "pre-commit": "lint-staged",
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
-      "pre-commit": "pretty-quick --staged",
       "pre-push": "npm run check"
     }
   },
-  "publishConfig": {
-    "access": "public"
-  },
-  "peerDependencies": {
-    "@aimee-blue/ab-contracts": ">=1.164.0"
+  "lint-staged": {
+    "*.{tsx,jsx,ts,js,json,md,yaml,yml}": [
+      "prettier --write"
+    ],
+    "package.json": [
+      "sort-package-json",
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "@aimee-blue/ab-auth": "1.4.1",
-    "@aimee-blue/ab-shared": "1.117.0",
+    "@aimee-blue/ab-shared": "1.118.1",
     "@google-cloud/pubsub": "1.2.0",
     "@hapi/joi": "15.1.1",
     "cors": "2.8.5",
@@ -78,9 +81,15 @@
     "@types/ws": "6.0.4",
     "chokidar": "3.3.1",
     "husky": "4.0.7",
-    "prettier": "1.19.1",
+    "lint-staged": "10.0.0-beta.15",
     "rxjs-marbles": "5.0.4",
-    "ts-deps": "0.12.4",
+    "ts-deps": "0.12.6",
     "utility-types": "3.10.0"
+  },
+  "peerDependencies": {
+    "@aimee-blue/ab-contracts": ">=1.164.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
