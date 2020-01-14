@@ -28,10 +28,10 @@
   resolved "https://registry.yarnpkg.com/@aimee-blue/ab-shared/-/ab-shared-1.118.0.tgz#f106990853de1f3d8aa543b7558da3aac4d94f1e"
   integrity sha512-MUomTVNXUnGsDNHEX1XtEIXjoFXafq/rEwHOQxoH2t5FiKcLKsaOk0p1ldpZU1emMFLOJQ6BGWMLDlp4IQFtzQ==
 
-"@aimee-blue/ab-shared@1.118.1":
-  version "1.118.1"
-  resolved "https://registry.yarnpkg.com/@aimee-blue/ab-shared/-/ab-shared-1.118.1.tgz#2fb9c5f2fb51e621db3350335f936f54f82b4a5b"
-  integrity sha512-aKbK88nTc1EC4Uai6Kl0OPagpwOKGU3weOkHuq0j1X8DKgsn1NXEmVLsXDalcXyNxIvXaBHV6q4Gat7xOTh67w==
+"@aimee-blue/ab-shared@1.118.2":
+  version "1.118.2"
+  resolved "https://registry.yarnpkg.com/@aimee-blue/ab-shared/-/ab-shared-1.118.2.tgz#90a64a4bda97bd9dd2633b30835515c727b88f14"
+  integrity sha512-SlEBSZBDYCiHcf17IsCrDgclQzibjGjULcXvTLHEfFEytJc8+ZqSgVEH9h64THVAregm0XKLknNRTGzxkDoogg==
 
 "@babel/cli@7.8.3":
   version "7.8.3"
