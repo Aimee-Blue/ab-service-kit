@@ -2,14 +2,14 @@
 # yarn lockfile v1
 
 
-"@aimee-blue/ab-auth@1.4.0":
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/@aimee-blue/ab-auth/-/ab-auth-1.4.0.tgz#39ec940bcbf5ae4fec328c56ebd50cc97698be03"
-  integrity sha512-mIWDUNFrQfJyEbu/luAAhGszVzhVB247TgbGkd9J8qBjdJW9iRAyzWdeMhb/bJpv/hJaSyyvnUIUJMGMsu8iQA==
+"@aimee-blue/ab-auth@1.4.1":
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/@aimee-blue/ab-auth/-/ab-auth-1.4.1.tgz#499481aeb5bcfde387c996ebdfa9b6a554b9e8a5"
+  integrity sha512-PBFAlux+9ZQfyLWSyakR7g5/upVzGJymwEnB0NLqojWv6qNDo1ctOHacUjVJ7OZ27FaYGqSWu8o6qODXk2W+JA==
   dependencies:
-    "@aimee-blue/ab-shared" "1.117.0"
+    "@aimee-blue/ab-shared" "1.118.0"
     "@hapi/joi" "15.1.1"
-    google-auth-library "5.7.0"
+    google-auth-library "5.8.0"
     jsonwebtoken "8.5.1"
     jwk-to-pem "2.0.2"
     node-fetch "2.6.0"
@@ -27,6 +27,11 @@
   version "1.117.0"
   resolved "https://registry.yarnpkg.com/@aimee-blue/ab-shared/-/ab-shared-1.117.0.tgz#1ba7822ba3205621639369926180012beb4a45a5"
   integrity sha512-Q7jb/RQHQYFrcyzAXJbEk+6yDoYs2/j6bul5vsandpx1B3JAhWAwe7oAptwPDFs9DX2nnnITqdQstTO7qNECfw==
+
+"@aimee-blue/ab-shared@1.118.0":
+  version "1.118.0"
+  resolved "https://registry.yarnpkg.com/@aimee-blue/ab-shared/-/ab-shared-1.118.0.tgz#f106990853de1f3d8aa543b7558da3aac4d94f1e"
+  integrity sha512-MUomTVNXUnGsDNHEX1XtEIXjoFXafq/rEwHOQxoH2t5FiKcLKsaOk0p1ldpZU1emMFLOJQ6BGWMLDlp4IQFtzQ==
 
 "@babel/cli@7.7.7":
   version "7.7.7"
@@ -3218,7 +3223,7 @@ gaxios@^2.1.0:
     is-stream "^2.0.0"
     node-fetch "^2.3.0"
 
-gcp-metadata@^3.2.0:
+gcp-metadata@^3.3.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/gcp-metadata/-/gcp-metadata-3.3.0.tgz#df061f0c0da3fb274b20f4af0d955030bbc21eac"
   integrity sha512-uO3P/aByOQmoDu5bOYBODHmD1oDCZw7/R8SYY0MdmMQSZVEmeTSxmiM1vwde+YHYSpkaQnAAMAIZuOqLvgfp/Q==
@@ -3312,18 +3317,18 @@ globals@^11.1.0:
   resolved "https://registry.yarnpkg.com/globals/-/globals-11.12.0.tgz#ab8795338868a0babd8525758018c2a7eb95c42e"
   integrity sha512-WOBp/EEGUiIsJSp7wcv/y6MO+lV9UoncWqxuFfm8eBwzWNgyfBd6Gz+IeKQ9jCmyhoH99g15M3T+QaVHFjizVA==
 
-google-auth-library@5.7.0, google-auth-library@^5.0.0, google-auth-library@^5.5.0:
-  version "5.7.0"
-  resolved "https://registry.yarnpkg.com/google-auth-library/-/google-auth-library-5.7.0.tgz#2d8273793a9177f9f37f3920861f4256419c77ae"
-  integrity sha512-uclMldsQNf64Qr67O8TINdnqbU/Ixv81WryX+sF9g7uP0igJ98aCR/uU399u1ABLa53LNsyji+bo+bP8/iL9dA==
+google-auth-library@5.8.0, google-auth-library@^5.0.0, google-auth-library@^5.5.0:
+  version "5.8.0"
+  resolved "https://registry.yarnpkg.com/google-auth-library/-/google-auth-library-5.8.0.tgz#60a29ef0288c4dc106b537a7a717edec09ded406"
+  integrity sha512-aXVUAUAhyof66F1STizYRQwO8nAqp7DDhF0tvfyXyZof8LxXaYtOk7CJeZ+o7G+o1EfqJZi9AAlK3FhZVzYWuQ==
   dependencies:
     arrify "^2.0.0"
     base64-js "^1.3.0"
     fast-text-encoding "^1.0.0"
     gaxios "^2.1.0"
-    gcp-metadata "^3.2.0"
+    gcp-metadata "^3.3.0"
     gtoken "^4.1.0"
-    jws "^3.1.5"
+    jws "^4.0.0"
     lru-cache "^5.0.0"
 
 google-gax@^1.7.5:
@@ -4471,6 +4476,15 @@ jwa@^1.4.1:
     ecdsa-sig-formatter "1.0.11"
     safe-buffer "^5.0.1"
 
+jwa@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/jwa/-/jwa-2.0.0.tgz#a7e9c3f29dae94027ebcaf49975c9345593410fc"
+  integrity sha512-jrZ2Qx916EA+fq9cEAeCROWPTfCwi1IVHqT2tapuqLEVVDKFDENFw1oL+MwrTvH6msKxsd1YTDVw6uKEcsrLEA==
+  dependencies:
+    buffer-equal-constant-time "1.0.1"
+    ecdsa-sig-formatter "1.0.11"
+    safe-buffer "^5.0.1"
+
 jwk-to-pem@2.0.2:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/jwk-to-pem/-/jwk-to-pem-2.0.2.tgz#4a13869c74a899aaf812fca32101b44cf5745f09"
@@ -4486,6 +4500,14 @@ jws@^3.1.5, jws@^3.2.2:
   integrity sha512-YHlZCB6lMTllWDtSPHz/ZXTsi8S00usEV6v1tjq8tOUZzw7DpSDWVXjXDre6ed1w/pd495ODpHZYSdkRTsa0HA==
   dependencies:
     jwa "^1.4.1"
+    safe-buffer "^5.0.1"
+
+jws@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/jws/-/jws-4.0.0.tgz#2d4e8cf6a318ffaa12615e9dec7e86e6c97310f4"
+  integrity sha512-KDncfTmOZoOMTFG4mBlG0qUIOlc03fmzH+ru6RgYVZhPkyiy/92Owlt/8UEN+a4TXR1FQetfIpJE8ApdvdVxTg==
+  dependencies:
+    jwa "^2.0.0"
     safe-buffer "^5.0.1"
 
 kind-of@^3.0.2, kind-of@^3.0.3, kind-of@^3.2.0:
