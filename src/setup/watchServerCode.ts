@@ -78,7 +78,14 @@ const moduleInfo = (mod: NodeModule) => ({
   mod,
 });
 
-function allChildModules(startFrom: NodeModule = require.main!) {
+function mainModule() {
+  if (!require.main) {
+    throw new Error('No require.main defined');
+  }
+  return require.main;
+}
+
+function allChildModules(startFrom: NodeModule = mainModule()) {
   return of(moduleInfo(startFrom)).pipe(stream => {
     const set = new Set();
 
@@ -93,7 +100,7 @@ function allChildModules(startFrom: NodeModule = require.main!) {
       expand(data =>
         from(uniqueModules(data.mod.children)).pipe(
           map(moduleInfo),
-          filter(pair => !/node_modules/.test(pair.filePath))
+          filter(pair => !pair.filePath.includes('node_modules'))
         )
       )
     );
@@ -102,7 +109,7 @@ function allChildModules(startFrom: NodeModule = require.main!) {
 
 function findModule(
   fullPathToJs: string,
-  startFrom: NodeModule = require.main!
+  startFrom: NodeModule = mainModule()
 ) {
   const compareTo = resolve(path.normalize(fullPathToJs));
 
@@ -147,10 +154,10 @@ function requireSetupModule(moduleId: string): IServiceConfig {
   }
 
   if ('default' in result) {
-    return result.default as IServiceConfig;
+    return result.default;
   }
 
-  return result as IServiceConfig;
+  return result;
 }
 
 export async function serviceSetupInWatchMode(

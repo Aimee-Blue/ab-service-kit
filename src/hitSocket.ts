@@ -1,5 +1,5 @@
 import WebSocket from 'ws';
-import { fromEvent, merge, empty, Subscription, Observable } from 'rxjs';
+import { fromEvent, merge, empty, Subscription } from 'rxjs';
 import {
   actionStreamFromSocket,
   dataStreamFromSocket,
@@ -26,7 +26,7 @@ async function start() {
 
   process.stdin.setEncoding('utf8');
 
-  const data = fromEvent(process.stdin, 'data') as Observable<string>;
+  const data = fromEvent<string>(process.stdin, 'data');
 
   const allData = dataStreamFromSocket(socket);
 

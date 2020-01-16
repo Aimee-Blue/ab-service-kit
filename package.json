@@ -17,13 +17,14 @@
     "prebuild": "node ./scripts/clean.js",
     "build": "node ./scripts/build.js -s",
     "build:watch": "node ./scripts/build.js -s --watch",
-    "check": "concurrently --raw \"node ./scripts/build.js\" \"tsc\" \"tslint -p . -t verbose\"",
+    "check": "concurrently --raw -c \"node ./scripts/build.js\" \"tsc\" \"eslint . --ext .js,.jsx,.ts,.tsx -f pretty\"",
     "clean": "node ./scripts/clean.js",
     "combine-coverage": "node ./scripts/combineCoverage.js",
     "declarations": "tsc -p ./tsconfig.declarations.json",
+    "eslint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "integration": "jest --config ./jest.config.integration.js --color -i",
     "integration:inspect": "node --inspect-brk ./node_modules/.bin/jest --config ./jest.config.integration.js --color -i",
-    "lint": "tslint -p . -t verbose",
+    "lint": "yarn run eslint -f pretty",
     "patch": "ts-deps patch",
     "prepublishOnly": "yarn run build && yarn run declarations",
     "release": "node ./scripts/release.js",
@@ -37,7 +38,7 @@
     "hooks": {
       "pre-commit": "lint-staged",
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
-      "pre-push": "npm run check"
+      "pre-push": "yarn run check"
     }
   },
   "lint-staged": {
@@ -45,8 +46,7 @@
       "prettier --write"
     ],
     "package.json": [
-      "sort-package-json",
-      "prettier --write"
+      "sort-package-json"
     ]
   },
   "dependencies": {
@@ -80,10 +80,10 @@
     "@types/uuid": "3.4.6",
     "@types/ws": "6.0.4",
     "chokidar": "3.3.1",
-    "husky": "4.0.7",
+    "husky": "4.0.10",
     "lint-staged": "10.0.0-beta.15",
     "rxjs-marbles": "5.0.4",
-    "ts-deps": "0.12.6",
+    "ts-deps": "0.13.0-alpha.8",
     "utility-types": "3.10.0"
   },
   "peerDependencies": {
