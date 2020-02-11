@@ -14,7 +14,7 @@ export * from './conditionalOperator';
 export * from './publishAs';
 export * from './env';
 export * from './pushToSubject';
-export { createSocketEpicContext } from './sockets';
+export * from './sockets';
 
 import * as Api from './api';
 import * as Auth from './auth';

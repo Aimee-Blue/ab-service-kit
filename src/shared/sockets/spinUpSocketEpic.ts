@@ -75,15 +75,15 @@ export const spinUpSocketEpic = (
   );
 
   subscription.add(
-    pipeStreamIntoSocket(
-      outgoing,
-      socket,
-      (sock, code) => {
+    pipeStreamIntoSocket(outgoing, socket, {
+      close: (sock, code) => {
         closeSocket(sock.id, code);
       },
-      epic.send,
-      logger
-    )
+      logger,
+      ...(epic.send && {
+        send: epic.send,
+      }),
+    })
   );
 
   subscription.add(connect());
