@@ -1,7 +1,12 @@
 import { Subscription, merge } from 'rxjs';
 import { ignoreElements } from 'rxjs/operators';
 import { publishStream } from '../publishStream';
-import { SocketWithInfo, MessageWithInfo } from './types';
+import {
+  SocketWithInfo,
+  MessageWithInfo,
+  SOCKET_CLOSE_WAIT_TIMEOUT,
+  SOCKET_COMPLETE_WARNING_TIMEOUT,
+} from './types';
 import { AnySocketEpic } from '../kit';
 import { isTruthy } from '../isTruthy';
 import { prepareWaitForCompletionFn } from './prepareWaitForCompletionFn';
@@ -51,9 +56,11 @@ export const spinUpSocketEpic = (
 
   const subscription = new Subscription();
 
-  const warningTimeout = epic.completedSocketWarningTimeout ?? 2500;
+  const warningTimeout =
+    epic.completedSocketWarningTimeout ?? SOCKET_COMPLETE_WARNING_TIMEOUT;
 
-  const completeWaitTimeout = epic.completedSocketWaitTimeout ?? 5000;
+  const completeWaitTimeout =
+    epic.completedSocketWaitTimeout ?? SOCKET_CLOSE_WAIT_TIMEOUT;
 
   const logging = [
     logWarningIfOutgoingStreamNotComplete(
