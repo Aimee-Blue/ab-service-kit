@@ -83,7 +83,7 @@
     "husky": "4.2.3",
     "lint-staged": "10.0.7",
     "rxjs-marbles": "5.0.4",
-    "ts-deps": "0.12.13",
+    "ts-deps": "0.13.0",
     "utility-types": "3.10.0"
   },
   "peerDependencies": {
