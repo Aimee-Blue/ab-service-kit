@@ -77,7 +77,7 @@
     "@types/hapi__joi": "15.0.4",
     "@types/node": "10",
     "@types/node-fetch": "2.5.4",
-    "@types/uuid": "3.4.7",
+    "@types/uuid": "7.0.0",
     "@types/ws": "7.2.1",
     "chokidar": "3.3.1",
     "husky": "4.2.3",
