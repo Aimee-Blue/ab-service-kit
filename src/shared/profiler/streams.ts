@@ -94,16 +94,6 @@ function createInitialState(deps = defaultDeps): IState {
   return self;
 }
 
-function sortedPush(value: number, items: number[]) {
-  const index = items.findIndex(item => item > value);
-  if (index === -1) {
-    items.push(value);
-  } else {
-    items.splice(index, 0, value);
-  }
-  return items;
-}
-
 function isMatch(name: string, to: string | RegExp) {
   return (
     (typeof to === 'string' && to === name) ||
@@ -120,7 +110,8 @@ function createSummary(name: string | RegExp): Observable<ISummary> {
     scan(
       (acc, item) => {
         const memos = [...acc.memos, item.time].slice(-MAX_MEMOS);
-        const sortedMemos = sortedPush(item.time, acc.sortedMemos);
+        const sortedMemos = [...memos];
+        sortedMemos.sort();
         return {
           ...acc,
           memos,
