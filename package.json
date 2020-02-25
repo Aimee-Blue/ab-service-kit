@@ -81,7 +81,7 @@
     "@types/ws": "7.2.1",
     "chokidar": "3.3.1",
     "husky": "4.2.3",
-    "lint-staged": "10.0.7",
+    "lint-staged": "10.0.8",
     "rxjs-marbles": "5.0.4",
     "ts-deps": "0.13.0",
     "utility-types": "3.10.0"
