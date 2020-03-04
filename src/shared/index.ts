@@ -36,3 +36,4 @@ export * from './publishAs';
 export * from './env';
 export * from './pushToSubject';
 export * from './sockets';
+export * from './uuid';

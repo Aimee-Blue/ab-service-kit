@@ -1,11 +1,11 @@
 import { Socket } from 'net';
 import WebSocket from 'ws';
-import uuid from 'uuid';
 import url from 'url';
 import { SocketWithInfo, MessageWithInfo } from './types';
 import { AnySocketEpic } from '../kit';
 import { RegistryStateApi } from './socketRegistryState';
 import { BasicLogger } from '../logging';
+import { uuid } from '../uuid';
 
 export const buildServerUpgradeListener = (
   wss: WebSocket.Server,
