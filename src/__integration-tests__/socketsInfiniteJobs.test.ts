@@ -3,7 +3,7 @@ import { fromEvent, merge, of, bindNodeCallback, never, from } from 'rxjs';
 import { mergeMap, take, timeoutWith, mapTo, map } from 'rxjs/operators';
 import { PromiseType } from 'utility-types';
 
-import { SocketEpic } from '../shared';
+import { SocketEpic, SOCKET_CLOSE_WAIT_TIMEOUT } from '../shared';
 import { initTestEpic } from './helpers';
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
@@ -17,7 +17,7 @@ describe('given service with a faulty epic that never finishes tasks', () => {
     data = await initTestEpic(epicThatNeverFinishes);
   });
 
-  it('should teardown within 5 seconds', async () => {
+  it('should teardown within 7.5 seconds', async () => {
     const socket = new WebSocket('ws://localhost:8080/events');
 
     const onOpen = fromEvent(socket, 'open');
@@ -48,7 +48,10 @@ describe('given service with a faulty epic that never finishes tasks', () => {
     socket.terminate();
 
     const teardownResult = await from(data.teardown())
-      .pipe(mapTo('done'), timeoutWith(6000, of('timeout')))
+      .pipe(
+        mapTo('done'),
+        timeoutWith(SOCKET_CLOSE_WAIT_TIMEOUT + 1000, of('timeout'))
+      )
       .toPromise();
 
     // we should teardown within 6s because the wait timeout is 5s
