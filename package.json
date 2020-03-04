@@ -17,13 +17,14 @@
     "prebuild": "node ./scripts/clean.js",
     "build": "node ./scripts/build.js -s",
     "build:watch": "node ./scripts/build.js -s --watch",
-    "check": "concurrently --raw \"node ./scripts/build.js\" \"tsc\" \"tslint -p . -t verbose\"",
+    "check": "concurrently --raw -c \"node ./scripts/build.js\" \"tsc\" \"eslint . --ext .js,.jsx,.ts,.tsx -f pretty\"",
     "clean": "node ./scripts/clean.js",
     "combine-coverage": "node ./scripts/combineCoverage.js",
     "declarations": "tsc -p ./tsconfig.declarations.json",
+    "eslint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "integration": "jest --config ./jest.config.integration.js --color -i",
     "integration:inspect": "node --inspect-brk ./node_modules/.bin/jest --config ./jest.config.integration.js --color -i",
-    "lint": "tslint -p . -t verbose",
+    "lint": "yarn run eslint -f pretty",
     "patch": "ts-deps patch",
     "prepublishOnly": "yarn run build && yarn run declarations",
     "release": "node ./scripts/release.js",
@@ -37,7 +38,7 @@
     "hooks": {
       "pre-commit": "lint-staged",
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
-      "pre-push": "npm run check"
+      "pre-push": "yarn run check"
     }
   },
   "lint-staged": {
@@ -45,8 +46,7 @@
       "prettier --write"
     ],
     "package.json": [
-      "sort-package-json",
-      "prettier --write"
+      "sort-package-json"
     ]
   },
   "dependencies": {
@@ -66,24 +66,24 @@
     "rxjs-spy": "7.5.1",
     "rxjs-stream": "3.1.1",
     "source-map-support": "0.5.16",
-    "uuid": "3.4.0",
+    "uuid": "7.0.1",
     "ws": "7.2.1",
     "yargs": "15.1.0"
   },
   "devDependencies": {
-    "@aimee-blue/ab-contracts": "1.180.0",
+    "@aimee-blue/ab-contracts": "1.189.3",
     "@types/cors": "2.8.6",
-    "@types/express": "4.17.2",
+    "@types/express": "4.17.3",
     "@types/hapi__joi": "15.0.4",
     "@types/node": "10",
-    "@types/node-fetch": "2.5.4",
-    "@types/uuid": "3.4.7",
-    "@types/ws": "7.2.1",
+    "@types/node-fetch": "2.5.5",
+    "@types/uuid": "7.0.0",
+    "@types/ws": "7.2.2",
     "chokidar": "3.3.1",
     "husky": "4.2.3",
-    "lint-staged": "10.0.7",
+    "lint-staged": "10.0.8",
     "rxjs-marbles": "5.0.4",
-    "ts-deps": "0.13.0",
+    "ts-deps": "0.15.0",
     "utility-types": "3.10.0"
   },
   "peerDependencies": {

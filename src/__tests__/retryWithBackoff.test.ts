@@ -117,6 +117,7 @@ describe(retryWithBackoff.name, () => {
           const result = source.pipe(
             tap(item => {
               if (item === 'X') {
+                // eslint-disable-next-line no-throw-literal
                 throw 'error';
               }
             }),

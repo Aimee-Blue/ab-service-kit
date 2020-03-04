@@ -350,12 +350,12 @@ export function logSummaries(params: {
 
 export function timesRegistered(name?: string | RegExp) {
   return allMemos.pipe(stream =>
-    !!name ? stream.pipe(filter(item => isMatch(item.name, name))) : stream
+    name ? stream.pipe(filter(item => isMatch(item.name, name))) : stream
   );
 }
 
 export function summariesLogged(name?: string) {
   return allSummaries.pipe(stream =>
-    !!name ? stream.pipe(filter(item => isMatch(item.name, name))) : stream
+    name ? stream.pipe(filter(item => isMatch(item.name, name))) : stream
   );
 }

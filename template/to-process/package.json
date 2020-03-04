@@ -4,24 +4,24 @@
   "author": "@aimee-blue",
   "main": "lib/server.js",
   "scripts": {
-    "upgrade-contracts": "yarn upgrade @aimee-blue/ab-contracts --latest",
-    "upgrade-scripts": "yarn upgrade @aimee-blue/ab-scripts --latest",
-    "upgrade-kit": "yarn upgrade @aimee-blue/ab-service-kit --latest",
-    "build:watch": "yarn build --watch",
-    "start": "node lib/server.js",
-    "start:watch": "node lib/server.js --watch",
     "build-docker": "docker build -t aimeeblue/$npm_package_name .",
+    "build:watch": "yarn build --watch",
     "ci-build-docker": "docker build -t aimeeblue/$npm_package_name .",
     "run-docker": "docker run -p 80:8080 --restart unless-stopped --name $npm_package_name $npm_package_name",
     "run-docker:dev": "docker run -p 80:8080 --name $npm_package_name aimeeblue/$npm_package_name",
-    "shell-docker": "docker exec -it $(docker ps -aqf name=$npm_package_name) bash"
+    "shell-docker": "docker exec -it $(docker ps -aqf name=$npm_package_name) bash",
+    "start": "node lib/server.js",
+    "start:watch": "node lib/server.js --watch",
+    "upgrade-contracts": "yarn upgrade @aimee-blue/ab-contracts --latest",
+    "upgrade-kit": "yarn upgrade @aimee-blue/ab-service-kit --latest",
+    "upgrade-scripts": "yarn upgrade @aimee-blue/ab-scripts --latest"
   },
   "dependencies": {
-    "@aimee-blue/ab-contracts": "1.149.0",
-    "@aimee-blue/ab-service-kit": "1.21.1"
+    "@aimee-blue/ab-contracts": "1.189.3",
+    "@aimee-blue/ab-service-kit": "1.25.1"
   },
   "devDependencies": {
-    "@aimee-blue/ab-scripts": "1.3.1",
-    "ts-deps": "0.10.0"
+    "@aimee-blue/ab-scripts": "1.6.2",
+    "ts-deps": "0.15.0"
   }
 }

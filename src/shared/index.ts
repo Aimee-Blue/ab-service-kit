@@ -1,21 +1,3 @@
-export * from './action';
-export * from './app';
-export * from './isTruthy';
-export * from './kit';
-export * from './publishStream';
-export * from './time';
-export * from './isTest';
-export * from './mergeEpics';
-export * from './ofType';
-export * from './retryWithBackoff';
-export * from './logging';
-export * from './registerError';
-export * from './conditionalOperator';
-export * from './publishAs';
-export * from './env';
-export * from './pushToSubject';
-export * from './sockets';
-
 import * as Api from './api';
 import * as Auth from './auth';
 import * as Config from './configuration';
@@ -36,3 +18,22 @@ export {
   Profiler,
   EventBus,
 };
+
+export * from './action';
+export * from './app';
+export * from './isTruthy';
+export * from './kit';
+export * from './publishStream';
+export * from './time';
+export * from './isTest';
+export * from './mergeEpics';
+export * from './ofType';
+export * from './retryWithBackoff';
+export * from './logging';
+export * from './registerError';
+export * from './conditionalOperator';
+export * from './publishAs';
+export * from './env';
+export * from './pushToSubject';
+export * from './sockets';
+export * from './uuid';

@@ -7,8 +7,11 @@ function random() {
 }
 
 export function serverTime() {
+  if (!process.env.TIME_URL) {
+    throw new Error(`No TIME_URL env var defined`);
+  }
   const rnd = random();
-  return fetch(`${process.env.TIME_URL!}?rnd=${rnd}`)
+  return fetch(`${process.env.TIME_URL}?rnd=${rnd}`)
     .then(async response => {
       if (!response.ok) {
         const message = await Errors.errorMessageFromFetchResponse(response);

@@ -1,14 +1,15 @@
+import { Config } from '@aimee-blue/ab-contracts';
+
 export interface IAppFlags {}
 
 const defaultFlags: IAppFlags = {};
 
-import { Config } from '@aimee-blue/ab-contracts';
-
 const fromConfig = (config: Config.IConfig) => {
-  return {
+  const appFlags: IAppFlags = {
     ...defaultFlags,
     ...config.featureFlags,
-  } as IAppFlags;
+  };
+  return appFlags;
 };
 
 export const Flags = {

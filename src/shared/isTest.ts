@@ -1,4 +1,4 @@
-declare var global: {
+declare const global: {
   INTEGRATION_TEST: true | false;
 };
 

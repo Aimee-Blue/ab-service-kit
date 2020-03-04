@@ -5,8 +5,8 @@ import {
 } from '@aimee-blue/ab-contracts';
 import { appName } from '../app';
 import { localNow } from '../time';
-import uuid from 'uuid';
 import { publish } from './pubsub';
+import { uuid } from '../uuid';
 
 export const publishAction = async <C extends ITopicBoundActionCreator>(
   creator: C,

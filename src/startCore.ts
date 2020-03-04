@@ -64,8 +64,8 @@ export async function startCore(
     });
   }
 
-  const certPath = params.cert || process.env.HTTPS_CERT_PATH!;
-  const keyPath = params.cert || process.env.HTTPS_KEY_PATH!;
+  const certPath = params.cert || process.env.HTTPS_CERT_PATH;
+  const keyPath = params.cert || process.env.HTTPS_KEY_PATH;
   const host = params.host || process.env.SERVER_HOSTNAME;
   const port = process.env.PORT || params.port;
 
@@ -95,8 +95,8 @@ export async function startCore(
   const server = params.http
     ? http.createServer()
     : https.createServer({
-        cert: fs.readFileSync(certPath, 'utf8'),
-        key: fs.readFileSync(keyPath, 'utf8'),
+        cert: certPath && fs.readFileSync(certPath, 'utf8'),
+        key: keyPath && fs.readFileSync(keyPath, 'utf8'),
         passphrase: process.env.HTTPS_PASSPHRASE,
       });
 

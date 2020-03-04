@@ -2,11 +2,11 @@ import * as PubSub from '@google-cloud/pubsub';
 import { fromEvent, defer, from, merge, Observable } from 'rxjs';
 import { switchMap, map, ignoreElements } from 'rxjs/operators';
 import { appName } from '../app';
-import uuid from 'uuid';
 import { EOL } from 'os';
 import { isDevBuild } from '../isTest';
 import { registerError } from '../registerError';
 import { BasicLogger, defaultBasicLogger } from '../logging';
+import { uuid } from '../uuid';
 
 let initializedClient: PubSub.PubSub | null = null;
 
