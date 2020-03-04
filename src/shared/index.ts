@@ -35,4 +35,4 @@ export * from './conditionalOperator';
 export * from './publishAs';
 export * from './env';
 export * from './pushToSubject';
-export { createSocketEpicContext } from './sockets';
+export * from './sockets';
