@@ -4059,10 +4059,10 @@ ini@^1.3.4:
   resolved "https://registry.yarnpkg.com/ini/-/ini-1.3.5.tgz#eee25f56db1c9ec6085e0c22778083f596abf927"
   integrity sha512-RZY5huIKCMRWDUqZlEi72f/lmXKMvuszcMBduliQ3nnWbx9X/ZBQO7DijMEYS9EhHBb2qacRUMtC7svLwe0lcw==
 
-inquirer@7.0.5, inquirer@^7.0.0:
-  version "7.0.5"
-  resolved "https://registry.yarnpkg.com/inquirer/-/inquirer-7.0.5.tgz#fb95b238ba19966c1a1f55db53c3f0ce5c9e4275"
-  integrity sha512-6Z5cP+LAO0rzNE7xWjWtT84jxKa5ScLEGLgegPXeO3dGeU8lNe5Ii7SlXH6KVtLGlDuaEhsvsFjrjWjw8j5lFg==
+inquirer@7.0.6, inquirer@^7.0.0:
+  version "7.0.6"
+  resolved "https://registry.yarnpkg.com/inquirer/-/inquirer-7.0.6.tgz#ee4ff0ea7ecda5324656fe665878790f66df7d0c"
+  integrity sha512-7SVO4h+QIdMq6XcqIqrNte3gS5MzCCKZdsq9DO4PJziBFNYzP3PGFbDjgadDb//MCahzgjCxvQ/O2wa7kx9o4w==
   dependencies:
     ansi-escapes "^4.2.1"
     chalk "^3.0.0"
@@ -7364,10 +7364,10 @@ trim-off-newlines@^1.0.0:
   resolved "https://registry.yarnpkg.com/trim-off-newlines/-/trim-off-newlines-1.0.1.tgz#9f9ba9d9efa8764c387698bcbfeb2c848f11adb3"
   integrity sha1-n5up2e+odkw4dpi8v+sshI8RrbM=
 
-ts-deps@0.15.0:
-  version "0.15.0"
-  resolved "https://registry.yarnpkg.com/ts-deps/-/ts-deps-0.15.0.tgz#6d4e0381374224ff1833dd424792543f7284c307"
-  integrity sha512-9n+Evea6QCStDGcrm8VlSsI+BRjTTpyMNXpzDeAmWf2aMMYutfSbHz4Pqy/iUcMB2QMZbvpByE5HhhSbwnTkYA==
+ts-deps@0.15.2:
+  version "0.15.2"
+  resolved "https://registry.yarnpkg.com/ts-deps/-/ts-deps-0.15.2.tgz#9c8070e1b5aa0826173821695a91fa61548595b5"
+  integrity sha512-+ODboFhF9YtSMrnZ+ryGs5vcC/U0jFpMhAda5p/plK9h3xvGhSBl8sB0hnovdABQfqKlGOc1qHQu2ovt0tS+vw==
   dependencies:
     "@babel/cli" "7.8.4"
     "@babel/core" "7.8.6"
@@ -7398,7 +7398,7 @@ ts-deps@0.15.0:
     eslint-plugin-import "2.20.1"
     fast-glob "3.2.2"
     fs-extra "8.1.0"
-    inquirer "7.0.5"
+    inquirer "7.0.6"
     istanbul-api "2.1.6"
     jest "25.1.0"
     prettier "1.19.1"
