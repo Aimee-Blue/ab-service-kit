@@ -1,12 +1,15 @@
 import fetch, { RequestInit } from 'node-fetch';
 import { Errors } from '@aimee-blue/ab-shared';
 import { PromiseType } from 'utility-types';
+import { envVar } from '../env';
+
+export const CLOUD_FUNCTION_ROOT_ENDPOINT = 'CLOUD_FUNCTION_ROOT_ENDPOINT';
 
 const constructEndpointUri = (rootEndpoint: string, functionName: string) =>
   rootEndpoint + functionName;
 
 export const defaultApiParams = () => ({
-  rootEndpoint: process.env.CLOUD_FUNCTION_ROOT_ENDPOINT!,
+  rootEndpoint: envVar(CLOUD_FUNCTION_ROOT_ENDPOINT),
 });
 
 export interface IApiParams {
