@@ -2,18 +2,18 @@
 # yarn lockfile v1
 
 
-"@aimee-blue/ab-auth@1.4.1":
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/@aimee-blue/ab-auth/-/ab-auth-1.4.1.tgz#499481aeb5bcfde387c996ebdfa9b6a554b9e8a5"
-  integrity sha512-PBFAlux+9ZQfyLWSyakR7g5/upVzGJymwEnB0NLqojWv6qNDo1ctOHacUjVJ7OZ27FaYGqSWu8o6qODXk2W+JA==
+"@aimee-blue/ab-auth@1.5.1":
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/@aimee-blue/ab-auth/-/ab-auth-1.5.1.tgz#309601161bd4f79d5bf8e558128fc6658ac6332e"
+  integrity sha512-bfVP4tnEVPZCreRapzMpkLiqx1sCZyNu4eR2Kn8NW/y6liRB/BbjSWA+VlOjf/H1/iiJSqwoIuGHPNTwk88BlQ==
   dependencies:
-    "@aimee-blue/ab-shared" "1.118.0"
+    "@aimee-blue/ab-shared" "1.119.2"
     "@hapi/joi" "15.1.1"
-    google-auth-library "5.8.0"
+    google-auth-library "5.10.1"
     jsonwebtoken "8.5.1"
-    jwk-to-pem "2.0.2"
+    jwk-to-pem "2.0.3"
     node-fetch "2.6.0"
-    uuid "3.3.3"
+    uuid "7.0.2"
 
 "@aimee-blue/ab-contracts@1.189.3":
   version "1.189.3"
@@ -23,15 +23,15 @@
     "@hapi/joi" "15.1.1"
     deepmerge "4.2.2"
 
-"@aimee-blue/ab-shared@1.118.0":
-  version "1.118.0"
-  resolved "https://registry.yarnpkg.com/@aimee-blue/ab-shared/-/ab-shared-1.118.0.tgz#f106990853de1f3d8aa543b7558da3aac4d94f1e"
-  integrity sha512-MUomTVNXUnGsDNHEX1XtEIXjoFXafq/rEwHOQxoH2t5FiKcLKsaOk0p1ldpZU1emMFLOJQ6BGWMLDlp4IQFtzQ==
-
 "@aimee-blue/ab-shared@1.119.0":
   version "1.119.0"
   resolved "https://registry.yarnpkg.com/@aimee-blue/ab-shared/-/ab-shared-1.119.0.tgz#a5f0217009b5909d4c700db2ca775a4ffebfa2a6"
   integrity sha512-Nq2RRTUiBzZYg3aH3PX1YtsozuztvQmi3h+bQ+FHi51NWBZgRquN0oCzcEhutAwhipAj5pkRL2ue0d7pOmeIYw==
+
+"@aimee-blue/ab-shared@1.119.2":
+  version "1.119.2"
+  resolved "https://registry.yarnpkg.com/@aimee-blue/ab-shared/-/ab-shared-1.119.2.tgz#4b9acf904b62ab22a93646603860f5c7954a6ade"
+  integrity sha512-Mg9xifHqGiJocmX+MqT7B+CzcBetzx2nUENW86q/TPcQerjbxAEq9HlviF3IRNEiyOOYV+alf3VnjNX3lFohSQ==
 
 "@babel/cli@7.8.4":
   version "7.8.4"
@@ -1865,14 +1865,15 @@ arrify@^2.0.0, arrify@^2.0.1:
   resolved "https://registry.yarnpkg.com/arrify/-/arrify-2.0.1.tgz#c9655e9331e0abcd588d2a7cad7e9956f66701fa"
   integrity sha512-3duEwti880xqi4eAMN8AyR4a0ByT90zoYdLlevfrvU43vb0YZwZVfxOgxWrLXXXpyugL0hNZc9G6BiB5B3nUug==
 
-asn1.js@^4.5.2:
-  version "4.10.1"
-  resolved "https://registry.yarnpkg.com/asn1.js/-/asn1.js-4.10.1.tgz#b9c2bf5805f1e64aadeed6df3a2bfafb5a73f5a0"
-  integrity sha512-p32cOF5q0Zqs9uBiONKYLm6BClCoBCM5O9JfeUSlnQLBTxYdTK+pW+nXflm8UkKd2UYlEbYz5qEi0JuZR9ckSw==
+asn1.js@^5.3.0:
+  version "5.3.0"
+  resolved "https://registry.yarnpkg.com/asn1.js/-/asn1.js-5.3.0.tgz#439099fe9174e09cff5a54a9dda70260517e8689"
+  integrity sha512-WHnQJFcOrIWT1RLOkFFBQkFVvyt9BPOOrH+Dp152Zk4R993rSzXUGPmkybIcUFhHE2d/iHH+nCaOWVCDbO8fgA==
   dependencies:
     bn.js "^4.0.0"
     inherits "^2.0.1"
     minimalistic-assert "^1.0.0"
+    safer-buffer "^2.1.0"
 
 asn1@~0.2.3:
   version "0.2.4"
@@ -3606,7 +3607,7 @@ gaxios@^2.1.0:
     is-stream "^2.0.0"
     node-fetch "^2.3.0"
 
-gcp-metadata@^3.3.0, gcp-metadata@^3.4.0:
+gcp-metadata@^3.4.0:
   version "3.5.0"
   resolved "https://registry.yarnpkg.com/gcp-metadata/-/gcp-metadata-3.5.0.tgz#6d28343f65a6bbf8449886a0c0e4a71c77577055"
   integrity sha512-ZQf+DLZ5aKcRpLzYUyBS3yo3N0JSa82lNDO8rj3nMSlovLcz2riKFBsYgDzeXcv75oo5eqB2lx+B14UvPoCRnA==
@@ -3741,21 +3742,7 @@ globby@10.0.1:
     merge2 "^1.2.3"
     slash "^3.0.0"
 
-google-auth-library@5.8.0:
-  version "5.8.0"
-  resolved "https://registry.yarnpkg.com/google-auth-library/-/google-auth-library-5.8.0.tgz#60a29ef0288c4dc106b537a7a717edec09ded406"
-  integrity sha512-aXVUAUAhyof66F1STizYRQwO8nAqp7DDhF0tvfyXyZof8LxXaYtOk7CJeZ+o7G+o1EfqJZi9AAlK3FhZVzYWuQ==
-  dependencies:
-    arrify "^2.0.0"
-    base64-js "^1.3.0"
-    fast-text-encoding "^1.0.0"
-    gaxios "^2.1.0"
-    gcp-metadata "^3.3.0"
-    gtoken "^4.1.0"
-    jws "^4.0.0"
-    lru-cache "^5.0.0"
-
-google-auth-library@^5.0.0, google-auth-library@^5.5.0:
+google-auth-library@5.10.1, google-auth-library@^5.0.0, google-auth-library@^5.5.0:
   version "5.10.1"
   resolved "https://registry.yarnpkg.com/google-auth-library/-/google-auth-library-5.10.1.tgz#504ec75487ad140e68dd577c21affa363c87ddff"
   integrity sha512-rOlaok5vlpV9rSiUu5EpR0vVpc+PhN62oF4RyX/6++DG1VsaulAFEMlDYBLjJDDPI6OcNOCGAKy9UVB/3NIDXg==
@@ -5002,12 +4989,12 @@ jwa@^2.0.0:
     ecdsa-sig-formatter "1.0.11"
     safe-buffer "^5.0.1"
 
-jwk-to-pem@2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/jwk-to-pem/-/jwk-to-pem-2.0.2.tgz#4a13869c74a899aaf812fca32101b44cf5745f09"
-  integrity sha512-93FbXww4zaWptIG0XRANnfGp+xJcmpzhm4/f5E6JPXHA4z+9Q80nZEpJprOsE2sVYtF3U9XRarxyKWR+bC2Ovg==
+jwk-to-pem@2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/jwk-to-pem/-/jwk-to-pem-2.0.3.tgz#83863b4a4263d06aeefd587c5d2f36b30d6c8098"
+  integrity sha512-T1MA0L3DVB2mOIZytZyNTdcAAOJscLLCi25dgzQtkHjTcuwpRW3BFnjj0eEpMORfJyZtFZ5wy++Ys6wsMolPsA==
   dependencies:
-    asn1.js "^4.5.2"
+    asn1.js "^5.3.0"
     elliptic "^6.5.2"
     safe-buffer "^5.0.1"
 
@@ -7578,15 +7565,15 @@ utils-merge@1.0.1:
   resolved "https://registry.yarnpkg.com/utils-merge/-/utils-merge-1.0.1.tgz#9f95710f50a267947b2ccc124741c1028427e713"
   integrity sha1-n5VxD1CiZ5R7LMwSR0HBAoQn5xM=
 
-uuid@3.3.3:
-  version "3.3.3"
-  resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.3.3.tgz#4568f0216e78760ee1dbf3a4d2cf53e224112866"
-  integrity sha512-pW0No1RGHgzlpHJO1nsVrHKpOEIxkGg1xB+v0ZmdNH5OAeAwzAVrCnI2/6Mtx+Uys6iaylxa+D3g4j63IKKjSQ==
-
 uuid@7.0.1:
   version "7.0.1"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-7.0.1.tgz#95ed6ff3d8c881cbf85f0f05cc3915ef994818ef"
   integrity sha512-yqjRXZzSJm9Dbl84H2VDHpM3zMjzSJQ+hn6C4zqd5ilW+7P4ZmLEEqwho9LjP+tGuZlF4xrHQXT0h9QZUS/pWA==
+
+uuid@7.0.2:
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-7.0.2.tgz#7ff5c203467e91f5e0d85cfcbaaf7d2ebbca9be6"
+  integrity sha512-vy9V/+pKG+5ZTYKf+VcphF5Oc6EFiu3W8Nv3P3zIh0EqVI80ZxOzuPfe9EHjkFNvf8+xuTHVeei4Drydlx4zjw==
 
 uuid@^3.3.2:
   version "3.4.0"
