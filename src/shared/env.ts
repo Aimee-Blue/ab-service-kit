@@ -16,6 +16,19 @@ interface ILoadEnvParams {
   logger?: BasicLogger;
 }
 
+export function envVar(name: string, defaultValue?: string): string {
+  const value = process.env[name];
+  if (value) {
+    return value;
+  }
+
+  if (typeof defaultValue === 'undefined') {
+    throw new Error(`${name} environment variable is not set`);
+  }
+
+  return defaultValue;
+}
+
 export async function loadEnv(
   params: ILoadEnvParams = {
     verbosity: 0,
