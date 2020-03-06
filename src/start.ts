@@ -14,6 +14,8 @@ export function start(config: IServiceConfig) {
     });
 }
 
+let shutdownRequests = 0;
+
 function startWithLoggerAndConfig(config: IServiceConfig, logger: BasicLogger) {
   function handleError(exc: unknown) {
     logger.error('💥  ', exc);
@@ -33,6 +35,18 @@ function startWithLoggerAndConfig(config: IServiceConfig, logger: BasicLogger) {
       shutdown()
         .then(finish)
         .catch(handleError);
+
+      shutdownRequests += 1;
+      if (shutdownRequests > 1) {
+        import('wtfnode').then(mod => {
+          console.log('== Open Handles ==');
+          mod.dump();
+          console.log(' ');
+        });
+      }
+      if (shutdownRequests > 5) {
+        process.exit(1);
+      }
     });
 
     process.on('SIGTERM', () => {
