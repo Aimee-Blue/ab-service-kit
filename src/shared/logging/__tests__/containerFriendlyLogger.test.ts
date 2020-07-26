@@ -26,7 +26,7 @@ describe(friendlyLogEntry.name, () => {
     expect(friendlyLogEntry('  x  x  ')).toEqual('["x  x"]');
     const err = new Error();
     expect(friendlyLogEntry(err)).toEqual(
-      '[' + JSON.stringify(`${err.stack}`) + ']'
+      '[' + JSON.stringify(`${String(err.stack)}`) + ']'
     );
     expect(friendlyLogEntry({ someValue: 1 })).toEqual('["{ someValue: 1 }"]');
     expect(

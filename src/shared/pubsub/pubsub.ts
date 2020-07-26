@@ -69,7 +69,7 @@ export const getTopic = (topic: string): PubSub.Topic => {
 };
 
 export async function prepareTopics(topics: string[]) {
-  topics.forEach(topic => {
+  topics.forEach((topic) => {
     addTopicToMap(topic);
   });
 }
@@ -122,7 +122,7 @@ async function createTopicAndSubscription(
   const shortName = fullName.replace('@aimee-blue/', '');
 
   const genName = isDevBuild()
-    ? `${shortName}-${process.env.USER}`
+    ? `${shortName}-${String(process.env.USER)}`
     : `${shortName}-${uuid()}`;
 
   const lastName = subscriptionNamesByTopic.get(topic);
@@ -173,10 +173,10 @@ export function subscribe(
   optLogger?: BasicLogger
 ) {
   return defer(() => from(appName())).pipe(
-    switchMap(name => createTopicAndSubscription(topic, name, options)),
+    switchMap((name) => createTopicAndSubscription(topic, name, options)),
     switchMap(
-      subscription =>
-        new Observable<Message>(subscriber => {
+      (subscription) =>
+        new Observable<Message>((subscriber) => {
           const name = subscription.name;
 
           const logger = optLogger || defaultBasicLogger();
@@ -190,7 +190,7 @@ export function subscribe(
             merge(
               fromEvent<PubSub.Message>(subscription, 'message'),
               fromEvent<Error>(subscription, 'error').pipe(
-                map(err => {
+                map((err) => {
                   throw err;
                 }),
                 ignoreElements()

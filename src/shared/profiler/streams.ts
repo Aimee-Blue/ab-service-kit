@@ -67,7 +67,7 @@ function createInitialState(deps = defaultDeps): IState {
     memo: (
       name: string,
       details?: IDetails,
-      determine: (metric: number) => number = value => value
+      determine: (metric: number) => number = (value) => value
     ): number | null => {
       const state = stateByTag.get(name);
       if (!state || !state.hitTime) {
@@ -106,7 +106,7 @@ function createSummary(name: string | RegExp): Observable<ISummary> {
 
   return allMemos.asObservable().pipe(
     //
-    filter(item => isMatch(item.name, name)),
+    filter((item) => isMatch(item.name, name)),
     scan(
       (acc, item) => {
         const memos = [...acc.memos, item.time].slice(-MAX_MEMOS);
@@ -133,7 +133,7 @@ function createSummary(name: string | RegExp): Observable<ISummary> {
         mostOfTheTimesLessThan: NaN,
       }
     ),
-    map(item => ({
+    map((item) => ({
       numberOfSamples: item.memos.length,
       max: item.max,
       min: item.min,
@@ -193,7 +193,7 @@ export function attach(params: {
         effectiveState
       );
 
-    return source.pipe(stream => {
+    return source.pipe((stream) => {
       if (params.till === 'unsubscribe' && params.from === 'complete') {
         return stream.pipe(startOp(), stopOp());
       } else {
@@ -278,10 +278,7 @@ export function stop(
   },
   state = globalState()
 ) {
-  const params = {
-    till: 'next' as const,
-    ...paramsRaw,
-  };
+  const params = paramsRaw;
   return <T>(stream: Observable<T>) => {
     const setMemo = () => {
       const timeTook = state.memo(
@@ -349,13 +346,13 @@ export function logSummaries(params: {
 }
 
 export function timesRegistered(name?: string | RegExp) {
-  return allMemos.pipe(stream =>
-    name ? stream.pipe(filter(item => isMatch(item.name, name))) : stream
+  return allMemos.pipe((stream) =>
+    name ? stream.pipe(filter((item) => isMatch(item.name, name))) : stream
   );
 }
 
 export function summariesLogged(name?: string) {
-  return allSummaries.pipe(stream =>
-    name ? stream.pipe(filter(item => isMatch(item.name, name))) : stream
+  return allSummaries.pipe((stream) =>
+    name ? stream.pipe(filter((item) => isMatch(item.name, name))) : stream
   );
 }

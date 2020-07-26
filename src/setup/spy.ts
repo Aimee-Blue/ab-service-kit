@@ -6,6 +6,7 @@ export async function setupSpy<D>(
   deps: ServiceDeps<D>
 ): Promise<TeardownHandler> {
   if (config.spy) {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { create } = require('rxjs-spy') as typeof import('rxjs-spy');
 
     const spy = create({

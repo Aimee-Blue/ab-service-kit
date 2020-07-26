@@ -4,7 +4,7 @@ import { initializeLoggerOrFallback } from './setup/initializeLogger';
 
 export function start(config: IServiceConfig) {
   initializeLoggerOrFallback(config)
-    .then(logger => {
+    .then((logger) => {
       startWithLoggerAndConfig(config, logger);
     })
     .catch(() => {
@@ -32,17 +32,19 @@ function startWithLoggerAndConfig(config: IServiceConfig, logger: BasicLogger) {
     process.on('SIGINT', () => {
       logger.log('\nShutting down due to SIGINT...\n');
 
-      shutdown()
-        .then(finish)
-        .catch(handleError);
+      shutdown().then(finish).catch(handleError);
 
       shutdownRequests += 1;
       if (shutdownRequests > 1) {
-        import('wtfnode').then(mod => {
-          console.log('== Open Handles ==');
-          mod.dump();
-          console.log(' ');
-        });
+        import('wtfnode')
+          .then((mod) => {
+            console.log('== Open Handles ==');
+            mod.dump();
+            console.log(' ');
+          })
+          .catch((err) => {
+            console.error(err);
+          });
       }
       if (shutdownRequests > 5) {
         process.exit(1);
@@ -52,9 +54,7 @@ function startWithLoggerAndConfig(config: IServiceConfig, logger: BasicLogger) {
     process.on('SIGTERM', () => {
       logger.log('\nShutting down due to SIGTERM...\n');
 
-      shutdown()
-        .then(finish)
-        .catch(handleError);
+      shutdown().then(finish).catch(handleError);
     });
 
     const teardown = await startCore(config, undefined, logger);
