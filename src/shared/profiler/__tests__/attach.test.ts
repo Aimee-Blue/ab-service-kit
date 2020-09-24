@@ -18,7 +18,7 @@ describe(`${attach.name} operator`, () => {
   describe('given observable that fires every 2ms', () => {
     it(
       'should allow profiling time between emissions',
-      marbles(m => {
+      marbles((m) => {
         const source = m.hot('a-b-c|'); // prettier-ignore
         const subs =         '^----!'; // prettier-ignore
         const expected =     'a-b-c|'; // prettier-ignore
@@ -60,12 +60,11 @@ describe(`${attach.name} operator`, () => {
         m.flush();
       })
     );
-  });
 
-  describe('given observable that fires every 2ms', () => {
+    // eslint-disable-next-line
     it(
       'should allow profiling subscription time',
-      marbles(m => {
+      marbles((m) => {
         const source = m.hot('a-b-c|'); // prettier-ignore
         const subs =         '^----!'; // prettier-ignore
         const expected =     'a-b-c|'; // prettier-ignore
@@ -103,12 +102,11 @@ describe(`${attach.name} operator`, () => {
         m.flush();
       })
     );
-  });
 
-  describe('given observable that fires every 2ms', () => {
+    // eslint-disable-next-line
     it(
       'should allow profiling completion time',
-      marbles(m => {
+      marbles((m) => {
         const source = m.hot('a-b-c|-'); // prettier-ignore
         const subs =         '^----!-'; // prettier-ignore
         const expected =     'a-b-c|-'; // prettier-ignore

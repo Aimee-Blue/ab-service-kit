@@ -30,10 +30,10 @@ export const buildServerUpgradeListener = (
     wss.handleUpgrade(request, socket, head, function done(ws: SocketWithInfo) {
       const id = uuid();
 
-      if ('id' in ws) {
+      if ('id' in (ws as {})) {
         throw new Error('id already exists in socket');
       }
-      if ('id' in request) {
+      if ('id' in (request as {})) {
         throw new Error('id already exists in request');
       }
 

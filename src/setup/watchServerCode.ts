@@ -35,7 +35,7 @@ const watchMultiple = (patterns: string[]) => {
 
   const logger = defaultBasicLogger();
 
-  return new Observable<string>(subscriber => {
+  return new Observable<string>((subscriber) => {
     const watcher = chokidar.watch(patterns, {
       ignorePermissionErrors: true,
     });
@@ -53,13 +53,10 @@ const watchMultiple = (patterns: string[]) => {
       subscriber.complete();
     };
 
-    watcher
-      .on('change', onChange)
-      .on('error', onError)
-      .on('close', onClose);
+    watcher.on('change', onChange).on('error', onError).on('close', onClose);
 
     return () => {
-      watcher.close().catch(err => {
+      watcher.close().catch((err) => {
         logger.log('Couldnt close file watcher', err);
       });
     };
@@ -86,21 +83,21 @@ function mainModule() {
 }
 
 function allChildModules(startFrom: NodeModule = mainModule()) {
-  return of(moduleInfo(startFrom)).pipe(stream => {
+  return of(moduleInfo(startFrom)).pipe((stream) => {
     const set = new Set();
 
     // sometimes modules circularly reference each other :(
     const uniqueModules = (arr: NodeModule[]) => {
-      const items = arr.filter(item => !set.has(item));
+      const items = arr.filter((item) => !set.has(item));
       items.forEach(set.add.bind(set));
       return items;
     };
 
     return stream.pipe(
-      expand(data =>
+      expand((data) =>
         from(uniqueModules(data.mod.children)).pipe(
           map(moduleInfo),
-          filter(pair => !pair.filePath.includes('node_modules'))
+          filter((pair) => !pair.filePath.includes('node_modules'))
         )
       )
     );
@@ -117,14 +114,14 @@ function findModule(
     allChildModules(startFrom),
     from(
       Object.entries(require.cache as { [key: string]: NodeModule | undefined })
-        .filter(entry => !entry[0].includes('node_modules'))
-        .map(entry => entry[1])
+        .filter((entry) => !entry[0].includes('node_modules'))
+        .map((entry) => entry[1])
         .filter(isTruthy)
-        .map(module => moduleInfo(module))
+        .map((module) => moduleInfo(module))
     )
   ).pipe(
     //
-    find(result => {
+    find((result) => {
       const resolvedPath = resolve(path.normalize(result.filePath));
       return resolvedPath === compareTo;
     })
@@ -135,8 +132,8 @@ function allParentModules(module: NodeModule) {
   return defer(() => {
     return of(module.parent).pipe(
       filter(isTruthy),
-      expand(next => (next.parent ? of(next.parent) : empty())),
-      map(mod => moduleInfo(mod))
+      expand((next) => (next.parent ? of(next.parent) : empty())),
+      map((mod) => moduleInfo(mod))
     );
   });
 }
@@ -144,6 +141,7 @@ function allParentModules(module: NodeModule) {
 type ServiceSetupFunc = (config: IServiceConfig) => Promise<TeardownHandler>;
 
 function requireSetupModule(moduleId: string): IServiceConfig {
+  // eslint-disable-next-line
   const result = require(moduleId) as
     | IServiceConfig
     | {
@@ -183,18 +181,18 @@ export async function serviceSetupInWatchMode(
     return watchMultiple(WATCH_PATTERNS);
   })
     .pipe(
-      mergeMap(filePath =>
+      mergeMap((filePath) =>
         from(
           pathExists(join(process.cwd(), filePath))
             .catch(() => false)
-            .then(exists => ({
+            .then((exists) => ({
               exists,
               filePath,
               resolved: join(process.cwd(), filePath),
             }))
         )
       ),
-      filter(pair => {
+      filter((pair) => {
         if (!pair.exists) {
           logger.log(
             `Cannot resolve changes to ${pair.filePath} (tried ${pair.resolved}), ignoring`
@@ -204,21 +202,21 @@ export async function serviceSetupInWatchMode(
         return pair.exists;
       }),
 
-      mergeMap(fileInfo =>
+      mergeMap((fileInfo) =>
         findModule(fileInfo.resolved).pipe(
           filter(isTruthy),
-          concatMap(mod => concat(of(mod), allParentModules(mod.mod))),
+          concatMap((mod) => concat(of(mod), allParentModules(mod.mod))),
           toArray()
         )
       ),
 
-      filter(mods => mods.length > 0),
+      filter((mods) => mods.length > 0),
 
-      concatMap(mods =>
+      concatMap((mods) =>
         from(teardownOldServer('watch-mode')).pipe(mapTo(mods))
       ),
 
-      concatMap(mods => {
+      concatMap((mods) => {
         for (const mod of mods) {
           if (mod.mod.id === '.') {
             // we do not reload the main module
@@ -231,13 +229,13 @@ export async function serviceSetupInWatchMode(
           clearModule(mod.mod.id);
         }
 
-        if (!mods.find(item => item.filePath === setupFilePath)) {
+        if (!mods.find((item) => item.filePath === setupFilePath)) {
           clearModule(setupFilePath);
         }
 
         return defer(() =>
           from(
-            setup(requireSetupModule(setupFilePath)).then(teardown => {
+            setup(requireSetupModule(setupFilePath)).then((teardown) => {
               teardownOldServer = teardown;
               return Promise.resolve();
             })
@@ -257,11 +255,11 @@ export async function serviceSetupInWatchMode(
       () => {
         return;
       },
-      err => logger.log('💥  Watching error', err),
+      (err) => logger.log('💥  Watching error', err),
       () => logger.log('Watching stopped')
     );
 
-  return async mode => {
+  return async (mode) => {
     subscription.unsubscribe();
 
     await teardownOldServer(mode);

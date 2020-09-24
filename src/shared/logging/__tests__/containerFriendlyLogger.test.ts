@@ -1,7 +1,7 @@
 import { trimWhitespace, friendlyLogEntry } from '../containerFriendlyLogger';
 import { EOL } from 'os';
 
-describe(trimWhitespace.name, () => {
+describe('trimWhitespace', () => {
   it('should work', () => {
     expect(trimWhitespace(false)).toBe(false);
     expect(trimWhitespace('')).toBe('');
@@ -13,7 +13,7 @@ describe(trimWhitespace.name, () => {
   });
 });
 
-describe(friendlyLogEntry.name, () => {
+describe('friendlyLogEntry', () => {
   it('should work', () => {
     expect(friendlyLogEntry()).toEqual('[]');
     expect(friendlyLogEntry(undefined)).toEqual('["undefined"]');
@@ -26,7 +26,7 @@ describe(friendlyLogEntry.name, () => {
     expect(friendlyLogEntry('  x  x  ')).toEqual('["x  x"]');
     const err = new Error();
     expect(friendlyLogEntry(err)).toEqual(
-      '[' + JSON.stringify(`${err.stack}`) + ']'
+      '[' + JSON.stringify(String(err.stack)) + ']'
     );
     expect(friendlyLogEntry({ someValue: 1 })).toEqual('["{ someValue: 1 }"]');
     expect(
@@ -44,7 +44,7 @@ describe(friendlyLogEntry.name, () => {
         },
       })
     ).toEqual(
-      '["{ value:\\n   { secondLevel:\\n      { thirdLevel: [ 1, 2, 3 ],\\n        another: { andNotDeeperThanThat: [Object] } } } }"]'
+      '["{ value:\\n   { secondLevel: { thirdLevel: [ 1, 2, 3 ], another: { andNotDeeperThanThat: [Object] } } } }"]'
     );
     expect(friendlyLogEntry(false)).toEqual('[false]');
     expect(friendlyLogEntry(123)).toEqual('[123]');

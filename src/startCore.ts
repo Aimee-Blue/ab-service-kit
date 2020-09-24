@@ -102,9 +102,9 @@ export async function startCore(
 
   const handleServerRequestsWithDevTools = async () => {
     if (params.watch) {
-      // tslint:disable-next-line: no-unsafe-any
-      const serviceSetupInWatchMode = require('./setup/watchServerCode')
-        .serviceSetupInWatchMode as typeof import('./setup/watchServerCode')['serviceSetupInWatchMode'];
+      const { serviceSetupInWatchMode } = await import(
+        './setup/watchServerCode'
+      );
 
       const configFile = config.serviceConfigModuleId || './lib/config.js';
       const configFilePath = resolve(configFile);
@@ -116,9 +116,12 @@ export async function startCore(
         );
       }
 
-      return await serviceSetupInWatchMode(configFilePath, async newConfig => {
-        return await serviceSetup(server, newConfig, params, logger);
-      });
+      return await serviceSetupInWatchMode(
+        configFilePath,
+        async (newConfig) => {
+          return await serviceSetup(server, newConfig, params, logger);
+        }
+      );
     } else {
       return await serviceSetup(server, config, params, logger);
     }
@@ -128,7 +131,7 @@ export async function startCore(
 
   await new Promise((res, rej) => {
     let handled = false;
-    server.on('error', err => {
+    server.on('error', (err) => {
       if (handled) {
         return;
       }
@@ -163,7 +166,7 @@ export async function startCore(
   return async () => {
     await teardown('destroy');
     await new Promise((res, rej) =>
-      server.close(err => {
+      server.close((err) => {
         if (err) {
           rej(err);
         } else {

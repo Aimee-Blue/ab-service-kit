@@ -1,6 +1,6 @@
 import { VerifyError } from '../verifyError';
 
-describe(VerifyError.name, () => {
+describe('VerifyError', () => {
   it('should inherit Error', () => {
     expect(new VerifyError('') instanceof Error).toBe(true);
   });

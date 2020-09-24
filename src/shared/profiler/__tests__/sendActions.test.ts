@@ -1,7 +1,7 @@
 import { marbles } from 'rxjs-marbles/jest';
 import { sendActions } from '../send';
 
-describe(sendActions.name, () => {
+describe('sendActions', () => {
   describe('given default parameters', () => {
     const deps = {
       sendOne: jest.fn(),
@@ -16,7 +16,7 @@ describe(sendActions.name, () => {
 
     it(
       'should work',
-      marbles(m => {
+      marbles((m) => {
         const source = m.hot('aaa|', map); // prettier-ignore
         const subs =         '^--!'; // prettier-ignore
         const expected =     'aaa|'; // prettier-ignore

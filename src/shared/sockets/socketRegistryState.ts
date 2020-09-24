@@ -88,7 +88,7 @@ const waitForCompletionThenTeardown = (
 ) => {
   wait()
     .then(teardown)
-    .catch(err => {
+    .catch((err) => {
       logger.error('💥  Error while waiting for epic to complete', err);
       teardown();
     });
@@ -187,8 +187,6 @@ const onServerClose = (state: ISocketRegistryState) => async () => {
   }
 };
 
-export type RegistryStateApi = ReturnType<typeof buildRegistryStateApi>;
-
 export const buildRegistryStateApi = (state: ISocketRegistryState) => {
   return Object.freeze({
     addSocket: addSocket(state),
@@ -198,3 +196,5 @@ export const buildRegistryStateApi = (state: ISocketRegistryState) => {
     onServerClose: onServerClose(state),
   });
 };
+
+export type RegistryStateApi = ReturnType<typeof buildRegistryStateApi>;

@@ -5,7 +5,7 @@ import {
   dataStreamFromSocket,
   pipeStreamIntoSocket,
 } from './shared/sockets';
-import Joi from '@hapi/joi';
+import Joi from 'joi';
 import {
   concatMap,
   map,
@@ -34,7 +34,7 @@ async function start() {
 
   const jobs = merge(
     actions.pipe(
-      concatMap(action => {
+      concatMap((action) => {
         logger.log('  -> Received', action);
         return empty();
       })
@@ -46,11 +46,11 @@ async function start() {
   subscriptions.add(
     pipeStreamIntoSocket(
       data.pipe(
-        map(text => ({
+        map((text) => ({
           type: 'TEST',
           text: text.replace('\n', ''),
         })),
-        tap(action => {
+        tap((action) => {
           logger.log('  <- Sending', action);
         })
       ),
@@ -69,6 +69,6 @@ async function start() {
     .toPromise();
 }
 
-start().catch(err => {
+start().catch((err) => {
   defaultBasicLogger().error('', err);
 });

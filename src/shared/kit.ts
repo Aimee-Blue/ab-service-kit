@@ -3,7 +3,7 @@ import express from 'express';
 import WebSocket from 'ws';
 import { Observable, ObservedValueOf } from 'rxjs';
 import { IncomingMessage } from 'http';
-import * as Joi from '@hapi/joi';
+import * as Joi from 'joi';
 import { IAction } from './action';
 import { TaggedLogger, BasicLogger } from './logging';
 

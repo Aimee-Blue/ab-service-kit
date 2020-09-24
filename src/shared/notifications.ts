@@ -45,7 +45,7 @@ export function executeOnNotifications<T, O extends Observable<unknown>>(
       return stream;
     }
 
-    return new Observable<X>(subscriber => {
+    return new Observable<X>((subscriber) => {
       const observables = notifications.filter(isObservable) as O[];
 
       if (notifications.includes('subscribe')) {
@@ -58,10 +58,10 @@ export function executeOnNotifications<T, O extends Observable<unknown>>(
 
       subscriber.add(
         shared.subscribe({
-          next: value => {
+          next: (value) => {
             lastValue = value;
           },
-          error: _err => {
+          error: (_err) => {
             // we can simply ignore the error because it
             // goes to the subscriber below anyway, however,
             // we cannot remove this handler otherwise the
@@ -69,7 +69,7 @@ export function executeOnNotifications<T, O extends Observable<unknown>>(
             return;
           },
           ...(notifications.includes('next') && {
-            next: value => {
+            next: (value) => {
               lastValue = value;
               cb({ notification: 'next', value });
             },
@@ -78,7 +78,7 @@ export function executeOnNotifications<T, O extends Observable<unknown>>(
             complete: () => cb({ notification: 'complete', lastValue }),
           }),
           ...(notifications.includes('error') && {
-            error: error => cb({ notification: 'error', error }),
+            error: (error: unknown) => cb({ notification: 'error', error }),
           }),
         })
       );
@@ -89,7 +89,7 @@ export function executeOnNotifications<T, O extends Observable<unknown>>(
             next: (notification: ObservedValueOf<O>) => {
               cb({ notification, lastValue });
             },
-            error: err => {
+            error: (err) => {
               registerError(err);
               logger.log('💥  Logging notifications generated an error', err);
             },

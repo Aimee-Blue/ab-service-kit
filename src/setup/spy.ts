@@ -6,7 +6,7 @@ export async function setupSpy<D>(
   deps: ServiceDeps<D>
 ): Promise<TeardownHandler> {
   if (config.spy) {
-    const { create } = require('rxjs-spy') as typeof import('rxjs-spy');
+    const { create } = await import('rxjs-spy');
 
     const spy = create({
       defaultPlugins: isDevBuild(),

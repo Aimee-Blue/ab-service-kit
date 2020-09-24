@@ -2,7 +2,7 @@ import { marbles } from 'rxjs-marbles/jest';
 import { retryWithBackoff, RetryOpts, createNoOpBasicLogger } from '../shared';
 import { take, tap } from 'rxjs/operators';
 
-describe(retryWithBackoff.name, () => {
+describe('retryWithBackoff', () => {
   describe('given default options', () => {
     const opts: RetryOpts = {
       shouldRetry: () => true,
@@ -10,9 +10,10 @@ describe(retryWithBackoff.name, () => {
     };
 
     describe('given source with no errors', () => {
+      // eslint-disable-next-line
       it(
         'should work',
-        marbles(m => {
+        marbles((m) => {
           const source = m.hot('aaa|'); // prettier-ignore
           const subs =         '^--!'; // prettier-ignore
           const expected =     'aaa|'; // prettier-ignore
@@ -26,9 +27,10 @@ describe(retryWithBackoff.name, () => {
     });
 
     describe('given empty source', () => {
+      // eslint-disable-next-line
       it(
         'should work',
-        marbles(m => {
+        marbles((m) => {
           const source = m.hot('|'); // prettier-ignore
           const subs =         '(^!)'; // prettier-ignore
           const expected =     '|'; // prettier-ignore
@@ -42,9 +44,10 @@ describe(retryWithBackoff.name, () => {
     });
 
     describe('given infinite source', () => {
+      // eslint-disable-next-line
       it(
         'should work',
-        marbles(m => {
+        marbles((m) => {
           const source = m.hot('---'); // prettier-ignore
           const subs =         '^--'; // prettier-ignore
           const expected =     '---'; // prettier-ignore
@@ -58,9 +61,10 @@ describe(retryWithBackoff.name, () => {
     });
 
     describe('given source that errors', () => {
+      // eslint-disable-next-line
       it(
         'should work',
-        marbles(m => {
+        marbles((m) => {
           const source = m.cold('a-bc-#'); // prettier-ignore
           const subs = [ // prettier-ignore
                                 '^----!', // prettier-ignore
@@ -80,9 +84,10 @@ describe(retryWithBackoff.name, () => {
     });
 
     describe('given source that errors twice after successful retry', () => {
+      // eslint-disable-next-line
       it(
         'should work',
-        marbles(m => {
+        marbles((m) => {
           const source = m.cold('a-bc-#'); // prettier-ignore
           const subs = [                                    // prettier-ignore
                                 '^----!',                   // prettier-ignore
@@ -103,9 +108,10 @@ describe(retryWithBackoff.name, () => {
     });
 
     describe('given source that errors twice in a row', () => {
+      // eslint-disable-next-line
       it(
         'should work',
-        marbles(m => {
+        marbles((m) => {
           const source = m.hot('aX 1s -X-|'); // prettier-ignore
           const subs = [                            // prettier-ignore
                                '^!',                // prettier-ignore
@@ -115,7 +121,7 @@ describe(retryWithBackoff.name, () => {
           const expected =     'a- 1s - 10s -|'; // prettier-ignore
 
           const result = source.pipe(
-            tap(item => {
+            tap((item) => {
               if (item === 'X') {
                 // eslint-disable-next-line no-throw-literal
                 throw 'error';

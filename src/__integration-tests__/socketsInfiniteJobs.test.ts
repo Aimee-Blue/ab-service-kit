@@ -1,16 +1,16 @@
 import WebSocket from 'ws';
-import { fromEvent, merge, of, bindNodeCallback, never, from } from 'rxjs';
+import { fromEvent, merge, of, bindNodeCallback, NEVER, from } from 'rxjs';
 import { mergeMap, take, timeoutWith, mapTo, map } from 'rxjs/operators';
 import { PromiseType } from 'utility-types';
 
 import { SocketEpic, SOCKET_CLOSE_WAIT_TIMEOUT } from '../shared';
 import { initTestEpic } from './helpers';
 
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
+jest.setTimeout(10000);
 
 describe('given service with a faulty epic that never finishes tasks', () => {
-  const epicThatNeverFinishes: SocketEpic = commands =>
-    merge(commands, never());
+  const epicThatNeverFinishes: SocketEpic = (commands) =>
+    merge(commands, NEVER);
 
   let data: PromiseType<ReturnType<typeof initTestEpic>>;
   beforeEach(async () => {

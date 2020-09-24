@@ -3,11 +3,11 @@ import { take, switchMap } from 'rxjs/operators';
 import { createSelfSignedTokens } from '../selfSignedTokens';
 import { of, timer } from 'rxjs';
 
-describe(createSelfSignedTokens.name, () => {
+describe('createSelfSignedTokens', () => {
   describe('given different tokens generated every time', () => {
     it(
       'should work',
-      marbles(m => {
+      marbles((m) => {
         const values = {
           a: {
             keyId: 'a',

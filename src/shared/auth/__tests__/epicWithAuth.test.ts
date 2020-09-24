@@ -31,12 +31,12 @@ const possibleOutput = {
 };
 
 function buildTestData(inputCmds: string, m: Context) {
-  const echoingEpicImpl: SocketEpic = commands => commands;
+  const echoingEpicImpl: SocketEpic = (commands) => commands;
   const echoingEpic = jest.fn(echoingEpicImpl);
 
   // tslint:disable-next-line
   const epic = epicWithAuth([], echoingEpic as any, {
-    verifyToken: jest.fn(data =>
+    verifyToken: jest.fn((data) =>
       data.token === 'TOKEN'
         ? timer(1, m.scheduler).pipe(mapTo({ status: 200, message: 'Ok' }))
         : timer(1, m.scheduler).pipe(mapTo({ status: 400, message: 'Oops!' }))
@@ -68,14 +68,14 @@ function buildTestData(inputCmds: string, m: Context) {
   };
 }
 
-describe(epicWithAuth.name, () => {
+describe('epicWithAuth', () => {
   describe('given no token sent', () => {
     const inputCmds = 'd';
     const outputCmds = '(U|)';
 
     it(
       'should complete with error',
-      marbles(m => {
+      marbles((m) => {
         const { output } = buildTestData(inputCmds, m);
 
         m.expect(output).toBeObservable(outputCmds, possibleOutput);
@@ -89,7 +89,7 @@ describe(epicWithAuth.name, () => {
 
     it(
       'should complete',
-      marbles(m => {
+      marbles((m) => {
         const { output } = buildTestData(inputCmds, m);
 
         m.expect(output).toBeObservable(outputCmds, possibleOutput);
@@ -104,7 +104,7 @@ describe(epicWithAuth.name, () => {
 
     it(
       'should complete',
-      marbles(m => {
+      marbles((m) => {
         const { input, output, originalEpic, context } = buildTestData(
           inputCmds,
           m

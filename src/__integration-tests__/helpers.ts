@@ -1,4 +1,4 @@
-import * as Joi from '@hapi/joi';
+import * as Joi from 'joi';
 import { IServiceConfig, SocketEpic } from '../shared';
 import { startCore } from '../startCore';
 import { create } from 'rxjs-spy';
