@@ -51,7 +51,7 @@
   },
   "dependencies": {
     "@aimee-blue/ab-auth": "1.6.1",
-    "@aimee-blue/ab-shared": "1.120.1",
+    "@aimee-blue/ab-shared": "1.121.1",
     "@google-cloud/pubsub": "2.5.0",
     "cors": "2.8.5",
     "dotenv": "8.2.0",
