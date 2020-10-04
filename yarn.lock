@@ -2,12 +2,12 @@
 # yarn lockfile v1
 
 
-"@aimee-blue/ab-auth@1.6.1":
-  version "1.6.1"
-  resolved "https://registry.yarnpkg.com/@aimee-blue/ab-auth/-/ab-auth-1.6.1.tgz#f06ef3ae2359c830f77f73012f546d4ca502a728"
-  integrity sha512-ET/Ko1UblNimqTYAgZ35kwjnfji23s30YWXhBHef+DBvb6kOrI8qctmVu0MAKd3nBeKWkmQL7CTq5rwyvlNAzQ==
+"@aimee-blue/ab-auth@1.6.2":
+  version "1.6.2"
+  resolved "https://registry.yarnpkg.com/@aimee-blue/ab-auth/-/ab-auth-1.6.2.tgz#5a079573605d53c3ca6f6d1e7cf01f0d91699a11"
+  integrity sha512-qc/JRQbGU0UDbi6e6DN5myEb+5KpZ0E/UepwggZJNZ/mtdYNGRf2SquG17skVx+R+26KYgUKkin/e3dAxCmDrg==
   dependencies:
-    "@aimee-blue/ab-shared" "1.120.1"
+    "@aimee-blue/ab-shared" "1.121.1"
     google-auth-library "6.1.0"
     joi "17.2.1"
     jsonwebtoken "8.5.1"
@@ -27,6 +27,11 @@
   version "1.120.1"
   resolved "https://registry.yarnpkg.com/@aimee-blue/ab-shared/-/ab-shared-1.120.1.tgz#398881caf783ad433d191f41f0ccb71cfd15505e"
   integrity sha512-Pdid7eokIyK7B1YKeAbLzIzG2QXCkfxY00g5g/rqBy62IvOuOZ0+AQ1hmunCW+/YCZ/sfe5m0ObrGlJz7JoXnQ==
+
+"@aimee-blue/ab-shared@1.121.1":
+  version "1.121.1"
+  resolved "https://registry.yarnpkg.com/@aimee-blue/ab-shared/-/ab-shared-1.121.1.tgz#d5d9fb2c2b650914cc2c42c5434c94c35beadce7"
+  integrity sha512-AMQSkbQmqzXDLgRtiK3kiqdtYfQ3ui7NzUcugqiSPCqAIpqrZTD8REJygHxREa89E6T6kjIy0PaJFiVcZyzf9w==
 
 "@babel/cli@7.11.6":
   version "7.11.6"
