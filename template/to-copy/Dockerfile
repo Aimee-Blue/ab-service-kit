@@ -1,4 +1,4 @@
-FROM node:10-alpine as install-dev-deps
+FROM node:12-alpine as install-dev-deps
 
 COPY scripts/clean.js /opt/app/scripts/
 COPY scripts/build.js /opt/app/scripts/
@@ -36,7 +36,7 @@ COPY --from=install-dev /opt/app/.env /opt/app/.env
 COPY --from=install-dev /opt/app/.yarnrc /opt/app/.yarnrc
 
 # Final runnable image
-FROM node:10-alpine as app-container
+FROM node:12-alpine as app-container
 
 RUN apk add --no-cache tini \
   && true

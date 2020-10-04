@@ -17,11 +17,11 @@
     "upgrade-scripts": "yarn upgrade @aimee-blue/ab-scripts --latest"
   },
   "dependencies": {
-    "@aimee-blue/ab-contracts": "1.189.3",
-    "@aimee-blue/ab-service-kit": "1.25.1"
+    "@aimee-blue/ab-contracts": "1.198.0",
+    "@aimee-blue/ab-service-kit": "1.28.1"
   },
   "devDependencies": {
-    "@aimee-blue/ab-scripts": "1.6.2",
-    "ts-deps": "0.15.0"
+    "@aimee-blue/ab-scripts": "1.8.0",
+    "ts-deps": "0.18.3"
   }
 }

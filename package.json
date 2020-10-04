@@ -50,8 +50,8 @@
     ]
   },
   "dependencies": {
-    "@aimee-blue/ab-auth": "1.6.1",
-    "@aimee-blue/ab-shared": "1.120.1",
+    "@aimee-blue/ab-auth": "1.6.2",
+    "@aimee-blue/ab-shared": "1.121.1",
     "@google-cloud/pubsub": "2.5.0",
     "cors": "2.8.5",
     "dotenv": "8.2.0",
@@ -66,25 +66,25 @@
     "rxjs-spy": "7.5.3",
     "rxjs-stream": "3.2.1",
     "source-map-support": "0.5.19",
-    "uuid": "8.3.0",
+    "uuid": "8.3.1",
     "ws": "7.3.1",
     "wtfnode": "0.8.3",
     "yargs": "16.0.3"
   },
   "devDependencies": {
-    "@aimee-blue/ab-contracts": "1.196.1",
+    "@aimee-blue/ab-contracts": "1.198.0",
     "@types/cors": "2.8.7",
     "@types/express": "4.17.8",
-    "@types/node": "10",
+    "@types/node": "12",
     "@types/node-fetch": "2.5.7",
     "@types/uuid": "8.3.0",
-    "@types/ws": "7.2.6",
+    "@types/ws": "7.2.7",
     "@types/wtfnode": "0.7.0",
     "chokidar": "3.4.2",
     "husky": "4.3.0",
     "lint-staged": "10.4.0",
     "rxjs-marbles": "6.0.1",
-    "ts-deps": "0.18.2",
+    "ts-deps": "0.18.3",
     "utility-types": "3.10.0"
   },
   "peerDependencies": {
