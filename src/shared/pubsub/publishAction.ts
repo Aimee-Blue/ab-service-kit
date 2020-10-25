@@ -2,6 +2,7 @@ import {
   ITopicBoundActionCreator,
   IActionCreator,
   Channels,
+  IAnyAction,
 } from '@aimee-blue/ab-contracts';
 import { appName } from '../app';
 import { localNow } from '../time';
@@ -23,7 +24,9 @@ export const multicastAction = async <C extends IActionCreator>(
   return publishActionToTopics(topics, creator, ...args);
 };
 
-const publishActionToTopics = async <C extends IActionCreator>(
+const publishActionToTopics = async <
+  C extends IActionCreator<IAnyAction, unknown[]>
+>(
   topics: string[],
   creator: C,
   ...args: Parameters<C>
@@ -44,7 +47,7 @@ const publishActionToTopics = async <C extends IActionCreator>(
   };
 
   await Promise.all(
-    topics.map(async topic => {
+    topics.map(async (topic) => {
       const message = {
         ...messagePrototype,
         channel: topic,
