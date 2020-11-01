@@ -9,14 +9,18 @@ import { localNow } from '../time';
 import { publish } from './pubsub';
 import { uuid } from '../uuid';
 
-export const publishAction = async <C extends ITopicBoundActionCreator>(
+export const publishAction = async <
+  C extends ITopicBoundActionCreator<IAnyAction, string, unknown[]>
+>(
   creator: C,
   ...args: Parameters<C>
 ) => {
   return publishActionToTopics([creator.topic], creator, ...args);
 };
 
-export const multicastAction = async <C extends IActionCreator>(
+export const multicastAction = async <
+  C extends IActionCreator<IAnyAction, unknown[]>
+>(
   topics: string[],
   creator: C,
   ...args: Parameters<C>
