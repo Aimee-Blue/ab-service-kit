@@ -8042,10 +8042,10 @@ ws@7.3.1, ws@^7.2.3:
   resolved "https://registry.yarnpkg.com/ws/-/ws-7.3.1.tgz#d0547bf67f7ce4f12a72dfe31262c68d7dc551c8"
   integrity sha512-D3RuNkynyHmEJIpD2qrgVkc9DQ23OrN/moAwZX4L8DfvszsJxpjQuUq3LMx6HoYji9fbIOBY18XWBsAux1ZZUA==
 
-wtfnode@0.8.3:
-  version "0.8.3"
-  resolved "https://registry.yarnpkg.com/wtfnode/-/wtfnode-0.8.3.tgz#39c40830555c9eb69e8bc2c57d6be5abe8bf5d0b"
-  integrity sha512-Ll7iH8MbRQTE+QTw20Xax/0PM5VeSVSOhsmoR3+knWuJkEWTV5d9yPO6Sb+IDbt9I4UCrKpvHuF9T9zteRNOuA==
+wtfnode@0.8.4:
+  version "0.8.4"
+  resolved "https://registry.yarnpkg.com/wtfnode/-/wtfnode-0.8.4.tgz#91ecf78a40ce222a73a063f26d72bea52357efcc"
+  integrity sha512-64GEKtMt/MUBuAm+8kHqP74ojjafzu00aT0JKsmkIwYmjRQ/odO0yhbzKLm+Z9v1gMla+8dwITRKzTAlHsB+Og==
 
 xml-name-validator@^3.0.0:
   version "3.0.0"
