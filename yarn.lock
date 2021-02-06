@@ -15,10 +15,10 @@
     node-fetch "2.6.1"
     uuid "8.3.1"
 
-"@aimee-blue/ab-contracts@1.204.2":
-  version "1.204.2"
-  resolved "https://registry.yarnpkg.com/@aimee-blue/ab-contracts/-/ab-contracts-1.204.2.tgz#7013e653d6c8c182c30804cf2e3841cc0c9a032d"
-  integrity sha512-ivcTZmhyZxBWxZWDRkFIaoWnEuxrWm9rbUoZ4grhwsr+SHufQbHawruI95220Sjc31eyQErxl3TPQHkGsi97xQ==
+"@aimee-blue/ab-contracts@2.0.3":
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/@aimee-blue/ab-contracts/-/ab-contracts-2.0.3.tgz#6b8825b80f1a818a5ad7692e289a2adb21a772ac"
+  integrity sha512-ay9sq8Ks/vVLoe8q9AW1ip30YIKnDTm45SnmeEm4YCaCoAEBHOfNaS2oTz/fkFrh8Txg8puBopfU1FSFIfa3DA==
   dependencies:
     deepmerge "4.2.2"
     joi "17.3.0"
